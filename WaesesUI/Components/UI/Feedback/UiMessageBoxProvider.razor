@@ -1,0 +1,167 @@
+@inject IMessageBoxService MessageBoxService
+@inject IJSRuntime JS
+@implements IDisposable
+@namespace WaesesUI
+
+@if (_currentOptions != null)
+{
+    <div class="ui-modal-backdrop"
+         @onclick="HandleBackdropClick"
+         @ref="_backdropRef">
+        <div class="ui-modal-box"
+             style="max-width: 440px;"
+             @onclick:stopPropagation="true"
+             @ref="_modalRef"
+             tabindex="-1"
+             role="alertdialog"
+             aria-modal="true"
+             aria-labelledby="@_titleId"
+             aria-describedby="@_descId">
+
+            <div class="ui-modal-header">
+                <div class="ui-flex-row" style="gap: 0.6rem; align-items: center;">
+                    <UiIcon Icon="@GetIcon(_currentOptions.Type)" Color="@GetIconColor(_currentOptions.Type)" Size="UiSize.Md" />
+                    <span id="@_titleId" class="ui-modal-title">@_currentOptions.Title</span>
+                </div>
+                <button type="button" class="ui-modal-close-btn" aria-label="Fermer" @onclick="() => Close(false)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <div id="@_descId" class="ui-modal-body" style="font-size: 0.925rem; line-height: 1.7;">
+                @_currentOptions.Message
+            </div>
+
+            <div class="ui-modal-footer">
+                @if (_currentOptions.ShowCancel)
+                {
+                    <UiButton Variant="UiButtonVariant.Secondary"
+                              Size="UiSize.Sm"
+                              Text="@_currentOptions.CancelText"
+                              OnClick="() => Close(false)" />
+                }
+                <UiButton Variant="@GetButtonVariant(_currentOptions.Type)"
+                          Size="UiSize.Sm"
+                          Text="@_currentOptions.ConfirmText"
+                          OnClick="() => Close(true)" />
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private MessageBoxOptions? _currentOptions;
+    private TaskCompletionSource<bool>? _tcs;
+    private ElementReference _backdropRef;
+    private ElementReference _modalRef;
+    private DotNetObjectReference<UiMessageBoxProvider>? _dotNetRef;
+    private readonly string _titleId = $"msgbox-title-{Guid.NewGuid():N}";
+    private readonly string _descId = $"msgbox-desc-{Guid.NewGuid():N}";
+
+    protected override void OnInitialized()
+    {
+        MessageBoxService.OnShow += ShowMessageBox;
+    }
+
+    private void ShowMessageBox(MessageBoxOptions options, TaskCompletionSource<bool> tcs)
+    {
+        _currentOptions = options;
+        _tcs = tcs;
+        InvokeAsync(async () =>
+        {
+            StateHasChanged();
+            await Task.Yield(); // let DOM render
+            await SetupInteropAsync();
+        });
+    }
+
+    private async Task SetupInteropAsync()
+    {
+        try
+        {
+            _dotNetRef?.Dispose();
+            _dotNetRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("UiInterop.setupModal", _backdropRef, _dotNetRef);
+            await JS.InvokeVoidAsync("UiInterop.lockBodyScroll");
+        }
+        catch (JSDisconnectedException) { }
+    }
+
+    private async Task TeardownInteropAsync()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("UiInterop.teardownModal", _backdropRef);
+            await JS.InvokeVoidAsync("UiInterop.unlockBodyScroll");
+        }
+        catch (JSDisconnectedException) { }
+
+        _dotNetRef?.Dispose();
+        _dotNetRef = null;
+    }
+
+    [JSInvokable]
+    public async Task OnEscapePressed()
+    {
+        if (_currentOptions?.CloseOnEscape == true)
+        {
+            await CloseAsync(false);
+        }
+    }
+
+    private async Task CloseAsync(bool result)
+    {
+        await TeardownInteropAsync();
+        _tcs?.TrySetResult(result);
+        _currentOptions = null;
+        _tcs = null;
+        StateHasChanged();
+    }
+
+    private void Close(bool result)
+    {
+        _ = CloseAsync(result);
+    }
+
+    private void HandleBackdropClick()
+    {
+        Close(false);
+    }
+
+    public void Dispose()
+    {
+        MessageBoxService.OnShow -= ShowMessageBox;
+        _dotNetRef?.Dispose();
+    }
+
+    private string GetIcon(MessageBoxType type) => type switch
+    {
+        MessageBoxType.Success => Icons.Material.Filled.CheckCircle,
+        MessageBoxType.Danger => Icons.Material.Filled.Error,
+        MessageBoxType.Warning => Icons.Material.Filled.Warning,
+        MessageBoxType.Info => Icons.Material.Filled.Info,
+        MessageBoxType.Confirm => Icons.Material.Filled.Help,
+        _ => Icons.Material.Filled.Info
+    };
+
+    private UiColor GetIconColor(MessageBoxType type) => type switch
+    {
+        MessageBoxType.Success => UiColor.Success,
+        MessageBoxType.Danger => UiColor.Danger,
+        MessageBoxType.Warning => UiColor.Warning,
+        MessageBoxType.Info => UiColor.Info,
+        MessageBoxType.Confirm => UiColor.Primary,
+        _ => UiColor.Primary
+    };
+
+    private UiButtonVariant GetButtonVariant(MessageBoxType type) => type switch
+    {
+        MessageBoxType.Danger => UiButtonVariant.Danger,
+        MessageBoxType.Success => UiButtonVariant.Success,
+        MessageBoxType.Warning => UiButtonVariant.Warning,
+        _ => UiButtonVariant.Primary
+    };
+}

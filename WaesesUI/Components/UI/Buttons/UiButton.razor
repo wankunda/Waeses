@@ -1,0 +1,82 @@
+@namespace WaesesUI
+
+@if (string.IsNullOrEmpty(Href))
+{
+    <button type="@Type"
+            class="ui-btn ui-btn-@Variant.ToString().ToLower() ui-btn-@Size.ToString().ToLower() @Class"
+            disabled="@(Disabled || Loading)"
+            @onclick="OnClick"
+            @attributes="AdditionalAttributes">
+        @if (Loading)
+        {
+            <span class="ui-spinner ui-spinner-sm" style="margin-right: 0.25rem;"></span>
+        }
+        @if (!string.IsNullOrEmpty(Icon) && !Loading)
+        {
+            @if (Icon.TrimStart().StartsWith("<"))
+            {
+                <UiIcon Icon="@Icon" Size="@(Size == UiSize.Sm ? UiSize.Sm : (Size == UiSize.Lg ? UiSize.Lg : UiSize.Md))" />
+            }
+            else
+            {
+                <span class="ui-btn-icon">@Icon</span>
+            }
+        }
+        @if (ChildContent != null)
+        {
+            @ChildContent
+        }
+        else if (!string.IsNullOrEmpty(Text))
+        {
+            <span>@Text</span>
+        }
+    </button>
+}
+else
+{
+    <a href="@Href"
+       target="@Target"
+       class="ui-btn ui-btn-@Variant.ToString().ToLower() ui-btn-@Size.ToString().ToLower() @Class"
+       disabled="@(Disabled || Loading)"
+       @attributes="AdditionalAttributes">
+        @if (Loading)
+        {
+            <span class="ui-spinner ui-spinner-sm" style="margin-right: 0.25rem;"></span>
+        }
+        @if (!string.IsNullOrEmpty(Icon) && !Loading)
+        {
+            @if (Icon.TrimStart().StartsWith("<"))
+            {
+                <UiIcon Icon="@Icon" Size="@(Size == UiSize.Sm ? UiSize.Sm : (Size == UiSize.Lg ? UiSize.Lg : UiSize.Md))" />
+            }
+            else
+            {
+                <span class="ui-btn-icon">@Icon</span>
+            }
+        }
+        @if (ChildContent != null)
+        {
+            @ChildContent
+        }
+        else if (!string.IsNullOrEmpty(Text))
+        {
+            <span>@Text</span>
+        }
+    </a>
+}
+
+@code {
+    [Parameter] public string? Text { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public UiButtonVariant Variant { get; set; } = UiButtonVariant.Primary;
+    [Parameter] public UiSize Size { get; set; } = UiSize.Md;
+    [Parameter] public string Type { get; set; } = "button";
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public bool Loading { get; set; }
+    [Parameter] public string? Icon { get; set; }
+    [Parameter] public string? Href { get; set; }
+    [Parameter] public string? Target { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+}

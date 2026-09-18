@@ -1,0 +1,67 @@
+@namespace WaesesUI
+
+<div class="ui-image-wrapper @GetRatioClass() @(Circle ? "ui-image-circle" : (Rounded ? "ui-image-rounded" : "")) @(HoverZoom ? "ui-image-hover-zoom" : "") @Class"
+     style="@Style"
+     @attributes="AdditionalAttributes">
+    
+    @if (_isLoading)
+    {
+        <div class="ui-image-skeleton"></div>
+    }
+
+    <img class="ui-image"
+         src="@(_hasError ? FallbackSrc : Src)"
+         alt="@Alt"
+         loading="@(Lazy ? "lazy" : "eager")"
+         style="@(_isLoading ? "display: none;" : "")"
+         @onload="HandleLoaded"
+         @onerror="HandleError" />
+
+    @if (!string.IsNullOrEmpty(Caption))
+    {
+        <div class="ui-image-caption">
+            @Caption
+        </div>
+    }
+</div>
+
+@code {
+    private bool _isLoading = true;
+    private bool _hasError;
+
+    [Parameter] public string? Src { get; set; }
+    [Parameter] public string? Alt { get; set; } = "Image";
+    [Parameter] public string? Caption { get; set; }
+    [Parameter] public ImageRatio Ratio { get; set; } = ImageRatio.Auto;
+    [Parameter] public bool Rounded { get; set; } = true;
+    [Parameter] public bool Circle { get; set; }
+    [Parameter] public bool HoverZoom { get; set; } = true;
+    [Parameter] public bool Lazy { get; set; } = true;
+    [Parameter] public string? FallbackSrc { get; set; }
+    [Parameter] public string? Style { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private void HandleLoaded()
+    {
+        _isLoading = false;
+    }
+
+    private void HandleError()
+    {
+        _isLoading = false;
+        if (!_hasError && !string.IsNullOrEmpty(FallbackSrc))
+        {
+            _hasError = true;
+        }
+    }
+
+    private string GetRatioClass() => Ratio switch
+    {
+        ImageRatio.Square => "ui-image-ratio-1-1",
+        ImageRatio.Widescreen => "ui-image-ratio-16-9",
+        ImageRatio.Standard => "ui-image-ratio-4-3",
+        ImageRatio.Photo => "ui-image-ratio-3-2",
+        _ => string.Empty
+    };
+}

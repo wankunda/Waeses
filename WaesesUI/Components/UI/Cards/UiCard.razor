@@ -1,0 +1,59 @@
+@namespace WaesesUI
+
+<div class="ui-card @(Hoverable ? "ui-card-hoverable" : "") @(Glass ? "ui-card-glass" : "") @Class" @attributes="AdditionalAttributes">
+    @if (Header != null || !string.IsNullOrEmpty(Title) || !string.IsNullOrEmpty(Subtitle))
+    {
+        <div class="ui-card-header">
+            @if (Header != null)
+            {
+                @Header
+            }
+            else
+            {
+                <div>
+                    @if (!string.IsNullOrEmpty(Title))
+                    {
+                        <div class="ui-card-title">@Title</div>
+                    }
+                    @if (!string.IsNullOrEmpty(Subtitle))
+                    {
+                        <div class="ui-card-subtitle">@Subtitle</div>
+                    }
+                </div>
+                @if (HeaderActions != null)
+                {
+                    <div class="ui-flex-row">
+                        @HeaderActions
+                    </div>
+                }
+            }
+        </div>
+    }
+
+    @if (ChildContent != null)
+    {
+        <div class="ui-card-body">
+            @ChildContent
+        </div>
+    }
+
+    @if (Footer != null)
+    {
+        <div class="ui-card-footer">
+            @Footer
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? Subtitle { get; set; }
+    [Parameter] public RenderFragment? Header { get; set; }
+    [Parameter] public RenderFragment? HeaderActions { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public RenderFragment? Footer { get; set; }
+    [Parameter] public bool Hoverable { get; set; }
+    [Parameter] public bool Glass { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+}

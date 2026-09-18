@@ -1,0 +1,25 @@
+@namespace WaesesUI
+
+<span class="ui-badge ui-badge-@Color.ToString().ToLower() @Class" @attributes="AdditionalAttributes">
+    @if (Dot)
+    {
+        <span class="ui-badge-dot"></span>
+    }
+    @if (ChildContent != null)
+    {
+        @ChildContent
+    }
+    else if (!string.IsNullOrEmpty(Text))
+    {
+        @Text
+    }
+</span>
+
+@code {
+    [Parameter] public string? Text { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public UiColor Color { get; set; } = UiColor.Primary;
+    [Parameter] public bool Dot { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+}

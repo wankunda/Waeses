@@ -1,0 +1,85 @@
+@page "/formulaires"
+@rendermode InteractiveServer
+
+<PageTitle>Formulaires · WaesesUI</PageTitle>
+
+<DemoPageHeader Eyebrow="02 · Formulaires" Title="Guider la saisie sans la surcharger" Description="Les champs se branchent sur EditForm, la validation DataAnnotations et les événements Blazor habituels." />
+
+<EditForm Model="_model" OnValidSubmit="HandleSubmit">
+    <DataAnnotationsValidator />
+    <section class="ui-grid ui-grid-cols-2">
+        <UiCard Title="Profil de démonstration" Subtitle="Un formulaire typique, avec validation native">
+            <div class="ui-grid ui-grid-cols-2">
+                <UiInput Label="Nom complet" @bind-Value="_model.Name" Placeholder="Ex. Alice Martin" Required="true" Clearable="true" />
+                <UiInput Label="Adresse e-mail" Type="email" @bind-Value="_model.Email" Placeholder="alice@exemple.fr" Required="true" />
+                <UiInput TValue="decimal" Label="Budget mensuel" Type="number" @bind-Value="_model.Budget" Min="0" Max="100000" Step="0.01" SuffixIcon="€" HelperText="Les valeurs numériques sont converties vers le type lié." />
+                <UiSelect TValue="string" Label="Équipe" @bind-Value="_model.Team" Required="true" Placeholder="Choisir une équipe">
+                    <option value="Produit">Produit</option>
+                    <option value="Design">Design</option>
+                    <option value="Ingénierie">Ingénierie</option>
+                </UiSelect>
+                <UiDateTimePicker Label="Disponibilité" Mode="UiDateTimeMode.Date" @bind-Value="_model.AvailableOn" />
+            </div>
+            <ValidationSummary />
+            <div class="ui-flex-row mt-md">
+                <UiButton Text="Valider le formulaire" Type="submit" />
+                <span class="text-secondary">Les erreurs apparaissent après soumission.</span>
+            </div>
+        </UiCard>
+
+        <UiCard Title="Contrôles spécialisés" Subtitle="Pour les préférences et les valeurs continues">
+            <div class="ui-flex-col">
+                <UiSwitch Label="Recevoir les nouveautés" @bind-Value="_model.Newsletter" />
+                <UiCheckbox Label="J'accepte les conditions de démonstration" @bind-Value="_model.Accepted" />
+                <UiSlider Label="Niveau de détail" @bind-Value="_model.DetailLevel" Min="0" Max="100" Step="10" ShowValue="true" />
+                <UiRadioGroup TValue="string" Label="Canal préféré" @bind-Value="_model.Channel">
+                    <UiRadioOption TValue="string" Value="@("Email")" Label="E-mail" />
+                    <UiRadioOption TValue="string" Value="@("Teams")" Label="Teams" />
+                </UiRadioGroup>
+            </div>
+        </UiCard>
+    </section>
+</EditForm>
+
+<section class="ui-grid ui-grid-cols-2 mt-sm">
+    <UiCard Title="Recherche assistée" Subtitle="Autocomplete typé">
+        <UiAutocomplete TItem="DemoCity" TValue="string" Label="Ville" Items="_cities" @bind-Value="_model.City" DisplaySelector="city => city.Name" ValueSelector="city => city.Code" Placeholder="Rechercher une ville" />
+        <p class="text-secondary">La liste peut être remplacée par un `SearchFunc` asynchrone.</p>
+    </UiCard>
+    <UiCard Title="Import de fichiers" Subtitle="Dropzone ou bouton classique">
+        <UiInputFile Label="Pièces jointes" HelperText="PNG, JPG ou PDF · 10 Mo maximum" Accept=".png,.jpg,.pdf" Multiple="true" FilesChanged="HandleFiles" />
+        @if (_fileCount > 0)
+        {
+            <UiAlert Message="@($"{_fileCount} fichier(s) sélectionné(s).")" Color="UiColor.Success" ShowIcon="true" />
+        }
+    </UiCard>
+</section>
+
+@code {
+    private readonly DemoFormModel _model = new() { AvailableOn = DateTime.Today.AddDays(7), Team = "Produit", Channel = "Email", City = "PAR" };
+    private readonly IReadOnlyList<DemoCity> _cities = new[]
+    {
+        new DemoCity("Paris", "PAR"), new DemoCity("Lyon", "LYO"), new DemoCity("Lille", "LIL"), new DemoCity("Marseille", "MRS")
+    };
+    private int _fileCount;
+
+    private void HandleSubmit() { }
+
+    private void HandleFiles(IReadOnlyList<IBrowserFile> files) => _fileCount = files.Count;
+
+    private sealed record DemoCity(string Name, string Code);
+
+    private sealed class DemoFormModel
+    {
+        [Required(ErrorMessage = "Le nom est obligatoire.")] public string Name { get; set; } = string.Empty;
+        [Required(ErrorMessage = "L'e-mail est obligatoire."), EmailAddress(ErrorMessage = "L'e-mail n'est pas valide.")] public string Email { get; set; } = string.Empty;
+        public decimal Budget { get; set; } = 2500;
+        [Required(ErrorMessage = "Choisissez une équipe.")] public string Team { get; set; } = string.Empty;
+        public DateTime? AvailableOn { get; set; }
+        public bool Newsletter { get; set; } = true;
+        public bool Accepted { get; set; }
+        public double DetailLevel { get; set; } = 50;
+        public string Channel { get; set; } = string.Empty;
+        public string City { get; set; } = string.Empty;
+    }
+}

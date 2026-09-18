@@ -1,0 +1,34 @@
+﻿@namespace WaesesUI
+
+@if (Disabled)
+{
+    <div class="nav-item px-3 nav-item-disabled" aria-disabled="true">
+        <span class="nav-link">
+            @if (!string.IsNullOrEmpty(Icon))
+            {
+                <UiIcon Icon="@Icon" Size="UiSize.Sm" />
+            }
+            <span>@Text</span>
+        </span>
+    </div>
+}
+else
+{
+    <div class="nav-item px-3">
+        <NavLink class="nav-link" href="@Href" Match="@Match">
+            @if (!string.IsNullOrEmpty(Icon))
+            {
+                <UiIcon Icon="@Icon" Size="UiSize.Sm" />
+            }
+            <span>@Text</span>
+        </NavLink>
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired] public string Text { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Href { get; set; } = string.Empty;
+    [Parameter] public string? Icon { get; set; }
+    [Parameter] public NavLinkMatch Match { get; set; } = NavLinkMatch.Prefix;
+    [Parameter] public bool Disabled { get; set; }
+}

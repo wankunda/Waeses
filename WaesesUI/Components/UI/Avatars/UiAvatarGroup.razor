@@ -1,0 +1,18 @@
+@namespace WaesesUI
+
+<div class="ui-avatar-group @Class" @attributes="AdditionalAttributes">
+    @ChildContent
+    @if (ExtraCount > 0)
+    {
+        <div class="ui-avatar ui-avatar-md ui-avatar-circle" style="background: var(--bg-surface-secondary); color: var(--text-main); font-size: 0.8rem;">
+            +@ExtraCount
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public int ExtraCount { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+}

@@ -1,0 +1,71 @@
+@namespace WaesesUI
+
+<CascadingValue Value="this" IsFixed="true">
+    <div class="ui-tabs @Class" @attributes="AdditionalAttributes">
+        <div class="ui-tab-nav">
+            @foreach (var panel in _panels)
+            {
+                <button type="button"
+                        class="ui-tab-btn @(panel == _activePanel ? "active" : "")"
+                        disabled="@panel.Disabled"
+                        @onclick="() => SelectPanel(panel)">
+                    @if (!string.IsNullOrEmpty(panel.Icon))
+                    {
+                        <span>@panel.Icon</span>
+                    }
+                    <span>@panel.Title</span>
+                    @if (!string.IsNullOrEmpty(panel.Badge))
+                    {
+                        <span class="ui-badge ui-badge-primary" style="font-size: 0.65rem; padding: 0.15rem 0.4rem;">@panel.Badge</span>
+                    }
+                </button>
+            }
+        </div>
+        <div class="ui-tab-content">
+            @ChildContent
+        </div>
+    </div>
+</CascadingValue>
+
+@code {
+    private readonly List<UiTabPanel> _panels = new();
+    private UiTabPanel? _activePanel;
+
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter] public EventCallback<int> OnTabChanged { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    public void AddPanel(UiTabPanel panel)
+    {
+        if (!_panels.Contains(panel))
+        {
+            _panels.Add(panel);
+            if (_activePanel == null || _panels.Count == 1)
+            {
+                _activePanel = panel;
+            }
+            StateHasChanged();
+        }
+    }
+
+    public void RemovePanel(UiTabPanel panel)
+    {
+        _panels.Remove(panel);
+        if (_activePanel == panel)
+        {
+            _activePanel = _panels.FirstOrDefault();
+        }
+        StateHasChanged();
+    }
+
+    public async Task SelectPanel(UiTabPanel panel)
+    {
+        if (panel.Disabled) return;
+        _activePanel = panel;
+        StateHasChanged();
+        await OnTabChanged.InvokeAsync(_panels.IndexOf(panel));
+    }
+
+    public bool IsActive(UiTabPanel panel) => _activePanel == panel;
+}

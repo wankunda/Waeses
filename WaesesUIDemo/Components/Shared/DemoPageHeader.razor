@@ -1,0 +1,11 @@
+<header class="ui-container">
+    <span class="text-primary fw-bold">@Eyebrow</span>
+    <h1>@Title</h1>
+    <p class="text-secondary">@Description</p>
+</header>
+
+@code {
+    [Parameter, EditorRequired] public string Eyebrow { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Description { get; set; } = string.Empty;
+}

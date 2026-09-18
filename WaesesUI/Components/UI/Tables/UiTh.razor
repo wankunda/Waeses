@@ -1,0 +1,59 @@
+@namespace WaesesUI
+@typeparam TItem
+
+<th class="@(IsSortable ? "ui-th-sortable" : "") @(IsSorted ? "ui-th-sorted" : "") @Class"
+    style="text-align: @Align; @Style"
+    @onclick="HandleClick"
+    @attributes="AdditionalAttributes">
+    <div class="ui-th-content" style="@(Align == "right" ? "justify-content: flex-end;" : (Align == "center" ? "justify-content: center;" : ""))">
+        @if (ChildContent != null)
+        {
+            @ChildContent
+        }
+        else
+        {
+            <span>@Title</span>
+        }
+
+        @if (IsSortable)
+        {
+            <span class="ui-th-sort-icon">
+                @if (IsSorted)
+                {
+                    @(IsAscending ? "▲" : "▼")
+                }
+                else
+                {
+                    <span>⇅</span>
+                }
+            </span>
+        }
+    </div>
+</th>
+
+@code {
+    [CascadingParameter] public UiTable<TItem>? Table { get; set; }
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public Func<TItem, object>? SortBy { get; set; }
+    [Parameter] public string? SortKey { get; set; }
+    [Parameter] public bool Sortable { get; set; } = true;
+    [Parameter] public string Align { get; set; } = "left";
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string? Style { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private bool IsSortable => Sortable && (SortBy != null || !string.IsNullOrEmpty(SortKey));
+    private bool IsSorted => Table != null && ((SortBy != null && Table.CurrentSortSelector == SortBy) || (!string.IsNullOrEmpty(SortKey) && Table.CurrentSortKey == SortKey));
+    private bool IsAscending => Table?.IsSortAscending ?? true;
+
+    private async Task HandleClick()
+    {
+        if (!IsSortable || Table == null) return;
+
+        if (SortBy != null)
+        {
+            await Table.SetSortAsync(SortBy, SortKey);
+        }
+    }
+}

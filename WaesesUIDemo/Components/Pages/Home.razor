@@ -1,0 +1,47 @@
+﻿@page "/"
+@rendermode InteractiveServer
+
+<PageTitle>WaesesUI · Démonstration</PageTitle>
+
+<div class="ui-container">
+<section class="ui-grid ui-grid-cols-2">
+	<div>
+		<span class="text-primary fw-bold">Razor component library · .NET 10</span>
+		<h1>Construire des interfaces nettes, composant par composant.</h1>
+		<p class="text-secondary">Un catalogue vivant des contrôles WaesesUI, avec des exemples lisibles, interactifs et directement transposables dans vos applications Blazor.</p>
+		<div class="ui-flex-row mt-md">
+			<UiButton Text="Explorer les fondations" Href="/fondations" Icon="→" Size="UiSize.Lg" />
+			<UiButton Text="Voir les formulaires" Href="/formulaires" Variant="UiButtonVariant.Outline" Size="UiSize.Lg" />
+		</div>
+	</div>
+	<div class="ui-card">
+		<div class="ui-card-header"><strong>Ce que vous trouverez</strong></div>
+		<div class="ui-card-body ui-flex-col">
+			<span><strong class="text-primary">20+</strong> composants prêts à l'emploi</span>
+			<span><strong class="text-primary">3</strong> scénarios fonctionnels</span>
+			<span><strong class="text-primary">100%</strong> référence locale</span>
+		</div>
+	</div>
+</section>
+
+<section class="mt-lg">
+	<div class="d-flex justify-space-between align-center">
+		<div><span class="text-primary fw-bold">Parcours recommandé</span><h2>Apprendre par intention</h2></div>
+		<span class="text-secondary">Chaque page isole une famille de composants.</span>
+	</div>
+	<div class="ui-grid ui-grid-cols-3">
+		<UiCard Title="01 · Fondations" Subtitle="Les briques visuelles et feedback" Hoverable="true">
+			<p>Buttons, badges, avatars, alertes, onglets et accordéons pour composer une interface expressive.</p>
+			<a class="text-primary" href="/fondations">Ouvrir la page →</a>
+		</UiCard>
+		<UiCard Title="02 · Formulaires" Subtitle="Des saisies guidées et accessibles" Hoverable="true">
+			<p>Validation, sélecteurs, interrupteurs, curseurs, date/heure et upload de fichiers.</p>
+			<a class="text-primary" href="/formulaires">Ouvrir la page →</a>
+		</UiCard>
+		<UiCard Title="03 · Données" Subtitle="Présenter, filtrer et suivre" Hoverable="true">
+			<p>Table triable et paginée, progression, images et interactions de confirmation.</p>
+			<a class="text-primary" href="/donnees">Ouvrir la page →</a>
+		</UiCard>
+	</div>
+</section>
+</div>

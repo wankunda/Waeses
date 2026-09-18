@@ -1,0 +1,53 @@
+﻿@namespace WaesesUI
+
+<CascadingValue Value="this">
+    @ChildContent
+</CascadingValue>
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; } = default!;
+    [Parameter] public UserSession? Session { get; set; }
+
+    public UserSession CurrentSession { get; private set; } = new();
+
+    protected override void OnInitialized()
+    {
+        if (Session != null && Session.ExpireIn > DateTime.Now.AddMinutes(1))
+        {
+            CurrentSession = new UserSession
+            {
+                Email = Session.Email,
+                Roles = Session.Roles,
+                ExpireIn = Session.ExpireIn,
+                RefreshToken = Session.RefreshToken,
+                Token = Session.Token
+            };
+        }
+    }
+
+    public void Login(UserSession session)
+    {
+        CurrentSession = new UserSession
+        {
+            Email = session.Email,
+            ExpireIn = session.ExpireIn,
+            Token = session.Token,
+            RefreshToken = session.RefreshToken,
+            Roles = session.Roles
+        };
+
+        SecureSessionHelper.SaveSession(session);
+
+        StateHasChanged();
+    }
+
+    public void Logout()
+    {
+        CurrentSession = new UserSession();
+        SecureSessionHelper.ClearSession();
+        StateHasChanged();
+    }
+
+    public bool IsInRole(string role) => CurrentSession.IsInRole(role);
+}

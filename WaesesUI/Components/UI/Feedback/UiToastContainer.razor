@@ -1,0 +1,45 @@
+@inject IToastService ToastService
+@implements IDisposable
+@namespace WaesesUI
+
+@{
+    var grouped = ToastService.Toasts.GroupBy(t => t.Position);
+}
+
+@foreach (var group in grouped)
+{
+    <div class="ui-toast-container @GetPositionClass(group.Key)">
+        @foreach (var toast in group)
+        {
+            <UiToastItem @key="toast.Id" Toast="@toast" OnDismiss="ToastService.RemoveToast" />
+        }
+    </div>
+}
+
+@code {
+    protected override void OnInitialized()
+    {
+        ToastService.OnChange += HandleStateChanged;
+    }
+
+    private void HandleStateChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        ToastService.OnChange -= HandleStateChanged;
+    }
+
+    private string GetPositionClass(ToastPosition pos) => pos switch
+    {
+        ToastPosition.TopRight => "ui-toast-topright",
+        ToastPosition.TopLeft => "ui-toast-topleft",
+        ToastPosition.BottomRight => "ui-toast-bottomright",
+        ToastPosition.BottomLeft => "ui-toast-bottomleft",
+        ToastPosition.TopCenter => "ui-toast-topcenter",
+        ToastPosition.BottomCenter => "ui-toast-bottomcenter",
+        _ => "ui-toast-bottomright"
+    };
+}

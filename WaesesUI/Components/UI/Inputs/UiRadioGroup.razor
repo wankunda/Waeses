@@ -1,0 +1,29 @@
+@namespace WaesesUI
+@typeparam TValue
+
+<CascadingValue Value="this" IsFixed="true">
+    <div class="ui-flex-col @Class" @attributes="AdditionalAttributes">
+        @if (!string.IsNullOrEmpty(Label))
+        {
+            <label class="ui-label">@Label</label>
+        }
+        <div class="ui-flex-row">
+            @ChildContent
+        </div>
+    </div>
+</CascadingValue>
+
+@code {
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public TValue? Value { get; set; }
+    [Parameter] public EventCallback<TValue?> ValueChanged { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    public async Task SelectValueAsync(TValue? val)
+    {
+        Value = val;
+        await ValueChanged.InvokeAsync(Value);
+    }
+}

@@ -1,0 +1,61 @@
+﻿@namespace WaesesUI
+
+@code {
+    [CascadingParameter]
+    public UiAuthState AuthState { get; set; } = default!;
+
+    // Liste de rôles séparés par des virgules (ex: "Admin, Manager")
+    [Parameter]
+    public string? Roles { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? Authorized { get; set; }
+
+    [Parameter]
+    public RenderFragment? NotAuthorized { get; set; }
+
+    private bool IsAuthorized()
+    {
+        if (AuthState == null)
+            return false;
+        if (AuthState.CurrentSession == null)
+            return false;
+        if (AuthState.CurrentSession.ExpireIn < DateTime.Now)
+            return false;
+        if (AuthState?.CurrentSession?.IsAuthenticated != true)
+            return false;
+        if (string.IsNullOrWhiteSpace(Roles))
+            return false;
+
+        var requiredRoles = Roles.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        foreach (var role in requiredRoles)
+        {
+            if (AuthState.IsInRole(role))
+                return true;
+        }
+
+        return false;
+    }
+}
+
+@if (IsAuthorized())
+{
+    @if (Authorized != null)
+    {
+        @Authorized
+    }
+    else
+    {
+        @ChildContent
+    }
+}
+else
+{
+    @if (NotAuthorized != null)
+    {
+        @NotAuthorized
+    }
+}

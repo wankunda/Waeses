@@ -1,0 +1,46 @@
+@namespace WaesesUI
+
+<div class="ui-progress-container @Class" @attributes="AdditionalAttributes">
+    @if (!string.IsNullOrEmpty(Label) || ShowValue)
+    {
+        <div class="ui-progress-header">
+            @if (!string.IsNullOrEmpty(Label))
+            {
+                <span>@Label</span>
+            }
+            @if (ShowValue)
+            {
+                <span>@Math.Round(ClampedValue, 1)%</span>
+            }
+        </div>
+    }
+
+    <div class="ui-progress-track ui-progress-track-@Size.ToString().ToLower() @(Striped ? "ui-progress-striped" : "") @(Animated ? "ui-progress-animated" : "")">
+        <div class="ui-progress-fill ui-progress-fill-@Color.ToString().ToLower()"
+             style="width: @ClampedValue.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)%;">
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public double Value { get; set; }
+    [Parameter] public double Max { get; set; } = 100;
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public bool ShowValue { get; set; } = true;
+    [Parameter] public UiColor Color { get; set; } = UiColor.Primary;
+    [Parameter] public UiSize Size { get; set; } = UiSize.Md;
+    [Parameter] public bool Striped { get; set; }
+    [Parameter] public bool Animated { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private double ClampedValue
+    {
+        get
+        {
+            if (Max <= 0) return 0;
+            var pct = (Value / Max) * 100;
+            return Math.Clamp(pct, 0, 100);
+        }
+    }
+}

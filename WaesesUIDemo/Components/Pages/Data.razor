@@ -1,0 +1,61 @@
+@page "/donnees"
+@rendermode InteractiveServer
+@inject IMessageBoxService MessageBoxService
+@inject IToastService ToastService
+
+<PageTitle>Données · WaesesUI</PageTitle>
+
+<DemoPageHeader Eyebrow="03 · Données" Title="Rendre les informations actionnables" Description="Une table enrichie de recherche, tri, pagination et sélection, accompagnée de composants de progression et de média." />
+
+<UiCard Title="Membres de l'équipe" Subtitle="Recherche, tri et pagination intégrés">
+    <UiTable TItem="DemoMember" Items="_members" ShowSearch="true" SearchPlaceholder="Rechercher un membre..." Paginated="true" PageSize="4" Striped="true" Hoverable="true" OnRowClick="OpenMember">
+        <HeaderContent>
+            <UiTh TItem="DemoMember" Title="Membre" SortBy="member => member.Name" />
+            <UiTh TItem="DemoMember" Title="Rôle" SortBy="member => member.Role" />
+            <UiTh TItem="DemoMember" Title="Statut" Sortable="false" />
+            <UiTh TItem="DemoMember" Title="Activité" Align="right" SortBy="member => member.Activity" />
+        </HeaderContent>
+        <RowTemplate Context="member">
+            <td><div class="ui-flex-row"><UiAvatar Initials="@member.Initials" Size="UiSize.Sm" BackgroundColor="@member.Color" /><span>@member.Name</span></div></td>
+            <td>@member.Role</td>
+            <td><UiBadge Text="@member.Status" Color="@(member.Status == "Actif" ? UiColor.Success : UiColor.Neutral)" /></td>
+            <td class="text-right">@member.Activity%</td>
+        </RowTemplate>
+    </UiTable>
+</UiCard>
+
+<section class="ui-grid ui-grid-cols-2 mt-sm">
+    <UiCard Title="Progression" Subtitle="Suivre une opération longue">
+        <div class="ui-flex-col">
+            <div><div class="d-flex justify-space-between"><span>Migration des données</span><strong class="text-info">72%</strong></div><UiProgress Value="72" Color="UiColor.Info" /></div>
+            <div><div class="d-flex justify-space-between"><span>Indexation</span><strong class="text-warning">46%</strong></div><UiProgress Value="46" Color="UiColor.Warning" /></div>
+            <div><div class="d-flex justify-space-between"><span>Publication</span><strong class="text-success">100%</strong></div><UiProgress Value="100" Color="UiColor.Success" /></div>
+        </div>
+        <UiProgressCircle Value="72" Label="72%" Color="UiColor.Info" />
+    </UiCard>
+    <UiCard Title="Média et actions" Subtitle="Image avec fallback, puis confirmation">
+        <UiImage Src="https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=900&q=80" Alt="Espace de travail lumineux" Caption="Un média avec ratio et légende." Ratio="ImageRatio.Widescreen" FallbackSrc="https://placehold.co/900x500/e8eef2/173f5f?text=WaesesUI" />
+        <div class="ui-flex-row mt-md"><UiButton Text="Archiver le projet" Variant="UiButtonVariant.Danger" OnClick="ArchiveProject" /><span class="text-secondary">OnRowClick ouvre aussi une boîte de dialogue.</span></div>
+    </UiCard>
+</section>
+
+@code {
+    private readonly IReadOnlyList<DemoMember> _members = new[]
+    {
+        new DemoMember("Alice Martin", "AM", "Produit", "Actif", 92, "#173f5f"), new DemoMember("Benoît Roy", "BR", "Design", "Actif", 78, "#ed553b"),
+        new DemoMember("Chloé Petit", "CP", "Ingénierie", "Absent", 64, "#20639b"), new DemoMember("David Nguyen", "DN", "Produit", "Actif", 88, "#3caea3"),
+        new DemoMember("Élodie Caron", "EC", "Support", "Actif", 57, "#f6d55c"), new DemoMember("Farid Saïd", "FS", "Ingénierie", "Actif", 81, "#8c6bb1")
+    };
+
+    private async Task OpenMember(DemoMember member) => await MessageBoxService.ShowAlertAsync(member.Name, $"{member.Role} · activité à {member.Activity}%.", MessageBoxType.Info);
+
+    private async Task ArchiveProject()
+    {
+        if (await MessageBoxService.ShowAsync("Archiver le projet ?", "Cette action est réversible dans cet exemple.", MessageBoxType.Confirm, "Archiver"))
+        {
+            ToastService.ShowToast("Projet archivé.", ToastType.Success);
+        }
+    }
+
+    private sealed record DemoMember(string Name, string Initials, string Role, string Status, int Activity, string Color);
+}

@@ -1,0 +1,26 @@
+﻿@inherits LayoutComponentBase
+
+<UiLayout BrandText="WaesesUI" BrandIcon="👽" VersionText="Demo" MainBody="@Body">
+    <NavMenu>
+        <UiNavMenu BrandText="WaesesUI" BrandHref="/" NavigationItems="@NavigationItems" />
+    </NavMenu>
+</UiLayout>
+
+<UiToastContainer />
+<UiMessageBoxProvider />
+
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">🗙</span>
+</div>
+
+@code {
+    private static readonly IReadOnlyList<NavigationItem> NavigationItems =
+    [
+        new() { Text = "Accueil", Href = "/", Match = NavLinkMatch.All },
+        new() { Text = "Fondations", Href = "/fondations" },
+        new() { Text = "Formulaires", Href = "/formulaires" },
+        new() { Text = "Données", Href = "/donnees" }
+    ];
+}

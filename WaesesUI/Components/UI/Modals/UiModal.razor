@@ -1,0 +1,186 @@
+@namespace WaesesUI
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+@if (IsOpen)
+{
+    <div class="ui-modal-backdrop"
+         @onclick="HandleBackdropClick"
+         @ref="_backdropRef">
+        <div class="ui-modal-box @SizeClass @Class"
+             style="@GetModalWidthStyle()"
+             @onclick:stopPropagation="true"
+             @ref="_modalRef"
+             tabindex="-1"
+             role="dialog"
+             aria-modal="true"
+             aria-labelledby="@_titleId"
+             @attributes="AdditionalAttributes">
+
+            @if (Header != null || !string.IsNullOrEmpty(Title) || ShowCloseButton)
+            {
+                <div class="ui-modal-header">
+                    @if (Header != null)
+                    {
+                        @Header
+                    }
+                    else
+                    {
+                        <div id="@_titleId" class="ui-modal-title">@Title</div>
+                    }
+
+                    @if (ShowCloseButton)
+                    {
+                        <button type="button"
+                                class="ui-modal-close-btn"
+                                aria-label="Fermer"
+                                @onclick="CloseAsync">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    }
+                </div>
+            }
+
+            <div class="ui-modal-body">
+                @ChildContent
+            </div>
+
+            @if (Footer != null)
+            {
+                <div class="ui-modal-footer">
+                    @Footer
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    private ElementReference _modalRef;
+    private ElementReference _backdropRef;
+    private DotNetObjectReference<UiModal>? _dotNetRef;
+    private readonly string _titleId = $"modal-title-{Guid.NewGuid():N}";
+    private bool _isSetUp;
+
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public RenderFragment? Header { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public RenderFragment? Footer { get; set; }
+    [Parameter] public UiSize Size { get; set; } = UiSize.Md;
+    [Parameter] public bool CloseOnBackdropClick { get; set; } = true;
+    [Parameter] public bool CloseOnEscape { get; set; } = true;
+    [Parameter] public bool FocusTrap { get; set; } = true;
+    [Parameter] public bool LockScroll { get; set; } = true;
+    [Parameter] public bool ShowCloseButton { get; set; } = true;
+    [Parameter] public EventCallback OnClosed { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string SizeClass => Size switch
+    {
+        UiSize.Sm => "ui-modal-sm",
+        UiSize.Lg => "ui-modal-lg",
+        UiSize.Xl => "ui-modal-xl",
+        _ => ""
+    };
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (IsOpen && !_isSetUp)
+        {
+            _isSetUp = true;
+            _dotNetRef = DotNetObjectReference.Create(this);
+
+            try
+            {
+                if (FocusTrap || CloseOnEscape)
+                {
+                    await JS.InvokeVoidAsync("UiInterop.setupModal", _backdropRef, _dotNetRef);
+                }
+                if (LockScroll)
+                {
+                    await JS.InvokeVoidAsync("UiInterop.lockBodyScroll");
+                }
+            }
+            catch (JSDisconnectedException) { }
+        }
+        else if (!IsOpen && _isSetUp)
+        {
+            await TeardownAsync();
+        }
+    }
+
+    [JSInvokable]
+    public async Task OnEscapePressed()
+    {
+        if (CloseOnEscape)
+        {
+            await CloseAsync();
+        }
+    }
+
+    private async Task HandleBackdropClick()
+    {
+        if (CloseOnBackdropClick)
+        {
+            await CloseAsync();
+        }
+    }
+
+    public async Task CloseAsync()
+    {
+        IsOpen = false;
+        await TeardownAsync();
+        await IsOpenChanged.InvokeAsync(false);
+        await OnClosed.InvokeAsync();
+    }
+
+    private async Task TeardownAsync()
+    {
+        if (!_isSetUp) return;
+        _isSetUp = false;
+
+        try
+        {
+            await JS.InvokeVoidAsync("UiInterop.teardownModal", _backdropRef);
+            if (LockScroll)
+            {
+                await JS.InvokeVoidAsync("UiInterop.unlockBodyScroll");
+            }
+        }
+        catch (JSDisconnectedException) { }
+
+        _dotNetRef?.Dispose();
+        _dotNetRef = null;
+    }
+
+    private string GetModalWidthStyle() => Size switch
+    {
+        UiSize.Sm => "max-width: 400px;",
+        UiSize.Lg => "max-width: 800px;",
+        UiSize.Xl => "max-width: 1000px;",
+        _ => "max-width: 540px;"
+    };
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_isSetUp)
+        {
+            try
+            {
+                await JS.InvokeVoidAsync("UiInterop.teardownModal", _backdropRef);
+                if (LockScroll)
+                {
+                    await JS.InvokeVoidAsync("UiInterop.unlockBodyScroll");
+                }
+            }
+            catch { }
+        }
+        _dotNetRef?.Dispose();
+    }
+}

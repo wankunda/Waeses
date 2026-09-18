@@ -1,0 +1,79 @@
+﻿@inject IThemeService ThemeService
+@namespace WaesesUI
+
+<main class="auth-layout">
+    <header class="d-flex justify-space-between align-center position-sticky" style="background: var(--bg-surface); border-bottom: 1px solid var(--border-default); padding: 0.85rem 1.5rem; top: 0; z-index: 100; backdrop-filter: blur(10px);">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+            @if (!string.IsNullOrWhiteSpace(BrandIcon))
+            {
+                <span style="font-size: 1.5rem;">@BrandIcon</span>
+            }
+            <span style="font-weight: 800; font-size: 1.15rem; background: linear-gradient(135deg, var(--primary), var(--info)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                @BrandText
+            </span>
+        </div>
+
+        @if (ShowThemeToggle)
+        {
+            <div class="d-flex align-center gap-sm">
+                <button type="button"
+                        class="ui-btn ui-btn-secondary ui-btn-sm"
+                        style="border-radius: var(--radius-full); padding: 0.4rem 0.85rem;"
+                        @onclick="ToggleTheme">
+                    @if (IsDarkMode)
+                    {
+                        <span>@LightModeText</span>
+                    }
+                    else
+                    {
+                        <span>@DarkModeText</span>
+                    }
+                </button>
+            </div>
+        }
+    </header>
+    @MainBody
+</main>
+
+@code {
+    [Parameter] public bool IsDarkMode { get; set; }
+    [Parameter] public EventCallback<bool> IsDarkModeChanged { get; set; }
+    [Parameter] public RenderFragment? MainBody { get; set; }
+    [Parameter] public bool ShowThemeToggle { get; set; } = true;
+    [Parameter] public string BrandText { get; set; } = "Blazor UI";
+    [Parameter] public string? BrandIcon { get; set; } = "⚡";
+    [Parameter] public string DarkModeText { get; set; } = "🌙 Mode Sombre";
+    [Parameter] public string LightModeText { get; set; } = "☀️ Mode Clair";
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await ThemeService.InitializeThemeAsync();
+            IsDarkMode = ThemeService.IsDarkMode;
+            await IsDarkModeChanged.InvokeAsync(IsDarkMode);
+            ThemeService.OnThemeChanged += HandleThemeChanged;
+            StateHasChanged();
+        }
+    }
+
+    private async Task ToggleTheme()
+    {
+        await ThemeService.ToggleThemeAsync();
+        IsDarkMode = ThemeService.IsDarkMode;
+        await IsDarkModeChanged.InvokeAsync(IsDarkMode);
+    }
+
+    private async void HandleThemeChanged()
+    {
+        IsDarkMode = ThemeService.IsDarkMode;
+        await IsDarkModeChanged.InvokeAsync(IsDarkMode);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        ThemeService.OnThemeChanged -= HandleThemeChanged;
+    }
+}

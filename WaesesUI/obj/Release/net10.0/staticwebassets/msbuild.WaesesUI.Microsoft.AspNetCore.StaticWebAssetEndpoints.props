@@ -1,0 +1,28 @@
+﻿<Project>
+  <ItemGroup>
+    <StaticWebAssetEndpoint Include="_content/WaesesUI/css/theme.1mb7cu3oq9.css">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\theme.css'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"1mb7cu3oq9"},{"Name":"integrity","Value":"sha256-iSoZoadaouVWAVwu\u002BpOVonDVx2Jg8cOmv3zmB1abHIs="},{"Name":"label","Value":"_content/WaesesUI/css/theme.css"}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"66809"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022iSoZoadaouVWAVwu\u002BpOVonDVx2Jg8cOmv3zmB1abHIs=\u0022"},{"Name":"Last-Modified","Value":"Thu, 17 Sep 2026 15:52:10 GMT"},{"Name":"Vary","Value":"Accept-Encoding"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="_content/WaesesUI/css/theme.css">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\theme.css'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-iSoZoadaouVWAVwu\u002BpOVonDVx2Jg8cOmv3zmB1abHIs="}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"66809"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022iSoZoadaouVWAVwu\u002BpOVonDVx2Jg8cOmv3zmB1abHIs=\u0022"},{"Name":"Last-Modified","Value":"Thu, 17 Sep 2026 15:52:10 GMT"},{"Name":"Vary","Value":"Accept-Encoding"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="_content/WaesesUI/js/ui-interop.js">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\js\ui-interop.js'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-KOc\u002BQauOJkOAaY8ES5Skt6XGG2O1E5kAnqR9JSqfVtc="}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"4721"},{"Name":"Content-Type","Value":"text/javascript"},{"Name":"ETag","Value":"\u0022KOc\u002BQauOJkOAaY8ES5Skt6XGG2O1E5kAnqR9JSqfVtc=\u0022"},{"Name":"Last-Modified","Value":"Tue, 15 Sep 2026 07:45:28 GMT"},{"Name":"Vary","Value":"Accept-Encoding"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="_content/WaesesUI/js/ui-interop.wa9j3oamrf.js">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\js\ui-interop.js'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"wa9j3oamrf"},{"Name":"integrity","Value":"sha256-KOc\u002BQauOJkOAaY8ES5Skt6XGG2O1E5kAnqR9JSqfVtc="},{"Name":"label","Value":"_content/WaesesUI/js/ui-interop.js"}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"4721"},{"Name":"Content-Type","Value":"text/javascript"},{"Name":"ETag","Value":"\u0022KOc\u002BQauOJkOAaY8ES5Skt6XGG2O1E5kAnqR9JSqfVtc=\u0022"},{"Name":"Last-Modified","Value":"Tue, 15 Sep 2026 07:45:28 GMT"},{"Name":"Vary","Value":"Accept-Encoding"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+  </ItemGroup>
+</Project>

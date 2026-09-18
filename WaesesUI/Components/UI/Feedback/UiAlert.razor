@@ -1,0 +1,62 @@
+@namespace WaesesUI
+
+@if (_visible)
+{
+    <div class="ui-alert ui-alert-@Color.ToString().ToLower() @Class" role="alert" @attributes="AdditionalAttributes">
+        @if (ShowIcon)
+        {
+            <div style="font-size: 1.15rem; line-height: 1;">
+                @GetIcon()
+            </div>
+        }
+        <div class="ui-alert-content">
+            @if (!string.IsNullOrEmpty(Title))
+            {
+                <div class="ui-alert-title">@Title</div>
+            }
+            @if (ChildContent != null)
+            {
+                @ChildContent
+            }
+            else if (!string.IsNullOrEmpty(Message))
+            {
+                <div>@Message</div>
+            }
+        </div>
+        @if (Dismissible)
+        {
+            <button type="button" class="ui-alert-close" aria-label="Close" @onclick="Close">
+                ✕
+            </button>
+        }
+    </div>
+}
+
+@code {
+    private bool _visible = true;
+
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? Message { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public UiColor Color { get; set; } = UiColor.Primary;
+    [Parameter] public bool Dismissible { get; set; }
+    [Parameter] public bool ShowIcon { get; set; } = true;
+    [Parameter] public EventCallback OnDismissed { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private async Task Close()
+    {
+        _visible = false;
+        await OnDismissed.InvokeAsync();
+    }
+
+    private string GetIcon() => Color switch
+    {
+        UiColor.Success => "✓",
+        UiColor.Danger => "✕",
+        UiColor.Warning => "⚠",
+        UiColor.Info => "ℹ",
+        _ => "★"
+    };
+}

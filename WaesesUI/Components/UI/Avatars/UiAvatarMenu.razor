@@ -1,0 +1,58 @@
+﻿@namespace WaesesUI
+
+<div class="ui-avatar ui-avatar-@Size.ToString().ToLower() ui-avatar-@Shape.ToString().ToLower() @Class"
+     style="@GetCustomStyle()" @onclick="ToggleMenu"
+     @attributes="AdditionalAttributes">
+    @if (!string.IsNullOrEmpty(Src))
+    {
+        <img class="ui-avatar-img" src="@Src" alt="@Alt" @onerror="HandleImageError" />
+    }
+    else if (!string.IsNullOrEmpty(Initials))
+    {
+        <span class="ui-avatar-initials">@Initials</span>
+    }
+    else
+    {
+        <span>👤</span>
+    }
+    @if (IsMenuOpen)
+    {
+        <div class="ui-avatar-menu">
+            @ChildContent
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public string? Src { get; set; }
+    [Parameter] public string? Alt { get; set; } = "Avatar";
+    [Parameter] public string? Initials { get; set; }
+    [Parameter] public UiSize Size { get; set; } = UiSize.Md;
+    [Parameter] public AvatarShape Shape { get; set; } = AvatarShape.Circle;
+    [Parameter] public string? BackgroundColor { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private bool IsMenuOpen { get; set; }
+
+    private void ToggleMenu()
+    {
+        IsMenuOpen = !IsMenuOpen;
+    }
+
+    private void HandleImageError()
+    {
+        Src = null;
+        StateHasChanged();
+    }
+
+    private string GetCustomStyle()
+    {
+        if (!string.IsNullOrEmpty(BackgroundColor))
+        {
+            return $"background: {BackgroundColor};";
+        }
+        return string.Empty;
+    }
+}

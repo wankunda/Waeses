@@ -1,0 +1,103 @@
+@implements IDisposable
+@namespace WaesesUI
+
+<div class="ui-toast ui-toast-@Toast.Type.ToString().ToLower()"
+     @onmouseenter="HandleMouseEnter"
+     @onmouseleave="HandleMouseLeave"
+     role="alert"
+     aria-live="polite">
+    <div style="font-size: 1.25rem; line-height: 1; display: flex; align-items: center;">
+        <UiIcon Icon="@GetIcon(Toast.Type)" Color="@GetColor(Toast.Type)" Size="UiSize.Md" />
+    </div>
+    <div class="ui-toast-body">
+        @if (!string.IsNullOrEmpty(Toast.Title))
+        {
+            <div class="ui-toast-title">@Toast.Title</div>
+        }
+        <div class="ui-toast-msg">@Toast.Message</div>
+    </div>
+    <button type="button" class="ui-alert-close" aria-label="Fermer" @onclick="Close">
+        ✕
+    </button>
+
+    @if (Toast.ShowProgressBar && Toast.DurationMs > 0)
+    {
+        <div class="ui-toast-progress-track">
+            <div class="ui-toast-progress-bar" style="animation-duration: @(Toast.DurationMs)ms;"></div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public ToastModel Toast { get; set; } = null!;
+    [Parameter] public EventCallback<string> OnDismiss { get; set; }
+
+    private System.Threading.Timer? _timer;
+    private DateTime _startTime;
+    private int _remainingMs;
+    private bool _isPaused;
+
+    protected override void OnInitialized()
+    {
+        _remainingMs = Toast.DurationMs;
+        if (_remainingMs > 0)
+        {
+            _startTime = DateTime.UtcNow;
+            _timer = new System.Threading.Timer(TimerCallback, null, _remainingMs, Timeout.Infinite);
+        }
+    }
+
+    private void HandleMouseEnter()
+    {
+        if (!Toast.PauseOnHover || _timer == null || _isPaused) return;
+
+        _isPaused = true;
+        var elapsed = (int)(DateTime.UtcNow - _startTime).TotalMilliseconds;
+        _remainingMs = Math.Max(0, _remainingMs - elapsed);
+        _timer.Change(Timeout.Infinite, Timeout.Infinite);
+    }
+
+    private void HandleMouseLeave()
+    {
+        if (!Toast.PauseOnHover || _timer == null || !_isPaused) return;
+
+        _isPaused = false;
+        _startTime = DateTime.UtcNow;
+        _timer.Change(_remainingMs, Timeout.Infinite);
+    }
+
+    private void TimerCallback(object? state)
+    {
+        InvokeAsync(Close);
+    }
+
+    private async Task Close()
+    {
+        _timer?.Dispose();
+        _timer = null;
+        await OnDismiss.InvokeAsync(Toast.Id);
+    }
+
+    public void Dispose()
+    {
+        _timer?.Dispose();
+    }
+
+    private string GetIcon(ToastType type) => type switch
+    {
+        ToastType.Success => Icons.Material.Filled.CheckCircle,
+        ToastType.Danger => Icons.Material.Filled.Error,
+        ToastType.Warning => Icons.Material.Filled.Warning,
+        ToastType.Info => Icons.Material.Filled.Info,
+        _ => Icons.Material.Filled.Info
+    };
+
+    private UiColor GetColor(ToastType type) => type switch
+    {
+        ToastType.Success => UiColor.Success,
+        ToastType.Danger => UiColor.Danger,
+        ToastType.Warning => UiColor.Warning,
+        ToastType.Info => UiColor.Info,
+        _ => UiColor.Primary
+    };
+}

@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="WaesesUI/WaesesUI.csproj" />
+  <Project Path="WaesesUIDemo/WaesesUIDemo.csproj" />
+</Solution>

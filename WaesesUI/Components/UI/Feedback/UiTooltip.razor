@@ -1,0 +1,16 @@
+@namespace WaesesUI
+
+<div class="ui-tooltip-wrapper @Class" @attributes="AdditionalAttributes">
+    @ChildContent
+    <div class="ui-tooltip-content ui-tooltip-@Position.ToString().ToLower()">
+        @Text
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Text { get; set; } = string.Empty;
+    [Parameter] public TooltipPosition Position { get; set; } = TooltipPosition.Top; // top, bottom, left, right
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+}

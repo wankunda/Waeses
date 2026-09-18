@@ -1,0 +1,69 @@
+@namespace WaesesUI
+
+<div class="ui-progress-circle-wrap @Class" style="width: @(Diameter)px; height: @(Diameter)px;" @attributes="AdditionalAttributes">
+    <svg width="@Diameter" height="@Diameter" viewBox="0 0 @Diameter @Diameter" style="transform: rotate(-90deg);">
+        <!-- Background Track -->
+        <circle cx="@(Diameter / 2.0)"
+                cy="@(Diameter / 2.0)"
+                r="@Radius"
+                fill="transparent"
+                stroke="var(--bg-surface-tertiary)"
+                stroke-width="@StrokeWidth" />
+
+        <!-- Fill Circle -->
+        <circle cx="@(Diameter / 2.0)"
+                cy="@(Diameter / 2.0)"
+                r="@Radius"
+                fill="transparent"
+                stroke="@GetColorCss()"
+                stroke-width="@StrokeWidth"
+                stroke-dasharray="@Circumference"
+                stroke-dashoffset="@DashOffset"
+                stroke-linecap="round"
+                style="transition: stroke-dashoffset 0.4s ease;" />
+    </svg>
+
+    @if (ShowValue)
+    {
+        <span class="ui-progress-circle-label">
+            @Math.Round(ClampedValue)%
+        </span>
+    }
+</div>
+
+@code {
+    [Parameter] public double Value { get; set; }
+    [Parameter] public double Max { get; set; } = 100;
+    [Parameter] public int Diameter { get; set; } = 72;
+    [Parameter] public int StrokeWidth { get; set; } = 6;
+    [Parameter] public UiColor Color { get; set; } = UiColor.Primary;
+    [Parameter] public bool ShowValue { get; set; } = true;
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private double Radius => (Diameter - StrokeWidth) / 2.0;
+    private double Circumference => 2 * Math.PI * Radius;
+
+    private double ClampedValue
+    {
+        get
+        {
+            if (Max <= 0) return 0;
+            var pct = (Value / Max) * 100;
+            return Math.Clamp(pct, 0, 100);
+        }
+    }
+
+    private double DashOffset => Circumference - (ClampedValue / 100.0 * Circumference);
+
+    private string GetColorCss() => Color switch
+    {
+        UiColor.Primary => "var(--primary)",
+        UiColor.Success => "var(--success)",
+        UiColor.Danger => "var(--danger)",
+        UiColor.Warning => "var(--warning)",
+        UiColor.Info => "var(--info)",
+        UiColor.Secondary => "var(--secondary)",
+        _ => "var(--primary)"
+    };
+}

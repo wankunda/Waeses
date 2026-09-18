@@ -1,0 +1,73 @@
+@namespace WaesesUI
+
+@if (!string.IsNullOrEmpty(Icon))
+{
+    @if (Icon.TrimStart().StartsWith("<svg", StringComparison.OrdinalIgnoreCase))
+    {
+        <span class="ui-icon ui-icon-@Size.ToString().ToLower() @Class" style="@GetStyle()" @onclick="OnClick" @attributes="AdditionalAttributes">
+            @((MarkupString)Icon)
+        </span>
+    }
+    else
+    {
+        <svg class="ui-icon ui-icon-@Size.ToString().ToLower() @Class"
+             viewBox="@ViewBox"
+             fill="@Fill"
+             style="@GetStyle()"
+             role="@(string.IsNullOrEmpty(Title) ? "presentation" : "img")"
+             aria-label="@Title"
+             @onclick="OnClick"
+             @attributes="AdditionalAttributes">
+            @if (!string.IsNullOrEmpty(Title))
+            {
+                <title>@Title</title>
+            }
+            @((MarkupString)Icon)
+        </svg>
+    }
+}
+
+@code {
+    [Parameter] public string? Icon { get; set; }
+    [Parameter] public UiSize Size { get; set; } = UiSize.Md;
+    [Parameter] public UiColor Color { get; set; } = UiColor.Neutral;
+    [Parameter] public string? CustomColor { get; set; }
+    [Parameter] public string ViewBox { get; set; } = "0 0 24 24";
+    [Parameter] public string Fill { get; set; } = "currentColor";
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? Style { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string GetStyle()
+    {
+        var styles = new List<string>();
+        if (!string.IsNullOrEmpty(CustomColor))
+        {
+            styles.Add($"color: {CustomColor};");
+        }
+        else if (Color != UiColor.Neutral)
+        {
+            styles.Add($"color: {GetColorCss(Color)};");
+        }
+
+        if (!string.IsNullOrEmpty(Style))
+        {
+            styles.Add(Style);
+        }
+
+        return string.Join(" ", styles);
+    }
+
+    private string GetColorCss(UiColor color) => color switch
+    {
+        UiColor.Primary => "var(--primary)",
+        UiColor.Secondary => "var(--secondary)",
+        UiColor.Success => "var(--success)",
+        UiColor.Danger => "var(--danger)",
+        UiColor.Warning => "var(--warning)",
+        UiColor.Info => "var(--info)",
+        _ => "currentColor"
+    };
+}

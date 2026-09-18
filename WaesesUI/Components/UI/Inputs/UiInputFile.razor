@@ -1,0 +1,192 @@
+﻿@namespace WaesesUI
+
+@using Microsoft.AspNetCore.Components.Forms
+
+<div class="ui-form-group @Class">
+    @if (!string.IsNullOrWhiteSpace(Label))
+    {
+        <label class="ui-label">
+            @Label
+            @if (Required)
+            {
+                <span class="ui-label-required">*</span>
+            }
+        </label>
+    }
+
+    @if (Variant == FileUploadVariant.Button)
+    {
+        <!-- MODE BOUTON -->
+        <div class="ui-fileupload-button-container @(Disabled ? "is-disabled" : "")">
+            <InputFile id="@Id"
+                       class="ui-fileupload-overlay"
+                       OnChange="HandleFileChange"
+                       accept="@Accept"
+                       multiple="@Multiple"
+                       disabled="@Disabled"
+                       @attributes="AdditionalAttributes" />
+
+            <div class="ui-fileupload-button-trigger">
+                @if (ButtonTemplate != null)
+                {
+                    @ButtonTemplate
+                }
+                else
+                {
+                    <UiButton Icon="@Icons.Material.Filled.Folder"
+                    Disabled="@Disabled" Variant="UiButtonVariant.Outline">
+                        @(string.IsNullOrEmpty(ButtonText) ? "Choisir un fichier" : ButtonText)
+                        </UiButton>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- MODE DROPZONE (GLISSER-DÉPOSER) -->
+        <div class="ui-fileupload-container @(IsDragging ? "is-dragging" : "") @(Disabled ? "is-disabled" : "") @(HasError ? "is-invalid" : "")">
+            <InputFile id="@Id"
+                       class="ui-fileupload-overlay"
+                       OnChange="HandleFileChange"
+                       @ondragenter="() => IsDragging = true"
+                       @ondragleave="() => IsDragging = false"
+                       accept="@Accept"
+                       multiple="@Multiple"
+                       disabled="@Disabled"
+                       @attributes="AdditionalAttributes" />
+
+            <div class="ui-fileupload-dropzone">
+                @if (ChildContent != null)
+                {
+                    @ChildContent(SelectedFiles)
+                }
+                else
+                {
+                    <div class="ui-fileupload-placeholder">
+                        <div class="ui-fileupload-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="17 8 12 3 7 8" />
+                                <line x1="12" y1="3" x2="12" y2="15" />
+                            </svg>
+                        </div>
+                        <div class="ui-fileupload-text">
+                            @if (IsDragging)
+                            {
+                                <span class="ui-fileupload-action">Relâchez pour déposer vos fichiers</span>
+                            }
+                            else
+                            {
+                                <span><span class="ui-fileupload-action">Cliquez pour parcourir</span> ou glissez-déposez ici</span>
+                            }
+                        </div>
+                        <div class="ui-fileupload-subtext">
+                            @(string.IsNullOrEmpty(Accept) ? "Tous formats" : Accept) (Max: @FormatBytes(MaxFileSize))
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    <!-- LISTE DES FICHIERS SÉLECTIONNÉS -->
+    @if (ShowFileList && SelectedFiles.Any())
+    {
+        <ul class="ui-fileupload-list">
+            @foreach (var file in SelectedFiles)
+            {
+                <li class="ui-fileupload-item">
+                    <div class="ui-fileupload-item-info">
+                        <span class="ui-fileupload-item-icon">📄</span>
+                        <div class="ui-fileupload-item-details">
+                            <span class="ui-fileupload-item-name">@file.Name</span>
+                            <span class="ui-fileupload-item-size">@FormatBytes(file.Size)</span>
+                        </div>
+                    </div>
+                    <button type="button"
+                            class="ui-fileupload-item-remove"
+                            @onclick="() => RemoveFile(file)"
+                            disabled="@Disabled"
+                            title="Supprimer">
+                        ✕
+                    </button>
+                </li>
+            }
+        </ul>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(ErrorMessage))
+    {
+        <div class="ui-error-text">
+            <span>⚠</span>
+            <span>@ErrorMessage</span>
+        </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(HelperText))
+    {
+        <div class="ui-helper-text">@HelperText</div>
+    }
+</div>
+
+@code {
+    [Parameter] public string Id { get; set; } = $"file-upload-{Guid.NewGuid():N}";
+    [Parameter] public FileUploadVariant Variant { get; set; } = FileUploadVariant.Dropzone;
+    [Parameter] public string? ButtonText { get; set; } = "Importer un fichier";
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public string? HelperText { get; set; }
+    [Parameter] public string? ErrorMessage { get; set; }
+    [Parameter] public bool Required { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public bool Multiple { get; set; }
+    [Parameter] public string? Accept { get; set; }
+    [Parameter] public int MaxAllowedFiles { get; set; } = 10;
+    [Parameter] public long MaxFileSize { get; set; } = 10 * 1024 * 1024;
+    [Parameter] public bool ShowFileList { get; set; } = true;
+    [Parameter] public string? Class { get; set; }
+
+    [Parameter] public RenderFragment? ButtonTemplate { get; set; }
+    [Parameter] public RenderFragment<IReadOnlyList<IBrowserFile>>? ChildContent { get; set; }
+    [Parameter] public EventCallback<IReadOnlyList<IBrowserFile>> FilesChanged { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private List<IBrowserFile> SelectedFiles { get; set; } = new();
+    private bool IsDragging { get; set; }
+    private bool HasError => !string.IsNullOrWhiteSpace(ErrorMessage);
+
+    private async Task HandleFileChange(InputFileChangeEventArgs args)
+    {
+        IsDragging = false;
+
+        var files = Multiple
+                    ? args.GetMultipleFiles(MaxAllowedFiles).ToList()
+                    : new List<IBrowserFile> { args.File };
+
+        if (!Multiple)
+            SelectedFiles.Clear();
+
+        SelectedFiles.AddRange(files);
+
+        await FilesChanged.InvokeAsync(SelectedFiles.AsReadOnly());
+    }
+
+    private async Task RemoveFile(IBrowserFile file)
+    {
+        SelectedFiles.Remove(file);
+        await FilesChanged.InvokeAsync(SelectedFiles.AsReadOnly());
+    }
+
+    private string FormatBytes(long bytes)
+    {
+        string[] suffix = { "B", "KB", "MB", "GB" };
+        int i = 0;
+        double dblSByte = bytes;
+        while (dblSByte >= 1024 && i < suffix.Length - 1)
+        {
+            dblSByte /= 1024;
+            i++;
+        }
+        return $"{dblSByte:0.#} {suffix[i]}";
+    }
+}

@@ -1,0 +1,102 @@
+﻿@inject IJSRuntime JS
+@implements IAsyncDisposable
+@namespace WaesesUI
+
+<div class="nav-menu-shell">
+    <button type="button"
+            class="navbar-toggler @(_isOpen ? "navbar-toggler-hidden" : "")"
+            aria-label="@(_isOpen ? "Fermer le menu de navigation" : "Ouvrir le menu de navigation")"
+            aria-expanded="@_isOpen"
+            aria-controls="@DrawerId"
+            @ref="_toggleRef"
+            @onclick="ToggleDrawer">
+        <UiIcon Icon="@Icons.Material.Filled.Menu" Size="UiSize.Sm" />
+    </button>
+
+    <button type="button"
+            class="drawer-backdrop @(_isOpen ? "drawer-backdrop-visible" : "")"
+            aria-label="Fermer le menu de navigation"
+            tabindex="-1"
+            @onclick="CloseDrawer"></button>
+
+    <aside id="@DrawerId" class="nav-drawer @(_isOpen ? "nav-drawer-open" : "")" @ref="_drawerRef">
+        <div class="top-row">
+            <a class="navbar-brand" href="@BrandHref">@BrandText</a>
+            <button type="button" class="drawer-close" aria-label="Fermer le menu" @ref="_closeRef" @onclick="CloseDrawer">
+                <UiIcon Icon="@Icons.Material.Filled.Close" Size="UiSize.Sm" />
+            </button>
+        </div>
+
+        <div class="nav-scrollable" @onclick="CloseDrawer">
+            <nav class="nav flex-column" aria-label="@AriaLabel">
+                @foreach (var item in Items)
+                {
+                    <UiNavMenuItem @key="item.Href"
+                                   Text="@item.Text"
+                                   Href="@item.Href"
+                                   Icon="@item.Icon"
+                                   Match="@item.Match"
+                                   Disabled="@item.Disabled" />
+                }
+            </nav>
+        </div>
+    </aside>
+</div>
+
+@code {
+    [Parameter] public string BrandText { get; set; } = "Blazor UI";
+    [Parameter] public string BrandHref { get; set; } = string.Empty;
+    [Parameter] public string DrawerId { get; set; } = "main-navigation-drawer";
+    [Parameter] public string AriaLabel { get; set; } = "Navigation principale";
+    [Parameter] public IEnumerable<NavigationItem>? NavigationItems { get; set; }
+
+    private IEnumerable<NavigationItem> Items => NavigationItems ?? Array.Empty<NavigationItem>();
+    private ElementReference _drawerRef;
+    private ElementReference _toggleRef;
+    private ElementReference _closeRef;
+    private DotNetObjectReference<UiNavMenu>? _dotNetRef;
+    private bool _isOpen = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _dotNetRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("UiInterop.setupDrawer", _drawerRef, _toggleRef, _dotNetRef);
+        }
+
+        await JS.InvokeVoidAsync("UiInterop.updateDrawer", _drawerRef, _toggleRef, _closeRef, _isOpen);
+    }
+
+    private void ToggleDrawer() => _isOpen = !_isOpen;
+
+    private void CloseDrawer() => _isOpen = false;
+
+    [JSInvokable]
+    public Task CloseDrawerAsync()
+    {
+        _isOpen = false;
+        return InvokeAsync(StateHasChanged);
+    }
+
+    public async ValueTask DisposeAsync()
+{
+    if (_dotNetRef == null)
+    {
+        return;
+    }
+
+    try
+    {
+        await JS.InvokeVoidAsync("UiInterop.teardownDrawer", _drawerRef);
+    }
+    catch (JSDisconnectedException)
+    {
+    }
+    finally
+    {
+        _dotNetRef.Dispose();
+        _dotNetRef = null;
+    }
+}
+}

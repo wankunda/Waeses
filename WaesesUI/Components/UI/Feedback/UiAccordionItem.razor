@@ -1,0 +1,45 @@
+@namespace WaesesUI
+
+<div class="ui-accordion-item @(IsOpen ? "active" : "") @Class" @attributes="AdditionalAttributes">
+    <div class="ui-accordion-header" @onclick="Toggle">
+        <span>@Title</span>
+        <svg class="ui-accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+    </div>
+    @if (IsOpen)
+    {
+        <div class="ui-accordion-body">
+            @ChildContent
+        </div>
+    }
+</div>
+
+@code {
+    [CascadingParameter] public UiAccordion? ParentAccordion { get; set; }
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    protected override void OnInitialized()
+    {
+        ParentAccordion?.RegisterItem(this);
+    }
+
+    private void Toggle()
+    {
+        IsOpen = !IsOpen;
+        if (IsOpen)
+        {
+            ParentAccordion?.ToggleItem(this);
+        }
+    }
+
+    public void Collapse()
+    {
+        IsOpen = false;
+        StateHasChanged();
+    }
+}
