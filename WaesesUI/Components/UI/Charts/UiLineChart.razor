@@ -1,0 +1,64 @@
+@namespace WaesesUI
+
+<div class="ui-chart @Class" @attributes="AdditionalAttributes">
+    <svg class="ui-chart-svg" viewBox="0 0 @Width @Height" role="img" aria-label="@AriaLabel" preserveAspectRatio="none">
+        @if (ShowGrid)
+        {
+            @foreach (var tick in GridTicks)
+            {
+                var y = ChartTop + (ChartHeight * (1 - tick / Maximum));
+                <line x1="@ChartLeft" y1="@y" x2="@(Width - ChartRight)" y2="@y" class="ui-chart-grid-line" />
+                @((MarkupString)SvgText(ChartLeft - 8, y + 4, "end", "ui-chart-axis-label", FormatValue(tick)))
+            }
+        }
+        @if (Data.Count > 0)
+        {
+            <polyline points="@Points" style="fill: none; stroke: @Color;" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" class="ui-chart-line" />
+            @for (var index = 0; index < Data.Count; index++)
+            {
+                var point = GetPoint(index);
+                <circle cx="@point.X" cy="@point.Y" r="5" fill="var(--bg-surface)" stroke="@Color" stroke-width="3">
+                    <title>@Data[index].Label : @FormatValue(Data[index].Value)</title>
+                </circle>
+                @((MarkupString)SvgText(point.X, Height - 14, "middle", "ui-chart-axis-label", Data[index].Label))
+            }
+        }
+    </svg>
+</div>
+
+@code {
+    [Parameter] public IReadOnlyList<UiChartData> Data { get; set; } = Array.Empty<UiChartData>();
+    [Parameter] public int Width { get; set; } = 640;
+    [Parameter] public int Height { get; set; } = 320;
+    [Parameter] public string Color { get; set; } = "var(--primary)";
+    [Parameter] public bool ShowGrid { get; set; } = true;
+    [Parameter] public string AriaLabel { get; set; } = "Graphique linéaire";
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private const double ChartLeft = 48;
+    private const double ChartRight = 16;
+    private const double ChartTop = 24;
+    private const double ChartBottom = 38;
+    private double ChartWidth => Math.Max(Width - ChartLeft - ChartRight, 1);
+    private double ChartHeight => Math.Max(Height - ChartTop - ChartBottom, 1);
+    private double Maximum => Math.Max(Data.Count == 0 ? 0 : Data.Max(item => item.Value), 1);
+    private IEnumerable<double> GridTicks => Enumerable.Range(0, 5).Select(index => Maximum * index / 4);
+    private string Points => string.Join(" ", Enumerable.Range(0, Data.Count).Select(index =>
+    {
+        var point = GetPoint(index);
+        return $"{point.X.ToString("0.##", CultureInfo.InvariantCulture)},{point.Y.ToString("0.##", CultureInfo.InvariantCulture)}";
+    }));
+
+    private (double X, double Y) GetPoint(int index)
+    {
+        var x = Data.Count == 1 ? ChartLeft + ChartWidth / 2 : ChartLeft + ChartWidth * index / (Data.Count - 1);
+        var y = ChartTop + ChartHeight - (ChartHeight * Math.Max(Data[index].Value, 0) / Maximum);
+        return (x, y);
+    }
+
+    private static string FormatValue(double value) => value.ToString("0.##", CultureInfo.InvariantCulture);
+
+    private static string SvgText(double x, double y, string anchor, string cssClass, string value) =>
+        $"<text x=\"{x.ToString("0.##", CultureInfo.InvariantCulture)}\" y=\"{y.ToString("0.##", CultureInfo.InvariantCulture)}\" text-anchor=\"{anchor}\" class=\"{cssClass}\">{System.Net.WebUtility.HtmlEncode(value)}</text>";
+}

@@ -1,0 +1,57 @@
+@namespace WaesesUI
+
+<div class="ui-chart ui-chart-pie @Class" @attributes="AdditionalAttributes">
+    <svg class="ui-chart-svg" viewBox="0 0 220 220" role="img" aria-label="@AriaLabel">
+        @if (Total > 0)
+        {
+            @for (var index = 0; index < Data.Count; index++)
+            {
+                var slice = GetSlice(index);
+                <path d="@slice.Path" style="fill: @(Data[index].Color ?? GetPaletteColor(index)); stroke: var(--bg-surface);" stroke-width="2">
+                    <title>@Data[index].Label : @FormatPercentage(Data[index].Value)</title>
+                </path>
+            }
+        }
+    </svg>
+    <div class="ui-chart-legend">
+        @foreach (var item in Data.Select((value, index) => (value, index)))
+        {
+            <span class="ui-chart-legend-item"><i style="background: @(item.value.Color ?? GetPaletteColor(item.index));"></i>@item.value.Label <strong>@FormatPercentage(item.value.Value)</strong></span>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public IReadOnlyList<UiChartData> Data { get; set; } = Array.Empty<UiChartData>();
+    [Parameter] public string AriaLabel { get; set; } = "Graphique circulaire";
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private double Total => Data.Sum(item => Math.Max(item.Value, 0));
+
+    private (string Path, double StartAngle, double EndAngle) GetSlice(int index)
+    {
+        var startAngle = Data.Take(index).Sum(item => Math.Max(item.Value, 0)) / Total * 360 - 90;
+        var endAngle = startAngle + Math.Max(Data[index].Value, 0) / Total * 360;
+        var start = PointOnCircle(110, 110, 100, startAngle);
+        var end = PointOnCircle(110, 110, 100, endAngle);
+        var largeArc = endAngle - startAngle > 180 ? 1 : 0;
+        return ($"M 110 110 L {start.X.ToString("0.##", CultureInfo.InvariantCulture)} {start.Y.ToString("0.##", CultureInfo.InvariantCulture)} A 100 100 0 {largeArc} 1 {end.X.ToString("0.##", CultureInfo.InvariantCulture)} {end.Y.ToString("0.##", CultureInfo.InvariantCulture)} Z", startAngle, endAngle);
+    }
+
+    private static (double X, double Y) PointOnCircle(double centerX, double centerY, double radius, double angle)
+    {
+        var radians = angle * Math.PI / 180;
+        return (centerX + radius * Math.Cos(radians), centerY + radius * Math.Sin(radians));
+    }
+
+    private string FormatPercentage(double value) => Total <= 0 ? "0 %" : $"{value / Total * 100:0.#} %";
+
+    private static string GetPaletteColor(int index) => (index % 4) switch
+    {
+        0 => "var(--primary)",
+        1 => "var(--info)",
+        2 => "var(--success)",
+        _ => "var(--warning)"
+    };
+}

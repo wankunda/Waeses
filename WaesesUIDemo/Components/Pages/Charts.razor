@@ -1,0 +1,50 @@
+@page "/charts"
+@rendermode InteractiveServer
+
+<PageTitle>Charts · WaesesUI</PageTitle>
+
+<DemoPageHeader Eyebrow="04 · Charts" Title="Lire les données d’un coup d’œil" Description="Quatre composants SVG responsives pour comparer des valeurs, suivre une tendance et visualiser une répartition." />
+
+<section class="ui-grid ui-grid-cols-2">
+    <UiCard Title="Bar chart" Subtitle="Comparer des valeurs par catégorie">
+        <UiBarChart Data="_barData" />
+    </UiCard>
+
+    <UiCard Title="Line chart" Subtitle="Suivre une tendance dans le temps">
+        <UiLineChart Data="_lineData" Color="var(--success)" />
+    </UiCard>
+
+    <UiCard Title="Pie chart" Subtitle="Répartition d’un ensemble">
+        <UiPieChart Data="_distributionData" />
+    </UiCard>
+
+    <UiCard Title="Donut chart" Subtitle="Afficher un objectif ou un ratio">
+        <UiDonutChart Data="_goalData" CenterLabel="72 %" CenterCaption="atteint" />
+    </UiCard>
+</section>
+
+@code {
+    private readonly IReadOnlyList<UiChartData> _barData = new[]
+    {
+        new UiChartData("Lun", 42), new UiChartData("Mar", 68), new UiChartData("Mer", 54),
+        new UiChartData("Jeu", 82), new UiChartData("Ven", 74)
+    };
+
+    private readonly IReadOnlyList<UiChartData> _lineData = new[]
+    {
+        new UiChartData("Jan", 24), new UiChartData("Fév", 38), new UiChartData("Mar", 32),
+        new UiChartData("Avr", 56), new UiChartData("Mai", 64), new UiChartData("Juin", 78)
+    };
+
+    private readonly IReadOnlyList<UiChartData> _distributionData = new[]
+    {
+        new UiChartData("Produit", 42), new UiChartData("Design", 28),
+        new UiChartData("Ingénierie", 20), new UiChartData("Support", 10)
+    };
+
+    private readonly IReadOnlyList<UiChartData> _goalData = new[]
+    {
+        new UiChartData("Réalisé", 72, "var(--success)"),
+        new UiChartData("Restant", 28, "var(--bg-surface-tertiary)")
+    };
+}

@@ -39,12 +39,50 @@
     </UiCard>
 </section>
 
+<section class="ui-grid ui-grid-cols-2 mt-sm">
+    <UiCard Title="Charts" Subtitle="Visualiser les tendances et répartitions">
+        <UiBarChart Data="_chartData" />
+    </UiCard>
+    <UiCard Title="Tendance mensuelle" Subtitle="Évolution de l'activité">
+        <UiLineChart Data="_lineData" Color="var(--success)" />
+    </UiCard>
+    <UiCard Title="Répartition" Subtitle="Vue circulaire des catégories">
+        <UiPieChart Data="_distributionData" />
+    </UiCard>
+    <UiCard Title="Objectif atteint" Subtitle="Anneau de progression">
+        <UiDonutChart Data="_goalData" CenterLabel="72 %" CenterCaption="atteint" />
+    </UiCard>
+</section>
+
 @code {
     private readonly IReadOnlyList<DemoMember> _members = new[]
     {
         new DemoMember("Alice Martin", "AM", "Produit", "Actif", 92, "#173f5f"), new DemoMember("Benoît Roy", "BR", "Design", "Actif", 78, "#ed553b"),
         new DemoMember("Chloé Petit", "CP", "Ingénierie", "Absent", 64, "#20639b"), new DemoMember("David Nguyen", "DN", "Produit", "Actif", 88, "#3caea3"),
         new DemoMember("Élodie Caron", "EC", "Support", "Actif", 57, "#f6d55c"), new DemoMember("Farid Saïd", "FS", "Ingénierie", "Actif", 81, "#8c6bb1")
+    };
+
+    private readonly IReadOnlyList<UiChartData> _chartData = new[]
+    {
+        new UiChartData("Lun", 42), new UiChartData("Mar", 68), new UiChartData("Mer", 54),
+        new UiChartData("Jeu", 82), new UiChartData("Ven", 74)
+    };
+
+    private readonly IReadOnlyList<UiChartData> _lineData = new[]
+    {
+        new UiChartData("Jan", 24), new UiChartData("Fév", 38), new UiChartData("Mar", 32),
+        new UiChartData("Avr", 56), new UiChartData("Mai", 64), new UiChartData("Juin", 78)
+    };
+
+    private readonly IReadOnlyList<UiChartData> _distributionData = new[]
+    {
+        new UiChartData("Produit", 42), new UiChartData("Design", 28),
+        new UiChartData("Ingénierie", 20), new UiChartData("Support", 10)
+    };
+
+    private readonly IReadOnlyList<UiChartData> _goalData = new[]
+    {
+        new UiChartData("Réalisé", 72, "var(--success)"), new UiChartData("Restant", 28, "var(--bg-surface-tertiary)")
     };
 
     private async Task OpenMember(DemoMember member) => await MessageBoxService.ShowAlertAsync(member.Name, $"{member.Role} · activité à {member.Activity}%.", MessageBoxType.Info);
