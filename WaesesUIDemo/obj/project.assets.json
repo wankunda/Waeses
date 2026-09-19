@@ -2,7 +2,7 @@
   "version": 4,
   "targets": {
     "net10.0": {
-      "Microsoft.AspNetCore.App.Internal.Assets/10.0.11": {
+      "Microsoft.AspNetCore.App.Internal.Assets/10.0.12": {
         "type": "package",
         "build": {
           "build/Microsoft.AspNetCore.App.Internal.Assets.props": {},
@@ -28,7 +28,7 @@
           "buildTransitive/net8.0/_._": {}
         }
       },
-      "WaesesUI/1.0.1": {
+      "WaesesUI/1.0.2": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v10.0",
         "dependencies": {
@@ -44,10 +44,10 @@
     }
   },
   "libraries": {
-    "Microsoft.AspNetCore.App.Internal.Assets/10.0.11": {
-      "sha512": "tYYYBZsuF2DSz1I3hcfB8qC4nNekIKufkYZOJ2R28fNK3PkS7fJao/mIX5H84NH94UACZQ4dhvt8GDlkrJFwLg==",
+    "Microsoft.AspNetCore.App.Internal.Assets/10.0.12": {
+      "sha512": "+sIBo9AMBZH46qHWHQdfzcGMt+RuBaPYrUMOAM9VjA7MQ9QtIez3lq1C3E05+Yroa94KKt3DSWaxmCI4H28a9Q==",
       "type": "package",
-      "path": "microsoft.aspnetcore.app.internal.assets/10.0.11",
+      "path": "microsoft.aspnetcore.app.internal.assets/10.0.12",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -63,7 +63,7 @@
         "build/Microsoft.AspNetCore.App.Internal.Assets.targets",
         "buildMultiTargeting/Microsoft.AspNetCore.App.Internal.Assets.targets",
         "buildTransitive/Microsoft.AspNetCore.App.Internal.Assets.targets",
-        "microsoft.aspnetcore.app.internal.assets.10.0.11.nupkg.sha512",
+        "microsoft.aspnetcore.app.internal.assets.10.0.12.nupkg.sha512",
         "microsoft.aspnetcore.app.internal.assets.nuspec"
       ]
     },
@@ -101,7 +101,7 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "WaesesUI/1.0.1": {
+    "WaesesUI/1.0.2": {
       "type": "project",
       "path": "../WaesesUI/WaesesUI.csproj",
       "msbuildProject": "../WaesesUI/WaesesUI.csproj"
@@ -109,29 +109,37 @@
   },
   "projectFileDependencyGroups": {
     "net10.0": [
-      "Microsoft.AspNetCore.App.Internal.Assets >= 10.0.11",
-      "WaesesUI >= 1.0.1"
+      "Microsoft.AspNetCore.App.Internal.Assets >= 10.0.12",
+      "WaesesUI >= 1.0.2"
     ]
   },
   "packageFolders": {
-    "/Users/wankunda/.nuget/packages/": {}
+    "C:\\Users\\pkwan\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/wankunda/Documents/Projets/Waeses/WaesesUIDemo/WaesesUIDemo.csproj",
+      "projectUniqueName": "C:\\Users\\pkwan\\source\\repos\\wankunda\\Waeses\\WaesesUIDemo\\WaesesUIDemo.csproj",
       "projectName": "WaesesUIDemo",
-      "projectPath": "/Users/wankunda/Documents/Projets/Waeses/WaesesUIDemo/WaesesUIDemo.csproj",
-      "packagesPath": "/Users/wankunda/.nuget/packages/",
-      "outputPath": "/Users/wankunda/Documents/Projets/Waeses/WaesesUIDemo/obj/",
+      "projectPath": "C:\\Users\\pkwan\\source\\repos\\wankunda\\Waeses\\WaesesUIDemo\\WaesesUIDemo.csproj",
+      "packagesPath": "C:\\Users\\pkwan\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\pkwan\\source\\repos\\wankunda\\Waeses\\WaesesUIDemo\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "/Users/wankunda/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\pkwan\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net10.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -139,8 +147,8 @@
           "framework": "net10.0",
           "targetAlias": "net10.0",
           "projectReferences": {
-            "/Users/wankunda/Documents/Projets/Waeses/WaesesUI/WaesesUI.csproj": {
-              "projectPath": "/Users/wankunda/Documents/Projets/Waeses/WaesesUI/WaesesUI.csproj"
+            "C:\\Users\\pkwan\\source\\repos\\wankunda\\Waeses\\WaesesUI\\WaesesUI.csproj": {
+              "projectPath": "C:\\Users\\pkwan\\source\\repos\\wankunda\\Waeses\\WaesesUI\\WaesesUI.csproj"
             }
           }
         }
@@ -165,7 +173,7 @@
           "Microsoft.AspNetCore.App.Internal.Assets": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "[10.0.11, )",
+            "version": "[10.0.12, )",
             "autoReferenced": true
           }
         },
@@ -188,7 +196,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.400/PortableRuntimeIdentifierGraph.json",
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.401/PortableRuntimeIdentifierGraph.json",
         "packagesToPrune": {
           "Microsoft.AspNetCore": "(,10.0.32767]",
           "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",

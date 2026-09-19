@@ -1,11 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "H0nuXsUcUXI=",
+  "dgSpecHash": "T0uzofQXTOc=",
   "success": true,
-  "projectFilePath": "/Users/wankunda/Documents/Projets/Waeses/WaesesUIDemo/WaesesUIDemo.csproj",
+  "projectFilePath": "C:\\Users\\pkwan\\source\\repos\\wankunda\\Waeses\\WaesesUIDemo\\WaesesUIDemo.csproj",
   "expectedPackageFiles": [
-    "/Users/wankunda/.nuget/packages/microsoft.aspnetcore.app.internal.assets/10.0.11/microsoft.aspnetcore.app.internal.assets.10.0.11.nupkg.sha512",
-    "/Users/wankunda/.nuget/packages/system.security.cryptography.protecteddata/9.0.11/system.security.cryptography.protecteddata.9.0.11.nupkg.sha512"
+    "C:\\Users\\pkwan\\.nuget\\packages\\microsoft.aspnetcore.app.internal.assets\\10.0.12\\microsoft.aspnetcore.app.internal.assets.10.0.12.nupkg.sha512",
+    "C:\\Users\\pkwan\\.nuget\\packages\\system.security.cryptography.protecteddata\\9.0.11\\system.security.cryptography.protecteddata.9.0.11.nupkg.sha512"
   ],
   "logs": []
 }

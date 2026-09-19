@@ -202,7 +202,7 @@ body {
 .ui-chart-svg {
     display: block;
     width: 100%;
-    min-height: 220px;
+    min-height: 200px;
     overflow: visible;
 }
 
@@ -238,6 +238,7 @@ body {
 
 .ui-chart-pie {
     display: flex;
+    flex-direction: column;
     align-items: center;
     gap: var(--space-md);
 }
@@ -245,12 +246,12 @@ body {
 .ui-chart-pie .ui-chart-svg {
     flex: 1 1 220px;
     max-width: 280px;
-    min-height: 220px;
+    min-height: 200px;
 }
 
 .ui-chart-legend {
     display: flex;
-    flex: 1 1 180px;
+    flex: 1 1 10px;
     flex-direction: column;
     gap: .6rem;
 }

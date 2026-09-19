@@ -59,6 +59,22 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxDYXJkc1xVaUNhcmQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Charts/UiBarChart.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxDaGFydHNcVWlCYXJDaGFydC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Charts/UiDonutChart.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxDaGFydHNcVWlEb251dENoYXJ0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Charts/UiLineChart.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxDaGFydHNcVWlMaW5lQ2hhcnQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Charts/UiPieChart.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxDaGFydHNcVWlQaWVDaGFydC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Feedback/UiAccordion.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxGZWVkYmFja1xVaUFjY29yZGlvbi5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 

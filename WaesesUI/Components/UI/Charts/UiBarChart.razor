@@ -7,7 +7,7 @@
             @foreach (var tick in GridTicks)
             {
                 var y = ChartTop + (ChartHeight * (1 - tick / Maximum));
-                <line x1="@ChartLeft" y1="@y" x2="@(Width - ChartRight)" y2="@y" class="ui-chart-grid-line" />
+                <line x1="@ChartLeft.ToString("0.##", CultureInfo.InvariantCulture)" y1="@y.ToString("0.##", CultureInfo.InvariantCulture)" x2="@((Width - ChartRight).ToString("0.##", CultureInfo.InvariantCulture))" y2="@y.ToString("0.##", CultureInfo.InvariantCulture)" class="ui-chart-grid-line" />
                 @((MarkupString)SvgText(ChartLeft - 8, y + 4, "end", "ui-chart-axis-label", FormatValue(tick)))
             }
         }
@@ -19,7 +19,7 @@
             var x = ChartLeft + (ChartWidth / Math.Max(Data.Count, 1) * index) + ((ChartWidth / Math.Max(Data.Count, 1) - barWidth) / 2);
             var barHeight = ChartHeight * Math.Max(item.Value, 0) / Maximum;
             var y = ChartTop + ChartHeight - barHeight;
-            <rect x="@x" y="@y" width="@barWidth" height="@barHeight" rx="4" style="fill: @(item.Color ?? GetPaletteColor(index));" class="ui-chart-bar">
+            <rect x="@x.ToString("0.##", CultureInfo.InvariantCulture)" y="@y.ToString("0.##", CultureInfo.InvariantCulture)" width="@barWidth.ToString("0.##", CultureInfo.InvariantCulture)" height="@barHeight.ToString("0.##", CultureInfo.InvariantCulture)" rx="4" style="fill: @(item.Color ?? GetPaletteColor(index));" class="ui-chart-bar">
                 <title>@item.Label : @FormatValue(item.Value)</title>
             </rect>
             @if (ShowValues)

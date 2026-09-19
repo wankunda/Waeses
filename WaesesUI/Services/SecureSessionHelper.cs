@@ -12,6 +12,11 @@ public static class SecureSessionHelper
 
     public static void SaveSession(UserSession session)
     {
+        if (!OperatingSystem.IsWindows())
+        {
+            return;
+        }
+
         try
         {
             var sessionObj = new
@@ -39,6 +44,11 @@ public static class SecureSessionHelper
 
     public static UserSession? LoadSession()
     {
+        if (!OperatingSystem.IsWindows())
+        {
+            return null;
+        }
+
         try
         {
             if (!File.Exists(FilePath)) return null;

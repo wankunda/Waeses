@@ -9,7 +9,7 @@
     <readme>README.md</readme>
     <description>Bibliothèque Razor Class Library de composants UI réutilisables pour Blazor.</description>
     <tags>blazor razor components ui frontend</tags>
-    <repository type="git" />
+    <repository type="git" commit="e3cf815b2a73127d25b0342713abc7074f3ac93c" />
     <dependencies>
       <group targetFramework="net10.0">
         <dependency id="Microsoft.AspNetCore.Components.Web" version="10.0.12" exclude="Build,Analyzers" />

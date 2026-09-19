@@ -12,12 +12,12 @@
       <RelatedAsset></RelatedAsset>
       <AssetTraitName></AssetTraitName>
       <AssetTraitValue></AssetTraitValue>
-      <Fingerprint>1mb7cu3oq9</Fingerprint>
-      <Integrity>iSoZoadaouVWAVwu+pOVonDVx2Jg8cOmv3zmB1abHIs=</Integrity>
+      <Fingerprint>83w6i4et33</Fingerprint>
+      <Integrity>DBb0NPpzIaXq+t52LdcOrKhnbbfcpq5FXMOS5Rvije4=</Integrity>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      <FileLength>66809</FileLength>
-      <LastWriteTime>Thu, 17 Sep 2026 15:52:10 GMT</LastWriteTime>
+      <FileLength>68592</FileLength>
+      <LastWriteTime>Sat, 19 Sep 2026 13:42:06 GMT</LastWriteTime>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\theme.css'))</OriginalItemSpec>
     </StaticWebAsset>
     <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\js\ui-interop.js'))">
