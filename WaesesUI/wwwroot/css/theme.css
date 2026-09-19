@@ -193,6 +193,105 @@ body {
     -moz-osx-font-smoothing: grayscale;
     min-height: 100vh;
 }
+
+.ui-chart {
+    width: 100%;
+    min-width: 0;
+}
+
+.ui-chart-svg {
+    display: block;
+    width: 100%;
+    min-height: 220px;
+    overflow: visible;
+}
+
+.ui-chart-grid-line {
+    stroke: var(--border-default);
+    stroke-dasharray: 3 5;
+    stroke-width: 1;
+}
+
+.ui-chart-axis-label,
+.ui-chart-value-label,
+.ui-chart-donut-caption {
+    fill: var(--text-muted);
+    font-size: 11px;
+    font-family: var(--font-sans);
+}
+
+.ui-chart-value-label {
+    fill: var(--text-secondary);
+    font-weight: 700;
+}
+
+.ui-chart-bar,
+.ui-chart-line {
+    transition: opacity var(--trans-fast), filter var(--trans-fast);
+}
+
+.ui-chart-bar:hover,
+.ui-chart-line:hover {
+    opacity: .78;
+    filter: brightness(1.08);
+}
+
+.ui-chart-pie {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.ui-chart-pie .ui-chart-svg {
+    flex: 1 1 220px;
+    max-width: 280px;
+    min-height: 220px;
+}
+
+.ui-chart-legend {
+    display: flex;
+    flex: 1 1 180px;
+    flex-direction: column;
+    gap: .6rem;
+}
+
+.ui-chart-legend-item {
+    display: flex;
+    align-items: center;
+    gap: .45rem;
+    color: var(--text-secondary);
+    font-size: .8125rem;
+}
+
+.ui-chart-legend-item i {
+    width: 10px;
+    height: 10px;
+    flex: 0 0 10px;
+    border-radius: 50%;
+}
+
+.ui-chart-legend-item strong {
+    margin-left: auto;
+    color: var(--text-main);
+}
+
+.ui-chart-donut-value {
+    fill: var(--text-main);
+    font-size: 22px;
+    font-weight: 800;
+    font-family: var(--font-sans);
+}
+
+@media (max-width: 640px) {
+    .ui-chart-pie {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .ui-chart-pie .ui-chart-svg {
+        align-self: center;
+    }
+}
 h1,
 h2,
 h3,

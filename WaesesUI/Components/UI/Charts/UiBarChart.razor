@@ -1,0 +1,65 @@
+@namespace WaesesUI
+
+<div class="ui-chart @Class" @attributes="AdditionalAttributes">
+    <svg class="ui-chart-svg" viewBox="0 0 @Width @Height" role="img" aria-label="@AriaLabel" preserveAspectRatio="none">
+        @if (ShowGrid)
+        {
+            @foreach (var tick in GridTicks)
+            {
+                var y = ChartTop + (ChartHeight * (1 - tick / Maximum));
+                <line x1="@ChartLeft" y1="@y" x2="@(Width - ChartRight)" y2="@y" class="ui-chart-grid-line" />
+                @((MarkupString)SvgText(ChartLeft - 8, y + 4, "end", "ui-chart-axis-label", FormatValue(tick)))
+            }
+        }
+
+        @for (var index = 0; index < Data.Count; index++)
+        {
+            var item = Data[index];
+            var barWidth = ChartWidth / Math.Max(Data.Count, 1) * 0.64;
+            var x = ChartLeft + (ChartWidth / Math.Max(Data.Count, 1) * index) + ((ChartWidth / Math.Max(Data.Count, 1) - barWidth) / 2);
+            var barHeight = ChartHeight * Math.Max(item.Value, 0) / Maximum;
+            var y = ChartTop + ChartHeight - barHeight;
+            <rect x="@x" y="@y" width="@barWidth" height="@barHeight" rx="4" style="fill: @(item.Color ?? GetPaletteColor(index));" class="ui-chart-bar">
+                <title>@item.Label : @FormatValue(item.Value)</title>
+            </rect>
+            @if (ShowValues)
+            {
+                @((MarkupString)SvgText(x + barWidth / 2, y - 8, "middle", "ui-chart-value-label", FormatValue(item.Value)))
+            }
+            @((MarkupString)SvgText(x + barWidth / 2, Height - 14, "middle", "ui-chart-axis-label", item.Label))
+        }
+    </svg>
+</div>
+
+@code {
+    [Parameter] public IReadOnlyList<UiChartData> Data { get; set; } = Array.Empty<UiChartData>();
+    [Parameter] public int Width { get; set; } = 640;
+    [Parameter] public int Height { get; set; } = 320;
+    [Parameter] public bool ShowGrid { get; set; } = true;
+    [Parameter] public bool ShowValues { get; set; } = true;
+    [Parameter] public string AriaLabel { get; set; } = "Graphique en barres";
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private const double ChartLeft = 48;
+    private const double ChartRight = 16;
+    private const double ChartTop = 24;
+    private const double ChartBottom = 38;
+    private double ChartWidth => Math.Max(Width - ChartLeft - ChartRight, 1);
+    private double ChartHeight => Math.Max(Height - ChartTop - ChartBottom, 1);
+    private double Maximum => Math.Max(Data.Count == 0 ? 0 : Data.Max(item => item.Value), 1);
+    private IEnumerable<double> GridTicks => Enumerable.Range(0, 5).Select(index => Maximum * index / 4);
+
+    private static string GetPaletteColor(int index) => (index % 4) switch
+    {
+        0 => "var(--primary)",
+        1 => "var(--info)",
+        2 => "var(--success)",
+        _ => "var(--warning)"
+    };
+
+    private static string SvgText(double x, double y, string anchor, string cssClass, string value) =>
+        $"<text x=\"{x.ToString("0.##", CultureInfo.InvariantCulture)}\" y=\"{y.ToString("0.##", CultureInfo.InvariantCulture)}\" text-anchor=\"{anchor}\" class=\"{cssClass}\">{System.Net.WebUtility.HtmlEncode(value)}</text>";
+
+    private static string FormatValue(double value) => value.ToString("0.##", CultureInfo.InvariantCulture);
+}

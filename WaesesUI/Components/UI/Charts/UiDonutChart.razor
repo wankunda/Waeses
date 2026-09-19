@@ -1,0 +1,67 @@
+@namespace WaesesUI
+
+<div class="ui-chart ui-chart-pie @Class" @attributes="AdditionalAttributes">
+    <svg class="ui-chart-svg" viewBox="0 0 220 220" role="img" aria-label="@AriaLabel">
+        @if (Total > 0)
+        {
+            @for (var index = 0; index < Data.Count; index++)
+            {
+                var slice = GetSlice(index);
+                <path d="@slice.Path" style="fill: @(Data[index].Color ?? GetPaletteColor(index)); stroke: var(--bg-surface);" stroke-width="2">
+                    <title>@Data[index].Label : @FormatPercentage(Data[index].Value)</title>
+                </path>
+            }
+        }
+        <circle cx="110" cy="110" r="58" fill="var(--bg-surface)" />
+        @((MarkupString)SvgText(110, 106, "middle", "ui-chart-donut-value", CenterLabel))
+        @((MarkupString)SvgText(110, 126, "middle", "ui-chart-donut-caption", CenterCaption))
+    </svg>
+    <div class="ui-chart-legend">
+        @foreach (var item in Data.Select((value, index) => (value, index)))
+        {
+            <span class="ui-chart-legend-item"><i style="background: @(item.value.Color ?? GetPaletteColor(item.index));"></i>@item.value.Label <strong>@FormatPercentage(item.value.Value)</strong></span>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public IReadOnlyList<UiChartData> Data { get; set; } = Array.Empty<UiChartData>();
+    [Parameter] public string CenterLabel { get; set; } = "100 %";
+    [Parameter] public string CenterCaption { get; set; } = "total";
+    [Parameter] public string AriaLabel { get; set; } = "Graphique en anneau";
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private double Total => Data.Sum(item => Math.Max(item.Value, 0));
+
+    private (string Path, double StartAngle, double EndAngle) GetSlice(int index)
+    {
+        var startAngle = Data.Take(index).Sum(item => Math.Max(item.Value, 0)) / Total * 360 - 90;
+        var endAngle = startAngle + Math.Max(Data[index].Value, 0) / Total * 360;
+        var outerStart = PointOnCircle(110, 110, 100, startAngle);
+        var outerEnd = PointOnCircle(110, 110, 100, endAngle);
+        var innerStart = PointOnCircle(110, 110, 60, startAngle);
+        var innerEnd = PointOnCircle(110, 110, 60, endAngle);
+        var largeArc = endAngle - startAngle > 180 ? 1 : 0;
+        return ($"M {outerStart.X.ToString("0.##", CultureInfo.InvariantCulture)} {outerStart.Y.ToString("0.##", CultureInfo.InvariantCulture)} A 100 100 0 {largeArc} 1 {outerEnd.X.ToString("0.##", CultureInfo.InvariantCulture)} {outerEnd.Y.ToString("0.##", CultureInfo.InvariantCulture)} L {innerEnd.X.ToString("0.##", CultureInfo.InvariantCulture)} {innerEnd.Y.ToString("0.##", CultureInfo.InvariantCulture)} A 60 60 0 {largeArc} 0 {innerStart.X.ToString("0.##", CultureInfo.InvariantCulture)} {innerStart.Y.ToString("0.##", CultureInfo.InvariantCulture)} Z", startAngle, endAngle);
+    }
+
+    private static (double X, double Y) PointOnCircle(double centerX, double centerY, double radius, double angle)
+    {
+        var radians = angle * Math.PI / 180;
+        return (centerX + radius * Math.Cos(radians), centerY + radius * Math.Sin(radians));
+    }
+
+    private string FormatPercentage(double value) => Total <= 0 ? "0 %" : $"{value / Total * 100:0.#} %";
+
+    private static string GetPaletteColor(int index) => (index % 4) switch
+    {
+        0 => "var(--primary)",
+        1 => "var(--info)",
+        2 => "var(--success)",
+        _ => "var(--warning)"
+    };
+
+    private static string SvgText(double x, double y, string anchor, string cssClass, string value) =>
+        $"<text x=\"{x.ToString("0.##", CultureInfo.InvariantCulture)}\" y=\"{y.ToString("0.##", CultureInfo.InvariantCulture)}\" text-anchor=\"{anchor}\" class=\"{cssClass}\">{System.Net.WebUtility.HtmlEncode(value)}</text>";
+}

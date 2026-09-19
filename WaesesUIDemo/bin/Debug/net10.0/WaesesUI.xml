@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>WaesesUI</name>
+    </assembly>
+    <members>
+        <member name="P:WaesesUI.UiAutocomplete`2.Items">
+            <summary>All available items to search from.</summary>
+        </member>
+        <member name="P:WaesesUI.UiAutocomplete`2.DisplaySelector">
+            <summary>Extracts the display text from an item.</summary>
+        </member>
+        <member name="P:WaesesUI.UiAutocomplete`2.ValueSelector">
+            <summary>Extracts the bound value from an item.</summary>
+        </member>
+        <member name="P:WaesesUI.UiAutocomplete`2.FilterPredicate">
+            <summary>Custom filter predicate. Defaults to case-insensitive contains on display text.</summary>
+        </member>
+        <member name="P:WaesesUI.UiAutocomplete`2.ItemTemplate">
+            <summary>Optional custom template for each dropdown option.</summary>
+        </member>
+        <member name="P:WaesesUI.UiAutocomplete`2.MaxResults">
+            <summary>Maximum number of items shown in the dropdown.</summary>
+        </member>
+        <member name="P:WaesesUI.UiAutocomplete`2.SearchFunc">
+            <summary>Optional asynchronous search provider. When set, it takes precedence over Items.</summary>
+        </member>
+    </members>
+</doc>
