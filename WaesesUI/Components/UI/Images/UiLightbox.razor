@@ -1,0 +1,18 @@
+@namespace WaesesUI
+
+<UiModal @bind-IsOpen="IsOpen" Title="@Alt" Size="UiSize.Xl" Class="ui-lightbox-modal">
+    <ChildContent>
+        <figure class="ui-lightbox-figure">
+            <img src="@Src" alt="@Alt" />
+            @if (!string.IsNullOrWhiteSpace(Caption)) { <figcaption>@Caption</figcaption> }
+        </figure>
+    </ChildContent>
+</UiModal>
+
+@code {
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
+    [Parameter] public string Src { get; set; } = string.Empty;
+    [Parameter] public string Alt { get; set; } = "Image";
+    [Parameter] public string? Caption { get; set; }
+}

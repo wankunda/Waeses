@@ -1,0 +1,24 @@
+@namespace WaesesUI
+
+<div class="ui-loading-overlay-host @Class" @attributes="AdditionalAttributes">
+    @ChildContent
+    @if (IsLoading)
+    {
+        <div class="ui-loading-overlay" role="status" aria-live="polite">
+            <UiSpinner Size="@Size" Color="UiColor.Primary" />
+            @if (!string.IsNullOrWhiteSpace(Text))
+            {
+                <span>@Text</span>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public bool IsLoading { get; set; }
+    [Parameter] public string? Text { get; set; } = "Chargement...";
+    [Parameter] public UiSize Size { get; set; } = UiSize.Md;
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+}

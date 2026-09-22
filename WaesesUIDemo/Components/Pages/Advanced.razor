@@ -1,0 +1,74 @@
+@page "/avances"
+@rendermode InteractiveServer
+
+<PageTitle>Compositions avancées · WaesesUI</PageTitle>
+
+<DemoPageHeader Eyebrow="05 · Avancé" Title="Composer des expériences complètes" Description="Navigation structurée, contenu riche, média et localisation dans une seule surface de démonstration." />
+
+<UiBreadcrumbs Items="_breadcrumbs" />
+
+<section class="ui-grid ui-grid-cols-2 mt-md">
+    <UiCard Title="Navigation avancée" Subtitle="Étapes et chronologie">
+        <UiStepper Steps="_steps" @bind-ActiveIndex="_activeStep" />
+        <UiDivider Label="Historique" />
+        <UiTimeline Items="_timeline" />
+    </UiCard>
+
+    <UiCard Title="Contenu composable" Subtitle="Des primitives pour structurer l'information">
+        <div class="ui-flex-row">
+            <UiChip Text="Stable" Color="UiColor.Success" />
+            <UiChip Text="Nouveau" Color="UiColor.Info" Dismissible="true" />
+            <UiChip Text="Design system" Color="UiColor.Primary" />
+        </div>
+        <UiCallout Title="Une composition locale" Color="UiColor.Info" Class="mt-sm">Les callouts, listes et séparateurs partagent les tokens du thème.</UiCallout>
+        <UiList TItem="string" Items="_team" Class="mt-sm">
+            <ItemTemplate Context="member">
+                <UiListItem>
+                    <ChildContent><strong>@member</strong><div class="text-secondary">Contributeur WaesesUI</div></ChildContent>
+                    <Trailing><UiBadge Text="Actif" Color="UiColor.Success" /></Trailing>
+                </UiListItem>
+            </ItemTemplate>
+        </UiList>
+    </UiCard>
+</section>
+
+<section class="ui-grid ui-grid-cols-2 mt-sm">
+    <UiCard Title="Code et fichiers" Subtitle="Partager un exemple ou un document">
+        <UiCodeBlock Language="razor" Code="@CodeSample" />
+        <div class="ui-flex-col mt-sm">
+            <UiFilePreview FileName="WaesesUI-guide.pdf" ContentType="application/pdf" SizeBytes="248832" Url="/README.md" />
+            <UiFilePreview FileName="Theme.cs" ContentType="text/plain" SizeBytes="8192" />
+        </div>
+    </UiCard>
+
+    <UiCard Title="Média et localisation" Subtitle="Galerie, lightbox et culture courante">
+        <UiImageGallery Items="_gallery" />
+        <UiDivider />
+        <UiLocaleSwitcher />
+        <p class="text-secondary mt-sm"><UiLocalizedText Key="ui.loading" Fallback="Chargement..." /> · <UiLocalizedText Key="ui.copy" Fallback="Copier" /></p>
+    </UiCard>
+</section>
+
+@code {
+    private int _activeStep = 1;
+    private readonly IReadOnlyList<UiBreadcrumbItem> _breadcrumbs = new[]
+    {
+        new UiBreadcrumbItem("Accueil", "/"), new UiBreadcrumbItem("Avancé", "/avances", Microsoft.AspNetCore.Components.Routing.NavLinkMatch.All)
+    };
+    private readonly IReadOnlyList<UiStepItem> _steps = new[]
+    {
+        new UiStepItem("Explorer", "Primitives", Completed: true), new UiStepItem("Composer", "Fragments"), new UiStepItem("Publier", "Production")
+    };
+    private readonly IReadOnlyList<UiTimelineItem> _timeline = new[]
+    {
+        new UiTimelineItem("Composants ajoutés", "Navigation et contenu riche disponibles.", "Aujourd'hui", UiColor.Success),
+        new UiTimelineItem("API stabilisée", "Paramètres typés et slots Razor.", "Cette semaine", UiColor.Info)
+    };
+    private readonly IReadOnlyList<string> _team = new[] { "Alice Martin", "Benoît Roy", "Chloé Petit" };
+    private readonly IReadOnlyList<UiGalleryItem> _gallery = new[]
+    {
+        new UiGalleryItem("https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1000&q=80", "Espace de travail", "Une composition claire."),
+        new UiGalleryItem("https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1000&q=80", "Salle de réunion", "Un second aperçu média.")
+    };
+    private const string CodeSample = "<UiBreadcrumbs Items=\"_items\" />\n<UiCallout Title=\"Information\">Contenu local.</UiCallout>";
+}

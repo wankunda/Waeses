@@ -61,6 +61,35 @@ window.UiInterop = {
         delete rootEl._uiHandleOutsideClick;
     },
 
+    setupOverlay: function (rootEl, dotNetRef) {
+        if (!rootEl) return;
+
+        rootEl._uiHandleOverlayOutsideClick = function (event) {
+            if (!rootEl.contains(event.target)) {
+                dotNetRef.invokeMethodAsync('CloseOverlay');
+            }
+        };
+        rootEl._uiHandleOverlayKeydown = function (event) {
+            if (event.key === 'Escape') {
+                dotNetRef.invokeMethodAsync('CloseOverlay');
+            }
+        };
+        document.addEventListener('mousedown', rootEl._uiHandleOverlayOutsideClick);
+        document.addEventListener('keydown', rootEl._uiHandleOverlayKeydown);
+    },
+
+    teardownOverlay: function (rootEl) {
+        if (!rootEl) return;
+        if (rootEl._uiHandleOverlayOutsideClick) {
+            document.removeEventListener('mousedown', rootEl._uiHandleOverlayOutsideClick);
+            delete rootEl._uiHandleOverlayOutsideClick;
+        }
+        if (rootEl._uiHandleOverlayKeydown) {
+            document.removeEventListener('keydown', rootEl._uiHandleOverlayKeydown);
+            delete rootEl._uiHandleOverlayKeydown;
+        }
+    },
+
     // Focus trap: returns first/last focusable inside container
     _getFocusableElements: function (container) {
         const selectors = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -128,5 +157,9 @@ window.UiInterop = {
 
     unlockBodyScroll: function () {
         document.body.style.overflow = '';
+    },
+
+    copyText: async function (text) {
+        await navigator.clipboard.writeText(text || '');
     }
 };

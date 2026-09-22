@@ -62,12 +62,12 @@ Les composants sont organises par familles :
 | Famille | Composants |
 | --- | --- |
 | Actions | `UiButton`, `UiBadge` |
-| Layout et navigation | `UiLayout`, `UiSimpleLayout`, `UiNavMenu`, `UiNavMenuItem` |
-| Formulaires | `UiInput`, `UiSelect`, `UiAutocomplete`, `UiDateTimePicker`, `UiCheckbox`, `UiSwitch`, `UiSlider`, `UiRadioGroup`, `UiRadioOption`, `UiInputFile` |
-| Contenu | `UiCard`, `UiImage`, `UiAvatar`, `UiAvatarGroup`, `UiAvatarMenu` |
-| Feedback | `UiAlert`, `UiSpinner`, `UiTooltip`, `UiAccordion`, `UiAccordionItem`, `UiToastContainer`, `UiMessageBoxProvider` |
-| Overlays | `UiModal` |
-| Donnees | `UiTable`, `UiTh`, `UiProgress`, `UiProgressCircle` |
+| Layout et navigation | `UiLayout`, `UiSimpleLayout`, `UiNavMenu`, `UiNavMenuItem`, `UiBreadcrumbs`, `UiStepper` |
+| Formulaires | `UiInput`, `UiTextArea`, `UiSelect`, `UiMultiSelect`, `UiLocaleSwitcher`, `UiAutocomplete`, `UiDateTimePicker`, `UiCheckbox`, `UiSwitch`, `UiSlider`, `UiRadioGroup`, `UiRadioOption`, `UiInputFile` |
+| Contenu | `UiCard`, `UiList`, `UiListItem`, `UiChip`, `UiDivider`, `UiCodeBlock`, `UiCopyButton`, `UiImage`, `UiImageGallery`, `UiLightbox`, `UiFilePreview`, `UiAvatar`, `UiAvatarGroup`, `UiAvatarMenu` |
+| Feedback | `UiAlert`, `UiCallout`, `UiTimeline`, `UiLocalizedText`, `UiSpinner`, `UiSkeleton`, `UiEmptyState`, `UiErrorState`, `UiLoadingOverlay`, `UiTooltip`, `UiAccordion`, `UiAccordionItem`, `UiToastContainer`, `UiMessageBoxProvider` |
+| Overlays | `UiModal`, `UiPopover`, `UiDropdownMenu`, `UiDrawer` |
+| Donnees | `UiTable`, `UiTh`, `UiPagination`, `UiProgress`, `UiProgressCircle` |
 | Onglets | `UiTabs`, `UiTabPanel` |
 | Icones | `UiIcon` et les collections de la classe `Icons` |
 
@@ -134,6 +134,27 @@ Les controles derives de `InputBase<TValue>` fonctionnent avec `@bind-Value` et 
 
 `UiInput<TValue>` prend notamment en charge `string`, `int`, `long`, `double`, `decimal` et les types nullable correspondants via `BindConverter`.
 
+Pour un texte long, utilisez `UiTextArea` avec `@bind-Value`, `Rows`, `MaxLength` et `ShowCharacterCount`. `UiMultiSelect` lie une collection typée via `SelectedValues` et `SelectedValuesChanged` :
+
+```razor
+<UiMultiSelect TItem="Team" TValue="int"
+               Items="@teams"
+               @bind-SelectedValues="selectedTeamIds"
+               DisplaySelector="team => team.Name"
+               ValueSelector="team => team.Id" />
+```
+
+`UiTable` expose aussi `IsLoading`, `ErrorMessage` et `OnRetry` pour afficher les états de chargement et d'erreur sans dupliquer le rendu dans chaque page. `UiPagination` peut être utilisé seul pour les collections chargées côté serveur.
+
+## Internationalisation
+
+`AddWaesesUIServices()` enregistre `IUiLocalizationService`. Utilisez `UiLocalizedText` pour un texte traduit, `UiLocaleSwitcher` pour changer de culture et le service pour formater les nombres et les dates :
+
+```razor
+<UiLocaleSwitcher />
+<UiLocalizedText Key="ui.loading" Fallback="Chargement..." />
+```
+
 ## Feedback et services
 
 Placez les providers une seule fois dans le layout principal :
@@ -183,6 +204,7 @@ Le projet `WaesesUIDemo` presente les composants par scenarios :
 - `/fondations` : actions, feedback, overlays, icones, avatars et layouts ;
 - `/formulaires` : formulaires et controles de saisie ;
 - `/donnees` : tables, progression, images et confirmations.
+- `/avances` : navigation avancée, contenu riche, galerie et localisation.
 
 Lancer le demo depuis la racine :
 

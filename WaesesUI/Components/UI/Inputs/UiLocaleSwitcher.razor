@@ -1,0 +1,35 @@
+@namespace WaesesUI
+@implements IDisposable
+@inject IUiLocalizationService Localization
+
+<div class="ui-locale-switcher @Class">
+    <label for="@Id">@Label</label>
+    <select id="@Id" value="@Localization.Culture.Name" @onchange="ChangeCulture" @attributes="AdditionalAttributes">
+        @foreach (var culture in Cultures)
+        {
+            <option value="@culture.Name">@culture.DisplayName</option>
+        }
+    </select>
+</div>
+
+@code {
+    [Parameter] public IReadOnlyList<CultureInfo> Cultures { get; set; } = new[] { CultureInfo.GetCultureInfo("fr-FR"), CultureInfo.GetCultureInfo("en-US") };
+    [Parameter] public string Label { get; set; } = "Langue";
+    [Parameter] public string? Id { get; set; } = $"locale-{Guid.NewGuid():N}";
+    [Parameter] public EventCallback<CultureInfo> CultureChanged { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    protected override void OnInitialized() => Localization.OnCultureChanged += HandleCultureChanged;
+
+    private async Task ChangeCulture(ChangeEventArgs args)
+    {
+        var name = args.Value?.ToString();
+        if (string.IsNullOrWhiteSpace(name)) return;
+        await Localization.SetCultureAsync(name);
+        await CultureChanged.InvokeAsync(Localization.Culture);
+    }
+
+    private void HandleCultureChanged() => InvokeAsync(StateHasChanged);
+    public void Dispose() => Localization.OnCultureChanged -= HandleCultureChanged;
+}

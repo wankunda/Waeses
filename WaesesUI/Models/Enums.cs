@@ -19,6 +19,19 @@ public enum UiSize
     Xl
 }
 
+public enum UiSkeletonVariant
+{
+    Text,
+    Rect,
+    Circle
+}
+
+public enum UiDrawerPosition
+{
+    Left,
+    Right
+}
+
 public enum UiDateTimeMode
 {
     Date,

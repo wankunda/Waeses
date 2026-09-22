@@ -8,7 +8,7 @@
     ".NETCoreApp,Version=v10.0": {
       "WaesesUIDemo/1.0.0": {
         "dependencies": {
-          "WaesesUI": "1.0.1"
+          "WaesesUI": "1.0.2"
         },
         "runtime": {
           "WaesesUIDemo.dll": {}
@@ -22,14 +22,14 @@
           }
         }
       },
-      "WaesesUI/1.0.1": {
+      "WaesesUI/1.0.2": {
         "dependencies": {
           "System.Security.Cryptography.ProtectedData": "9.0.11"
         },
         "runtime": {
           "WaesesUI.dll": {
-            "assemblyVersion": "1.0.1.0",
-            "fileVersion": "1.0.1.0"
+            "assemblyVersion": "1.0.2.0",
+            "fileVersion": "1.0.2.0"
           }
         }
       }
@@ -48,7 +48,7 @@
       "path": "system.security.cryptography.protecteddata/9.0.11",
       "hashPath": "system.security.cryptography.protecteddata.9.0.11.nupkg.sha512"
     },
-    "WaesesUI/1.0.1": {
+    "WaesesUI/1.0.2": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

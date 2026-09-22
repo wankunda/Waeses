@@ -1,0 +1,36 @@
+@namespace WaesesUI
+
+<article class="ui-file-preview @Class" @attributes="AdditionalAttributes">
+    <UiIcon Icon="@GetIcon()" Size="UiSize.Lg" Color="UiColor.Primary" aria-hidden="true" />
+    <div class="ui-file-preview-info">
+        <strong>@FileName</strong>
+        @if (!string.IsNullOrWhiteSpace(ContentType) || SizeBytes.HasValue) { <small>@ContentType @FormatSize()</small> }
+    </div>
+    @if (!string.IsNullOrWhiteSpace(Url))
+    {
+        <a class="ui-btn ui-btn-ghost ui-btn-sm" href="@Url" target="_blank" rel="noopener" download="@FileName">Ouvrir</a>
+    }
+</article>
+
+@code {
+    [Parameter] public string FileName { get; set; } = "Fichier";
+    [Parameter] public string? ContentType { get; set; }
+    [Parameter] public long? SizeBytes { get; set; }
+    [Parameter] public string? Url { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string FormatSize() => !SizeBytes.HasValue ? string.Empty : SizeBytes.Value switch
+    {
+        < 1024 => $"· {SizeBytes} o",
+        < 1024 * 1024 => $"· {SizeBytes.Value / 1024d:0.#} Ko",
+        _ => $"· {SizeBytes.Value / (1024d * 1024d):0.#} Mo"
+    };
+
+    private string GetIcon() => ContentType?.ToLowerInvariant() switch
+    {
+        "application/pdf" => Icons.Custom.FileFormats.FilePdf,
+        "image/jpeg" or "image/png" or "image/webp" => Icons.Custom.FileFormats.FileImage,
+        _ => Icons.Custom.FileFormats.FileDocument
+    };
+}

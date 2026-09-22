@@ -1,0 +1,22 @@
+@namespace WaesesUI
+
+<ol class="ui-timeline @Class" aria-label="@AriaLabel" @attributes="AdditionalAttributes">
+    @foreach (var item in Items)
+    {
+        <li class="ui-timeline-item">
+            <span class="ui-timeline-marker ui-timeline-marker-@item.Color.ToString().ToLower()" aria-hidden="true"></span>
+            <div class="ui-timeline-content">
+                @if (!string.IsNullOrWhiteSpace(item.Date)) { <time>@item.Date</time> }
+                <strong>@item.Title</strong>
+                @if (!string.IsNullOrWhiteSpace(item.Description)) { <p>@item.Description</p> }
+            </div>
+        </li>
+    }
+</ol>
+
+@code {
+    [Parameter] public IReadOnlyList<UiTimelineItem> Items { get; set; } = Array.Empty<UiTimelineItem>();
+    [Parameter] public string AriaLabel { get; set; } = "Chronologie";
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+}

@@ -1,0 +1,64 @@
+@namespace WaesesUI
+
+@if (IsOpen)
+{
+    <div class="ui-drawer-backdrop" @onclick="HandleBackdropClick">
+        <aside class="ui-drawer ui-drawer-@Position.ToString().ToLower() @Class"
+               role="dialog"
+               aria-modal="true"
+               aria-label="@AriaLabel"
+               @onclick:stopPropagation="true"
+               @attributes="AdditionalAttributes">
+            <header class="ui-drawer-header">
+                @if (Header != null)
+                {
+                    @Header
+                }
+                else
+                {
+                    <h2>@Title</h2>
+                }
+                @if (ShowCloseButton)
+                {
+                    <button type="button" class="ui-modal-close-btn" aria-label="Fermer" @onclick="CloseAsync">✕</button>
+                }
+            </header>
+            <div class="ui-drawer-body">@ChildContent</div>
+            @if (Footer != null)
+            {
+                <footer class="ui-modal-footer">@Footer</footer>
+            }
+        </aside>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
+    [Parameter] public string Title { get; set; } = "Panneau";
+    [Parameter] public string AriaLabel { get; set; } = "Panneau latéral";
+    [Parameter] public UiDrawerPosition Position { get; set; } = UiDrawerPosition.Right;
+    [Parameter] public bool CloseOnBackdropClick { get; set; } = true;
+    [Parameter] public bool ShowCloseButton { get; set; } = true;
+    [Parameter] public RenderFragment? Header { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public RenderFragment? Footer { get; set; }
+    [Parameter] public EventCallback OnClosed { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private async Task HandleBackdropClick()
+    {
+        if (CloseOnBackdropClick)
+        {
+            await CloseAsync();
+        }
+    }
+
+    private async Task CloseAsync()
+    {
+        IsOpen = false;
+        await IsOpenChanged.InvokeAsync(false);
+        await OnClosed.InvokeAsync();
+    }
+}

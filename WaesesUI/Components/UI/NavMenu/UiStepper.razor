@@ -1,0 +1,25 @@
+@namespace WaesesUI
+
+<ol class="ui-stepper @Class" aria-label="@AriaLabel" @attributes="AdditionalAttributes">
+    @foreach (var step in Steps.Select((value, index) => (value, index)))
+    {
+        var state = step.index < ActiveIndex || step.value.Completed ? "complete" : step.index == ActiveIndex ? "active" : "upcoming";
+        <li class="ui-step ui-step-@state @(step.value.Disabled ? "disabled" : "")">
+            <button type="button" disabled="@step.value.Disabled" aria-current="@(step.index == ActiveIndex ? "step" : null)" @onclick="() => SelectStep(step.index)">
+                <span class="ui-step-number">@(step.value.Completed || step.index < ActiveIndex ? "✓" : step.index + 1)</span>
+                <span class="ui-step-copy"><strong>@step.value.Title</strong>@if (!string.IsNullOrWhiteSpace(step.value.Description)) { <small>@step.value.Description</small> }</span>
+            </button>
+        </li>
+    }
+</ol>
+
+@code {
+    [Parameter] public IReadOnlyList<UiStepItem> Steps { get; set; } = Array.Empty<UiStepItem>();
+    [Parameter] public int ActiveIndex { get; set; }
+    [Parameter] public EventCallback<int> ActiveIndexChanged { get; set; }
+    [Parameter] public string AriaLabel { get; set; } = "Étapes";
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private Task SelectStep(int index) => ActiveIndexChanged.InvokeAsync(index);
+}

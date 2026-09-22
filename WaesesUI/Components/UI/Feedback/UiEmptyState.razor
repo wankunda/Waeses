@@ -1,0 +1,35 @@
+@namespace WaesesUI
+
+<section class="ui-empty-state @Class" role="status" @attributes="AdditionalAttributes">
+    @if (!string.IsNullOrWhiteSpace(Icon))
+    {
+        <UiIcon Icon="@Icon" Size="UiSize.Xl" Color="@IconColor" aria-hidden="true" />
+    }
+    <h3>@Title</h3>
+    @if (!string.IsNullOrWhiteSpace(Description))
+    {
+        <p>@Description</p>
+    }
+    @if (ChildContent != null)
+    {
+        <div class="ui-empty-state-actions">@ChildContent</div>
+    }
+    else if (!string.IsNullOrWhiteSpace(ActionText))
+    {
+        <button type="button" class="ui-btn ui-btn-outline ui-btn-md" @onclick="OnActionClick">@ActionText</button>
+    }
+</section>
+
+@code {
+    [Parameter] public string Title { get; set; } = "Aucun résultat";
+    [Parameter] public string? Description { get; set; }
+    [Parameter] public string? Icon { get; set; }
+    [Parameter] public UiColor IconColor { get; set; } = UiColor.Neutral;
+    [Parameter] public string? ActionText { get; set; }
+    [Parameter] public EventCallback OnAction { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private Task OnActionClick() => OnAction.InvokeAsync();
+}

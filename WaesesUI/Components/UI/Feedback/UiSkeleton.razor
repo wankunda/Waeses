@@ -1,0 +1,24 @@
+@namespace WaesesUI
+
+<div class="ui-skeleton ui-skeleton-@Variant.ToString().ToLower() @Class"
+     style="@GetStyle()"
+     role="status"
+     aria-label="@AriaLabel"
+     @attributes="AdditionalAttributes"></div>
+
+@code {
+    [Parameter] public UiSkeletonVariant Variant { get; set; } = UiSkeletonVariant.Text;
+    [Parameter] public string? Width { get; set; }
+    [Parameter] public string? Height { get; set; }
+    [Parameter] public string AriaLabel { get; set; } = "Chargement";
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string GetStyle()
+    {
+        var styles = new List<string>();
+        if (!string.IsNullOrWhiteSpace(Width)) styles.Add($"width: {Width};");
+        if (!string.IsNullOrWhiteSpace(Height)) styles.Add($"height: {Height};");
+        return string.Join(" ", styles);
+    }
+}

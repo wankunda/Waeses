@@ -1,0 +1,26 @@
+@namespace WaesesUI
+
+<nav class="ui-breadcrumbs @Class" aria-label="@AriaLabel" @attributes="AdditionalAttributes">
+    <ol>
+        @foreach (var item in Items.Select((value, index) => (value, index)))
+        {
+            <li class="@(item.index == Items.Count - 1 ? "current" : "")">
+                @if (!string.IsNullOrWhiteSpace(item.value.Href) && item.index < Items.Count - 1)
+                {
+                    <NavLink href="@item.value.Href" Match="@item.value.Match">@item.value.Text</NavLink>
+                }
+                else
+                {
+                    <span aria-current="@(item.index == Items.Count - 1 ? "page" : null)">@item.value.Text</span>
+                }
+            </li>
+        }
+    </ol>
+</nav>
+
+@code {
+    [Parameter] public IReadOnlyList<UiBreadcrumbItem> Items { get; set; } = Array.Empty<UiBreadcrumbItem>();
+    [Parameter] public string AriaLabel { get; set; } = "Fil d’Ariane";
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+}

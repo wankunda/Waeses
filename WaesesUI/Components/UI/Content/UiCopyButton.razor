@@ -1,0 +1,27 @@
+@namespace WaesesUI
+@inject IJSRuntime JS
+
+<button type="button" class="ui-copy-button @Class" aria-label="@Label" title="@Label" @onclick="CopyAsync">
+    <UiIcon Icon="@Icons.Material.Outlined.ContentCopy" Size="UiSize.Sm" aria-hidden="true" />
+    @if (ShowLabel) { <span>@(_copied ? CopiedLabel : Label)</span> }
+</button>
+
+@code {
+    [Parameter] public string Text { get; set; } = string.Empty;
+    [Parameter] public string Label { get; set; } = "Copier";
+    [Parameter] public string CopiedLabel { get; set; } = "Copié";
+    [Parameter] public bool ShowLabel { get; set; }
+    [Parameter] public EventCallback OnCopied { get; set; }
+    [Parameter] public string? Class { get; set; }
+
+    private bool _copied;
+
+    private async Task CopyAsync()
+    {
+        await JS.InvokeVoidAsync("UiInterop.copyText", Text);
+        _copied = true;
+        await OnCopied.InvokeAsync();
+        await Task.Delay(1400);
+        _copied = false;
+    }
+}

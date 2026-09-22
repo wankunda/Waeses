@@ -1,0 +1,16 @@
+@namespace WaesesUI
+@implements IDisposable
+@inject IUiLocalizationService Localization
+
+<span class="@Class" @attributes="AdditionalAttributes">@Localization.Get(Key, Fallback)</span>
+
+@code {
+    [Parameter] public string Key { get; set; } = string.Empty;
+    [Parameter] public string Fallback { get; set; } = string.Empty;
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    protected override void OnInitialized() => Localization.OnCultureChanged += HandleCultureChanged;
+    private void HandleCultureChanged() => InvokeAsync(StateHasChanged);
+    public void Dispose() => Localization.OnCultureChanged -= HandleCultureChanged;
+}

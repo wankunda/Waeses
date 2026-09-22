@@ -9,6 +9,7 @@ namespace WaesesUI
             services.AddScoped<IToastService, ToastService>();
             services.AddScoped<IMessageBoxService, MessageBoxService>();
             services.AddScoped<IThemeService, ThemeService>();
+            services.AddScoped<IUiLocalizationService, UiLocalizationService>();
             return services;
         }
     }

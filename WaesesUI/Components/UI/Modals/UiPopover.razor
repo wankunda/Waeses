@@ -1,0 +1,76 @@
+@namespace WaesesUI
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+<div class="ui-popover @Class" @ref="_rootRef" @attributes="AdditionalAttributes">
+    <button type="button"
+            class="ui-popover-trigger"
+            aria-expanded="@_isOpen"
+            aria-haspopup="dialog"
+            @onclick="Toggle">
+        @Trigger
+    </button>
+    @if (_isOpen)
+    {
+        <div class="ui-popover-content" role="dialog" @onclick:stopPropagation="true">
+            @ChildContent
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public RenderFragment? Trigger { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private bool _isOpen;
+    private bool _initialized;
+    private ElementReference _rootRef;
+    private DotNetObjectReference<UiPopover>? _dotNetRef;
+
+    protected override void OnParametersSet()
+    {
+        if (!_initialized || IsOpenChanged.HasDelegate)
+        {
+            _isOpen = IsOpen;
+            _initialized = true;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _dotNetRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("UiInterop.setupOverlay", _rootRef, _dotNetRef);
+        }
+    }
+
+    [JSInvokable]
+    public Task CloseOverlay() => CloseAsync();
+
+    public async Task CloseAsync()
+    {
+        _isOpen = false;
+        await IsOpenChanged.InvokeAsync(false);
+    }
+
+    private async Task Toggle()
+    {
+        _isOpen = !_isOpen;
+        await IsOpenChanged.InvokeAsync(_isOpen);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("UiInterop.teardownOverlay", _rootRef);
+        }
+        catch (JSDisconnectedException) { }
+        _dotNetRef?.Dispose();
+    }
+}

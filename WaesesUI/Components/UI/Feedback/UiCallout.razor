@@ -1,0 +1,15 @@
+@namespace WaesesUI
+
+<aside class="ui-callout ui-callout-@Color.ToString().ToLower() @Class" role="note" @attributes="AdditionalAttributes">
+    <UiIcon Icon="@Icon" Size="UiSize.Md" aria-hidden="true" />
+    <div><strong>@Title</strong><div>@ChildContent</div></div>
+</aside>
+
+@code {
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public string? Icon { get; set; } = Icons.Material.Filled.Info;
+    [Parameter] public UiColor Color { get; set; } = UiColor.Info;
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+}

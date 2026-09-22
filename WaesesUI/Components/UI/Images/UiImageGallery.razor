@@ -1,0 +1,28 @@
+@namespace WaesesUI
+
+<div class="ui-gallery @Class" @attributes="AdditionalAttributes">
+    @foreach (var item in Items)
+    {
+        <button type="button" class="ui-gallery-item" aria-label="Afficher @item.Alt" @onclick="() => Open(item)">
+            <UiImage Src="@(item.ThumbnailSrc ?? item.Src)" Alt="@item.Alt" Caption="@item.Caption" Ratio="@Ratio" />
+        </button>
+    }
+</div>
+
+<UiLightbox @bind-IsOpen="_isOpen" Src="@(_selected?.Src ?? string.Empty)" Alt="@(_selected?.Alt ?? "Image")" Caption="@_selected?.Caption" />
+
+@code {
+    [Parameter] public IReadOnlyList<UiGalleryItem> Items { get; set; } = Array.Empty<UiGalleryItem>();
+    [Parameter] public ImageRatio Ratio { get; set; } = ImageRatio.Widescreen;
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private UiGalleryItem? _selected;
+    private bool _isOpen;
+
+    private void Open(UiGalleryItem item)
+    {
+        _selected = item;
+        _isOpen = true;
+    }
+}

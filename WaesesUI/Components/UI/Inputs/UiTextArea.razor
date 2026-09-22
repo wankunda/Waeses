@@ -1,0 +1,91 @@
+@typeparam TValue
+@inherits InputBase<TValue>
+@namespace WaesesUI
+
+<div class="ui-form-group @Class">
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <label class="ui-label" for="@Id">
+            @Label
+            @if (Required || IsRequiredByAttribute())
+            {
+                <span class="ui-label-required">*</span>
+            }
+        </label>
+    }
+    <textarea id="@Id"
+              class="ui-input ui-textarea @CssClass @(HasError ? "ui-input-error" : "")"
+              placeholder="@Placeholder"
+              rows="@Rows"
+              disabled="@Disabled"
+              readonly="@ReadOnly"
+              maxlength="@MaxLength"
+              @oninput="HandleInput"
+              @onchange="HandleChange"
+              @attributes="AdditionalAttributes">@CurrentValueAsString</textarea>
+    @if (ShowCharacterCount && MaxLength.HasValue)
+    {
+        <div class="ui-textarea-count">@((CurrentValueAsString ?? string.Empty).Length) / @MaxLength</div>
+    }
+    @if (HasError)
+    {
+        <div class="ui-error-text"><span>⚠</span><span>@GetFirstError()</span></div>
+    }
+    else if (!string.IsNullOrEmpty(HelperText))
+    {
+        <div class="ui-helper-text">@HelperText</div>
+    }
+</div>
+
+@code {
+    [Parameter] public string? Id { get; set; } = $"textarea-{Guid.NewGuid():N}";
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public string? Placeholder { get; set; }
+    [Parameter] public string? HelperText { get; set; }
+    [Parameter] public string? ErrorMessage { get; set; }
+    [Parameter] public bool Required { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public bool ReadOnly { get; set; }
+    [Parameter] public int Rows { get; set; } = 4;
+    [Parameter] public int? MaxLength { get; set; }
+    [Parameter] public bool ShowCharacterCount { get; set; }
+    [Parameter] public string? Class { get; set; }
+
+    private IEnumerable<string> GetErrors()
+    {
+        if (!string.IsNullOrEmpty(ErrorMessage)) yield return ErrorMessage;
+        if (EditContext != null && ValueExpression != null)
+        {
+            foreach (var message in EditContext.GetValidationMessages(FieldIdentifier)) yield return message;
+        }
+    }
+
+    private bool HasError => GetErrors().Any();
+    private string GetFirstError() => GetErrors().FirstOrDefault() ?? string.Empty;
+
+    private void HandleInput(ChangeEventArgs args) => CurrentValueAsString = args.Value?.ToString();
+    private void HandleChange(ChangeEventArgs args) => CurrentValueAsString = args.Value?.ToString();
+
+    protected override bool TryParseValueFromString(string? value, out TValue result, [NotNullWhen(false)] out string? validationErrorMessage)
+    {
+        if (BindConverter.TryConvertTo<TValue>(value, CultureInfo.CurrentCulture, out var parsedValue))
+        {
+            result = parsedValue!;
+            validationErrorMessage = null;
+            return true;
+        }
+
+        result = default!;
+        validationErrorMessage = $"La valeur « {value} » n'est pas valide.";
+        return false;
+    }
+
+    private bool IsRequiredByAttribute()
+    {
+        if (EditContext != null && ValueExpression?.Body is System.Linq.Expressions.MemberExpression memberExpression)
+        {
+            return memberExpression.Member.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.RequiredAttribute), true).Any();
+        }
+        return false;
+    }
+}
