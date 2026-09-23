@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WaesesUIDemo")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5f28a31631632ed8c68725f9523232577a4d4e46")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+175fb782cfb53ab514e2f70ef7eb0507af08f0fb")]
 [assembly: System.Reflection.AssemblyProductAttribute("WaesesUIDemo")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WaesesUIDemo")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
