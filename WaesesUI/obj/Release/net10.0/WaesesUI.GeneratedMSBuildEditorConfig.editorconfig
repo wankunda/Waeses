@@ -75,6 +75,30 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxDaGFydHNcVWlQaWVDaGFydC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Content/UiChip.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxDb250ZW50XFVpQ2hpcC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Content/UiCodeBlock.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxDb250ZW50XFVpQ29kZUJsb2NrLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Content/UiCopyButton.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxDb250ZW50XFVpQ29weUJ1dHRvbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Content/UiDivider.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxDb250ZW50XFVpRGl2aWRlci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Content/UiList.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxDb250ZW50XFVpTGlzdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Content/UiListItem.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxDb250ZW50XFVpTGlzdEl0ZW0ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Feedback/UiAccordion.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxGZWVkYmFja1xVaUFjY29yZGlvbi5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
@@ -87,12 +111,40 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxGZWVkYmFja1xVaUFsZXJ0LnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Feedback/UiCallout.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxGZWVkYmFja1xVaUNhbGxvdXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Feedback/UiEmptyState.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxGZWVkYmFja1xVaUVtcHR5U3RhdGUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Feedback/UiErrorState.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxGZWVkYmFja1xVaUVycm9yU3RhdGUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Feedback/UiLoadingOverlay.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxGZWVkYmFja1xVaUxvYWRpbmdPdmVybGF5LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Feedback/UiLocalizedText.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxGZWVkYmFja1xVaUxvY2FsaXplZFRleHQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Feedback/UiMessageBoxProvider.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxGZWVkYmFja1xVaU1lc3NhZ2VCb3hQcm92aWRlci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Feedback/UiSkeleton.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxGZWVkYmFja1xVaVNrZWxldG9uLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Feedback/UiSpinner.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxGZWVkYmFja1xVaVNwaW5uZXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Feedback/UiTimeline.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxGZWVkYmFja1xVaVRpbWVsaW5lLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Feedback/UiToastContainer.razor]
@@ -111,8 +163,20 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxJY29uc1xVaUljb24ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Images/UiFilePreview.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxJbWFnZXNcVWlGaWxlUHJldmlldy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Images/UiImage.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxJbWFnZXNcVWlJbWFnZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Images/UiImageGallery.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxJbWFnZXNcVWlJbWFnZUdhbGxlcnkucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Images/UiLightbox.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxJbWFnZXNcVWlMaWdodGJveC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Inputs/UiAutocomplete.razor]
@@ -135,6 +199,14 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxJbnB1dHNcVWlJbnB1dEZpbGUucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Inputs/UiLocaleSwitcher.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxJbnB1dHNcVWlMb2NhbGVTd2l0Y2hlci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Inputs/UiMultiSelect.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxJbnB1dHNcVWlNdWx0aVNlbGVjdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Inputs/UiRadioGroup.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxJbnB1dHNcVWlSYWRpb0dyb3VwLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
@@ -155,6 +227,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxJbnB1dHNcVWlTd2l0Y2gucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Inputs/UiTextArea.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxJbnB1dHNcVWlUZXh0QXJlYS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Layout/UiLayout.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxMYXlvdXRcVWlMYXlvdXQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
@@ -163,8 +239,24 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxMYXlvdXRcVWlTaW1wbGVMYXlvdXQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Modals/UiDrawer.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxNb2RhbHNcVWlEcmF3ZXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Modals/UiDropdownMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxNb2RhbHNcVWlEcm9wZG93bk1lbnUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Modals/UiModal.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxNb2RhbHNcVWlNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Modals/UiPopover.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxNb2RhbHNcVWlQb3BvdmVyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/NavMenu/UiBreadcrumbs.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxOYXZNZW51XFVpQnJlYWRjcnVtYnMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/NavMenu/UiNavMenu.razor]
@@ -175,12 +267,20 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxOYXZNZW51XFVpTmF2TWVudUl0ZW0ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/NavMenu/UiStepper.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxOYXZNZW51XFVpU3RlcHBlci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Progress/UiProgress.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxQcm9ncmVzc1xVaVByb2dyZXNzLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Progress/UiProgressCircle.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxQcm9ncmVzc1xVaVByb2dyZXNzQ2lyY2xlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Tables/UiPagination.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxUYWJsZXNcVWlQYWdpbmF0aW9uLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Tables/UiTable.razor]

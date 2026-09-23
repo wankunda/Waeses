@@ -16,7 +16,6 @@ C:\Users\pkwan\source\repos\wankunda\Waeses\WaesesUI\obj\Release\net10.0\rjimswa
 C:\Users\pkwan\source\repos\wankunda\Waeses\WaesesUI\obj\Release\net10.0\rjsmrazor.dswa.cache.json
 C:\Users\pkwan\source\repos\wankunda\Waeses\WaesesUI\obj\Release\net10.0\rjsmcshtml.dswa.cache.json
 C:\Users\pkwan\source\repos\wankunda\Waeses\WaesesUI\obj\Release\net10.0\scopedcss\bundle\WaesesUI.styles.css
-C:\Users\pkwan\source\repos\wankunda\Waeses\WaesesUI\obj\Release\net10.0\compressed\wb92zxxr3j-{0}-wa9j3oamrf-wa9j3oamrf.gz
 C:\Users\pkwan\source\repos\wankunda\Waeses\WaesesUI\obj\Release\net10.0\staticwebassets.build.json
 C:\Users\pkwan\source\repos\wankunda\Waeses\WaesesUI\obj\Release\net10.0\staticwebassets.build.json.cache
 C:\Users\pkwan\source\repos\wankunda\Waeses\WaesesUI\obj\Release\net10.0\staticwebassets.development.json
@@ -34,4 +33,5 @@ C:\Users\pkwan\source\repos\wankunda\Waeses\WaesesUI\obj\Release\net10.0\WaesesU
 C:\Users\pkwan\source\repos\wankunda\Waeses\WaesesUI\obj\Release\net10.0\WaesesUI.pdb
 C:\Users\pkwan\source\repos\wankunda\Waeses\WaesesUI\obj\Release\net10.0\ref\WaesesUI.dll
 C:\Users\pkwan\source\repos\wankunda\Waeses\WaesesUI\obj\Release\net10.0\WaesesUI.sourcelink.json
-C:\Users\pkwan\source\repos\wankunda\Waeses\WaesesUI\obj\Release\net10.0\compressed\4tq8b7y96v-{0}-83w6i4et33-83w6i4et33.gz
+C:\Users\pkwan\source\repos\wankunda\Waeses\WaesesUI\obj\Release\net10.0\compressed\4tq8b7y96v-{0}-8f42c2ge0a-8f42c2ge0a.gz
+C:\Users\pkwan\source\repos\wankunda\Waeses\WaesesUI\obj\Release\net10.0\compressed\wb92zxxr3j-{0}-dehhssbdd8-dehhssbdd8.gz
