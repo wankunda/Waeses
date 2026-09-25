@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("Bibliothèque Razor Class Library de composants UI réutilisables pour Blazor.")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.4.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.4+9d969aa472352fd2dfbdb77d01d48650fc30a764")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.4+0c4edbe32ce7b465a26888d1c453c9d91ad11dd6")]
 [assembly: System.Reflection.AssemblyProductAttribute("WaesesUI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WaesesUI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.4.0")]
