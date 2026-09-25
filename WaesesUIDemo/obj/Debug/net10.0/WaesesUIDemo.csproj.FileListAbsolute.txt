@@ -41,7 +41,6 @@ C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUIDemo/obj/Debug/net10.0/refin
 C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUIDemo/obj/Debug/net10.0/WaesesUIDemo.pdb
 C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUIDemo/obj/Debug/net10.0/WaesesUIDemo.genruntimeconfig.cache
 C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUIDemo/obj/Debug/net10.0/ref/WaesesUIDemo.dll
-C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUIDemo/bin/Debug/net10.0/System.Security.Cryptography.ProtectedData.dll
 /Users/wankunda/Documents/Projets/Waeses/WaesesUIDemo/obj/Debug/net10.0/EmbeddedAttribute.cs
 /Users/wankunda/Documents/Projets/Waeses/WaesesUIDemo/obj/Debug/net10.0/ValidatableTypeAttribute.cs
 /Users/wankunda/Documents/Projets/Waeses/WaesesUIDemo/obj/Debug/net10.0/WaesesUIDemo.dll
@@ -104,7 +103,6 @@ C:\Users\pkwan\source\repos\wankunda\Waeses\WaesesUIDemo\bin\Debug\net10.0\Waese
 C:\Users\pkwan\source\repos\wankunda\Waeses\WaesesUIDemo\bin\Debug\net10.0\WaesesUIDemo.runtimeconfig.json
 C:\Users\pkwan\source\repos\wankunda\Waeses\WaesesUIDemo\bin\Debug\net10.0\WaesesUIDemo.dll
 C:\Users\pkwan\source\repos\wankunda\Waeses\WaesesUIDemo\bin\Debug\net10.0\WaesesUIDemo.pdb
-C:\Users\pkwan\source\repos\wankunda\Waeses\WaesesUIDemo\bin\Debug\net10.0\System.Security.Cryptography.ProtectedData.dll
 C:\Users\pkwan\source\repos\wankunda\Waeses\WaesesUIDemo\bin\Debug\net10.0\WaesesUI.dll
 C:\Users\pkwan\source\repos\wankunda\Waeses\WaesesUIDemo\bin\Debug\net10.0\WaesesUI.pdb
 C:\Users\pkwan\source\repos\wankunda\Waeses\WaesesUIDemo\bin\Debug\net10.0\WaesesUI.xml

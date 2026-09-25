@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "/MZDMk1kmEs=",
+  "dgSpecHash": "oOa0FHgc0wA=",
   "success": true,
   "projectFilePath": "C:\\Users\\pkwan\\source\\repos\\wankunda\\Waeses\\WaesesUI\\WaesesUI.csproj",
   "expectedPackageFiles": [
@@ -22,8 +22,7 @@
     "C:\\Users\\pkwan\\.nuget\\packages\\microsoft.extensions.options.configurationextensions\\10.0.12\\microsoft.extensions.options.configurationextensions.10.0.12.nupkg.sha512",
     "C:\\Users\\pkwan\\.nuget\\packages\\microsoft.extensions.primitives\\10.0.12\\microsoft.extensions.primitives.10.0.12.nupkg.sha512",
     "C:\\Users\\pkwan\\.nuget\\packages\\microsoft.extensions.validation\\10.0.12\\microsoft.extensions.validation.10.0.12.nupkg.sha512",
-    "C:\\Users\\pkwan\\.nuget\\packages\\microsoft.jsinterop\\10.0.12\\microsoft.jsinterop.10.0.12.nupkg.sha512",
-    "C:\\Users\\pkwan\\.nuget\\packages\\system.security.cryptography.protecteddata\\9.0.11\\system.security.cryptography.protecteddata.9.0.11.nupkg.sha512"
+    "C:\\Users\\pkwan\\.nuget\\packages\\microsoft.jsinterop\\10.0.12\\microsoft.jsinterop.10.0.12.nupkg.sha512"
   ],
   "logs": []
 }

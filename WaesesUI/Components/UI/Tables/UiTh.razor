@@ -2,10 +2,10 @@
 @typeparam TItem
 
 <th class="@(IsSortable ? "ui-th-sortable" : "") @(IsSorted ? "ui-th-sorted" : "") @Class"
-    style="text-align: @Align; @Style"
+    style="text-align: @Align.ToString().ToLower(); @Style"
     @onclick="HandleClick"
     @attributes="AdditionalAttributes">
-    <div class="ui-th-content" style="@(Align == "right" ? "justify-content: flex-end;" : (Align == "center" ? "justify-content: center;" : ""))">
+    <div class="ui-th-content" style="@(Align == Alignement.Right ? "justify-content: flex-end;" : (Align == Alignement.Center ? "justify-content: center;" : ""))">
         @if (ChildContent != null)
         {
             @ChildContent
@@ -37,7 +37,7 @@
     [Parameter] public Func<TItem, object>? SortBy { get; set; }
     [Parameter] public string? SortKey { get; set; }
     [Parameter] public bool Sortable { get; set; } = true;
-    [Parameter] public string Align { get; set; } = "left";
+    [Parameter] public Alignement Align { get; set; } = Alignement.Left;
     [Parameter] public RenderFragment? ChildContent { get; set; }
     [Parameter] public string? Style { get; set; }
     [Parameter] public string? Class { get; set; }

@@ -336,22 +336,6 @@
             "related": ".xml"
           }
         }
-      },
-      "System.Security.Cryptography.ProtectedData/9.0.11": {
-        "type": "package",
-        "compile": {
-          "lib/net9.0/System.Security.Cryptography.ProtectedData.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net9.0/System.Security.Cryptography.ProtectedData.dll": {
-            "related": ".xml"
-          }
-        },
-        "build": {
-          "buildTransitive/net8.0/_._": {}
-        }
       }
     }
   },
@@ -877,46 +861,11 @@
         "microsoft.jsinterop.10.0.12.nupkg.sha512",
         "microsoft.jsinterop.nuspec"
       ]
-    },
-    "System.Security.Cryptography.ProtectedData/9.0.11": {
-      "sha512": "s8yUYuYYu+PAwvBdhLG1KyrGrk9gkYeuPxfAsXsTqqWyepwSyEw8hAaflW4nO98NG52YpYI1am2+9o+79h2RtQ==",
-      "type": "package",
-      "path": "system.security.cryptography.protecteddata/9.0.11",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "Icon.png",
-        "LICENSE.TXT",
-        "PACKAGE.md",
-        "THIRD-PARTY-NOTICES.TXT",
-        "buildTransitive/net461/System.Security.Cryptography.ProtectedData.targets",
-        "buildTransitive/net462/_._",
-        "buildTransitive/net8.0/_._",
-        "buildTransitive/netcoreapp2.0/System.Security.Cryptography.ProtectedData.targets",
-        "lib/MonoAndroid10/_._",
-        "lib/MonoTouch10/_._",
-        "lib/net462/System.Security.Cryptography.ProtectedData.dll",
-        "lib/net462/System.Security.Cryptography.ProtectedData.xml",
-        "lib/net8.0/System.Security.Cryptography.ProtectedData.dll",
-        "lib/net8.0/System.Security.Cryptography.ProtectedData.xml",
-        "lib/net9.0/System.Security.Cryptography.ProtectedData.dll",
-        "lib/net9.0/System.Security.Cryptography.ProtectedData.xml",
-        "lib/netstandard2.0/System.Security.Cryptography.ProtectedData.dll",
-        "lib/netstandard2.0/System.Security.Cryptography.ProtectedData.xml",
-        "lib/xamarinios10/_._",
-        "lib/xamarinmac20/_._",
-        "lib/xamarintvos10/_._",
-        "lib/xamarinwatchos10/_._",
-        "system.security.cryptography.protecteddata.9.0.11.nupkg.sha512",
-        "system.security.cryptography.protecteddata.nuspec",
-        "useSharedDesignerContext.txt"
-      ]
     }
   },
   "projectFileDependencyGroups": {
     "net10.0": [
-      "Microsoft.AspNetCore.Components.Web >= 10.0.12",
-      "System.Security.Cryptography.ProtectedData >= 9.0.11"
+      "Microsoft.AspNetCore.Components.Web >= 10.0.12"
     ]
   },
   "packageFolders": {
@@ -924,7 +873,7 @@
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
-    "version": "1.0.3",
+    "version": "1.0.4",
     "restore": {
       "projectUniqueName": "C:\\Users\\pkwan\\source\\repos\\wankunda\\Waeses\\WaesesUI\\WaesesUI.csproj",
       "projectName": "WaesesUI",
@@ -975,10 +924,6 @@
           "Microsoft.AspNetCore.Components.Web": {
             "target": "Package",
             "version": "[10.0.12, )"
-          },
-          "System.Security.Cryptography.ProtectedData": {
-            "target": "Package",
-            "version": "[9.0.11, )"
           }
         },
         "imports": [

@@ -287,6 +287,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxUYWJsZXNcVWlUYWJsZS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Tables/UiTd.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxUYWJsZXNcVWlUZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/pkwan/source/repos/wankunda/Waeses/WaesesUI/Components/UI/Tables/UiTh.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xVSVxUYWJsZXNcVWlUaC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 

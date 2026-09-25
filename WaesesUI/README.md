@@ -196,28 +196,6 @@ Pour une confirmation, utilisez `ShowAsync` et verifiez la valeur booleenne reto
 
 Les collections sont disponibles sous `Icons.Material.Filled`, `Icons.Material.Outlined`, `Icons.Material.Rounded`, `Icons.Material.Sharp`, `Icons.Material.TwoTone` et `Icons.Custom`.
 
-## Projet de demonstration
-
-Le projet `WaesesUIDemo` presente les composants par scenarios :
-
-- `/` : vue d'ensemble ;
-- `/fondations` : actions, feedback, overlays, icones, avatars et layouts ;
-- `/formulaires` : formulaires et controles de saisie ;
-- `/donnees` : tables, progression, images et confirmations.
-- `/avances` : navigation avancée, contenu riche, galerie et localisation.
-
-Lancer le demo depuis la racine :
-
-```powershell
-dotnet run --project WaesesUIDemo
-```
-
-Avec le profil HTTPS :
-
-```powershell
-dotnet watch --project .\WaesesUIDemo\WaesesUIDemo.csproj --launch-profile https
-```
-
 ## Compatibilite et limites
 
 - Le projet cible actuellement `net10.0`.
@@ -225,10 +203,3 @@ dotnet watch --project .\WaesesUIDemo\WaesesUIDemo.csproj --launch-profile https
 - `UiModal`, `UiNavMenu`, `UiAutocomplete` et certains composants de formulaire utilisent JavaScript interop. Lors de la deconnexion d'un circuit Blazor Server, les appels JavaScript de nettoyage peuvent echouer et doivent etre traites comme tels.
 - Les assets sous `_content/WaesesUI` sont servis automatiquement par le mecanisme des bibliotheques Razor.
 
-## Compilation
-
-Depuis la racine de la solution :
-
-```powershell
-dotnet build Waeses.slnx
-```

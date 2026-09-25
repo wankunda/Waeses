@@ -6,10 +6,9 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v10.0": {
-      "WaesesUI/1.0.3": {
+      "WaesesUI/1.0.4": {
         "dependencies": {
-          "Microsoft.AspNetCore.Components.Web": "10.0.12",
-          "System.Security.Cryptography.ProtectedData": "9.0.11"
+          "Microsoft.AspNetCore.Components.Web": "10.0.12"
         },
         "runtime": {
           "WaesesUI.dll": {}
@@ -219,19 +218,11 @@
             "fileVersion": "10.0.1226.42308"
           }
         }
-      },
-      "System.Security.Cryptography.ProtectedData/9.0.11": {
-        "runtime": {
-          "lib/net9.0/System.Security.Cryptography.ProtectedData.dll": {
-            "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.1125.51716"
-          }
-        }
       }
     }
   },
   "libraries": {
-    "WaesesUI/1.0.3": {
+    "WaesesUI/1.0.4": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
@@ -361,13 +352,6 @@
       "sha512": "sha512-bLgqhSs2YS3i2sOe8Mo11JzgdktB+/VADJXx2oSCE1crpg3RbFESn1mEBfiO4MjX9icW+An1zdGBFucIwIYwmA==",
       "path": "microsoft.jsinterop/10.0.12",
       "hashPath": "microsoft.jsinterop.10.0.12.nupkg.sha512"
-    },
-    "System.Security.Cryptography.ProtectedData/9.0.11": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-s8yUYuYYu+PAwvBdhLG1KyrGrk9gkYeuPxfAsXsTqqWyepwSyEw8hAaflW4nO98NG52YpYI1am2+9o+79h2RtQ==",
-      "path": "system.security.cryptography.protecteddata/9.0.11",
-      "hashPath": "system.security.cryptography.protecteddata.9.0.11.nupkg.sha512"
     }
   }
 }

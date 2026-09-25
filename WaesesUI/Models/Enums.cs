@@ -123,3 +123,10 @@ public enum UiSpinnerVariant
     Pulse
 }
 
+public enum Alignement
+{
+    Left,
+    Center,
+    Right
+}
+

@@ -1,16 +1,16 @@
 ﻿<Project>
   <ItemGroup>
-    <StaticWebAssetEndpoint Include="_content/WaesesUI/css/theme.8f42c2ge0a.css">
-      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\theme.css'))</AssetFile>
-      <Selectors><![CDATA[[]]]></Selectors>
-      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"8f42c2ge0a"},{"Name":"integrity","Value":"sha256-5NYahZgKvhwm/Vn/o97wWbJmVFrUVUsekzmSDqAjSM4="},{"Name":"label","Value":"_content/WaesesUI/css/theme.css"}]]]></EndpointProperties>
-      <ResponseHeaders><![CDATA[[{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"81646"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u00225NYahZgKvhwm/Vn/o97wWbJmVFrUVUsekzmSDqAjSM4=\u0022"},{"Name":"Last-Modified","Value":"Wed, 23 Sep 2026 06:37:57 GMT"},{"Name":"Vary","Value":"Accept-Encoding"}]]]></ResponseHeaders>
-    </StaticWebAssetEndpoint>
     <StaticWebAssetEndpoint Include="_content/WaesesUI/css/theme.css">
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\theme.css'))</AssetFile>
       <Selectors><![CDATA[[]]]></Selectors>
-      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-5NYahZgKvhwm/Vn/o97wWbJmVFrUVUsekzmSDqAjSM4="}]]]></EndpointProperties>
-      <ResponseHeaders><![CDATA[[{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"81646"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u00225NYahZgKvhwm/Vn/o97wWbJmVFrUVUsekzmSDqAjSM4=\u0022"},{"Name":"Last-Modified","Value":"Wed, 23 Sep 2026 06:37:57 GMT"},{"Name":"Vary","Value":"Accept-Encoding"}]]]></ResponseHeaders>
+      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-9xnXjaGooXH1NQi9Mak4IGzx98PFB93MaxPmb9ALuy0="}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"81674"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u00229xnXjaGooXH1NQi9Mak4IGzx98PFB93MaxPmb9ALuy0=\u0022"},{"Name":"Last-Modified","Value":"Wed, 23 Sep 2026 07:58:46 GMT"},{"Name":"Vary","Value":"Accept-Encoding"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="_content/WaesesUI/css/theme.p4an3kunvr.css">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\theme.css'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"p4an3kunvr"},{"Name":"integrity","Value":"sha256-9xnXjaGooXH1NQi9Mak4IGzx98PFB93MaxPmb9ALuy0="},{"Name":"label","Value":"_content/WaesesUI/css/theme.css"}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"81674"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u00229xnXjaGooXH1NQi9Mak4IGzx98PFB93MaxPmb9ALuy0=\u0022"},{"Name":"Last-Modified","Value":"Wed, 23 Sep 2026 07:58:46 GMT"},{"Name":"Vary","Value":"Accept-Encoding"}]]]></ResponseHeaders>
     </StaticWebAssetEndpoint>
     <StaticWebAssetEndpoint Include="_content/WaesesUI/js/ui-interop.dehhssbdd8.js">
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\js\ui-interop.js'))</AssetFile>

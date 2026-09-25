@@ -1149,7 +1149,7 @@ a {
 .ui-loading-overlay-host { position: relative; min-height: 2rem; }
 .ui-loading-overlay { position: absolute; inset: 0; z-index: 20; display: flex; align-items: center; justify-content: center; gap: .65rem; color: var(--text-secondary); background: color-mix(in srgb, var(--bg-surface) 78%, transparent); backdrop-filter: blur(2px); }
 
-.ui-pagination { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.ui-pagination { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; padding: var(--space-sm); }
 .ui-pagination-info { color: var(--text-secondary); font-size: .85rem; }
 
 /* ==========================================================================
@@ -2262,13 +2262,13 @@ a {
 .ui-pagination-nav {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: 0.5rem;
 }
 
 .ui-pagination-btn {
-    min-width: 32px;
-    height: 32px;
-    padding: 0 0.4rem;
+    min-width: 42px;
+    height: 42px;
+    padding: 0.8rem 1rem;
     border-radius: var(--radius-sm);
     border: 1px solid var(--border-default);
     background-color: var(--bg-surface);

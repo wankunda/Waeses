@@ -1,0 +1,15 @@
+@namespace WaesesUI
+
+<td class="@Class" @attributes="AdditionalAttributes" data-title ="@Label"
+style="text-align: @Align.ToString().ToLower(); @Style">
+  @ChildContent
+</td>
+
+@code{
+ [Parameter] public string? Class { get; set; }
+ [Parameter] public string? Label { get; set; }
+ [Parameter] public RenderFragment? ChildContent { get; set; }
+[Parameter] public Alignement Align { get; set; } = Alignement.Left;
+[Parameter] public string? Style { get; set; }
+ [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+}
