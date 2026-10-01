@@ -63,13 +63,32 @@ Les composants sont organises par familles :
 | --- | --- |
 | Actions | `UiButton`, `UiBadge` |
 | Layout et navigation | `UiLayout`, `UiSimpleLayout`, `UiNavMenu`, `UiNavMenuItem`, `UiBreadcrumbs`, `UiStepper` |
-| Formulaires | `UiInput`, `UiTextArea`, `UiSelect`, `UiMultiSelect`, `UiLocaleSwitcher`, `UiAutocomplete`, `UiDateTimePicker`, `UiCheckbox`, `UiSwitch`, `UiSlider`, `UiRadioGroup`, `UiRadioOption`, `UiInputFile` |
-| Contenu | `UiCard`, `UiList`, `UiListItem`, `UiChip`, `UiDivider`, `UiCodeBlock`, `UiCopyButton`, `UiImage`, `UiImageGallery`, `UiLightbox`, `UiFilePreview`, `UiAvatar`, `UiAvatarGroup`, `UiAvatarMenu` |
+| Formulaires | `UiFormField`, `UiInput`, `UiTextArea`, `UiSelect`, `UiMultiSelect`, `UiCombobox`, `UiColorPicker`, `UiTimePicker`, `UiDateRangePicker`, `UiTagInput`, `UiLocaleSwitcher`, `UiAutocomplete`, `UiDateTimePicker`, `UiCheckbox`, `UiSwitch`, `UiSlider`, `UiRadioGroup`, `UiRadioOption`, `UiInputFile` |
+| Contenu | `UiCard`, `UiList`, `UiListItem`, `UiChip`, `UiDivider`, `UiCodeBlock`, `UiCopyButton`, `UiImage`, `UiImageGallery`, `UiLightbox`, `UiCarousel`, `UiFilePreview`, `UiAvatar`, `UiAvatarGroup`, `UiAvatarMenu` |
 | Feedback | `UiAlert`, `UiCallout`, `UiTimeline`, `UiLocalizedText`, `UiSpinner`, `UiSkeleton`, `UiEmptyState`, `UiErrorState`, `UiLoadingOverlay`, `UiTooltip`, `UiAccordion`, `UiAccordionItem`, `UiToastContainer`, `UiMessageBoxProvider` |
 | Overlays | `UiModal`, `UiPopover`, `UiDropdownMenu`, `UiDrawer` |
 | Donnees | `UiTable`, `UiTh`, `UiPagination`, `UiProgress`, `UiProgressCircle` |
 | Onglets | `UiTabs`, `UiTabPanel` |
 | Icones | `UiIcon` et les collections de la classe `Icons` |
+
+## Thème et tailles
+
+Placez un unique `UiThemeProvider` dans le layout principal. Il configure globalement le thème, la densité et les palettes de couleurs transmises à tous les composants. Les palettes proviennent de la classe statique `UiColors` et contiennent les teintes `Default`, `Lighten1..5`, `Darken1..4` et, selon la palette, `Accent1..4`.
+
+```razor
+<UiThemeProvider Theme="UiTheme.System"
+                 Density="UiDensity.Comfortable"
+                 Primary="@UiColors.Indigo"
+                 Secondary="@UiColors.BlueGray"
+                 Success="@UiColors.Green"
+                 Danger="@UiColors.Red"
+                 Warning="@UiColors.Amber"
+                 Info="@UiColors.LightBlue" />
+```
+
+Les tailles standard sont `UiSize.Xs`, `Sm`, `Md` et `Lg`. `UiSize.Xl` est conservé pour compatibilité et les éléments volontairement grands. Les tokens typographiques des contrôles sont `--control-font-xs`, `--control-font-sm`, `--control-font-md` et `--control-font-lg`; leurs hauteurs correspondantes sont `--control-height-xs` à `--control-height-lg`. L'espacement s'appuie sur `--space-2xs`, `--space-xs`, `--space-sm`, `--space-md`, `--space-lg` et `--space-xl`. La densité est réglée par `data-ui-density` et `--density-factor`.
+
+Les boutons utilisent `Size`. Les champs natifs peuvent recevoir les classes `ui-input-xs`, `ui-input-sm` et `ui-input-lg` en complément de la taille standard `md`.
 
 ## Layout et navigation
 
@@ -154,6 +173,10 @@ Pour un texte long, utilisez `UiTextArea` avec `@bind-Value`, `Rows`, `MaxLength
 <UiLocaleSwitcher />
 <UiLocalizedText Key="ui.loading" Fallback="Chargement..." />
 ```
+
+## Formulaires avancés
+
+`UiTimePicker` lie un `TimeSpan?`, `UiDateRangePicker` lie séparément les bornes `Start` et `End`, et `UiTagInput` expose une collection de chaînes via `@bind-Values`. `UiCombobox` fournit un contrôle de sélection unique avec filtrage clavier ; `UiColorPicker` lie une couleur hexadécimale. `UiFormField` enveloppe un contrôle personnalisé avec un libellé, une aide et une erreur cohérents.
 
 ## Feedback et services
 

@@ -13,10 +13,26 @@ public enum UiColor
 
 public enum UiSize
 {
+    Xs,
     Sm,
     Md,
     Lg,
-    Xl
+    Xl,
+    Max
+}
+
+public enum UiDensity
+{
+    Compact,
+    Comfortable,
+    Spacious
+}
+
+public enum UiTheme
+{
+    System,
+    Light,
+    Dark
 }
 
 public enum UiSkeletonVariant

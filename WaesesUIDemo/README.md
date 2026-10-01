@@ -6,8 +6,9 @@ Projet Blazor Web App .NET 10 qui presente l'utilisation de la bibliotheque Razo
 
 - `/` : vue d'ensemble et parcours recommande.
 - `/fondations` : boutons, badges, alertes, toasts, boites de dialogue, onglets, accordeon, avatars, tooltip et progression.
-- `/formulaires` : `EditForm`, validation DataAnnotations, champs texte et numériques typés, select, date/heure, switch, checkbox, slider, radios, autocomplete et upload.
-- `/donnees` : table avec recherche, tri, pagination et clic de ligne, progression circulaire, image avec fallback et confirmation.
+- `/formulaires` : `EditForm`, validation DataAnnotations, champs texte et numériques typés, select, couleur, heure, plages de dates, tags, combobox, switch, checkbox, slider, radios, autocomplete et upload.
+- `/donnees` : table avec recherche, tri, pagination et clic de ligne, progression circulaire, image avec fallback, carousel et confirmation.
+- `/avances` : navigation avancée, contenu riche, galerie, aperçu de fichiers, `UiThemeProvider` et localisation.
 
 ## Lancer le demo
 

@@ -19,7 +19,11 @@
                     <option value="Ingénierie">Ingénierie</option>
                 </UiSelect>
                 <UiDateTimePicker Label="Disponibilité" Mode="UiDateTimeMode.Date" @bind-Value="_model.AvailableOn" />
+                <UiTimePicker Label="Heure de disponibilité" @bind-Value="_model.AvailableAt" Step="900" />
+                <UiDateRangePicker Label="Période du projet" @bind-Start="_model.PeriodStart" @bind-End="_model.PeriodEnd" />
+                <UiColorPicker TValue="string" Label="Couleur du projet" @bind-Value="_model.ProjectColor" />
                 <UiTextArea TValue="string" Label="Contexte du projet" @bind-Value="_model.Context" Placeholder="Décrivez le besoin en quelques lignes..." Rows="4" MaxLength="240" ShowCharacterCount="true" />
+                <UiTagInput Label="Mots-clés" @bind-Values="_model.Tags" HelperText="Entrée ou virgule pour ajouter." />
             </div>
             <ValidationSummary />
             <div class="ui-flex-row mt-md">
@@ -46,6 +50,7 @@
 <section class="ui-grid ui-grid-cols-2 mt-sm">
     <UiCard Title="Recherche assistée" Subtitle="Autocomplete typé">
         <UiAutocomplete TItem="DemoCity" TValue="string" Label="Ville" Items="_cities" @bind-Value="_model.City" DisplaySelector="city => city.Name" ValueSelector="city => city.Code" Placeholder="Rechercher une ville" />
+        <UiCombobox TItem="DemoCity" TValue="string" Label="Ville (combobox)" Items="_cities" @bind-Value="_model.City" DisplaySelector="city => city.Name" ValueSelector="city => city.Code" Placeholder="Filtrer et sélectionner" />
         <p class="text-secondary">La liste peut être remplacée par un `SearchFunc` asynchrone.</p>
     </UiCard>
     <UiCard Title="Import de fichiers" Subtitle="Dropzone ou bouton classique">
@@ -58,7 +63,7 @@
 </section>
 
 @code {
-    private readonly DemoFormModel _model = new() { AvailableOn = DateTime.Today.AddDays(7), Team = "Produit", Channel = "Email", City = "PAR" };
+    private readonly DemoFormModel _model = new() { AvailableOn = DateTime.Today.AddDays(7), AvailableAt = TimeSpan.FromHours(9), PeriodStart = DateTime.Today, PeriodEnd = DateTime.Today.AddDays(7), ProjectColor = "#4f46e5", Team = "Produit", Channel = "Email", City = "PAR", Tags = new[] { "Blazor" } };
     private readonly IReadOnlyList<DemoCity> _cities = new[]
     {
         new DemoCity("Paris", "PAR"), new DemoCity("Lyon", "LYO"), new DemoCity("Lille", "LIL"), new DemoCity("Marseille", "MRS")
@@ -79,7 +84,12 @@
         public decimal Budget { get; set; } = 2500;
         [Required(ErrorMessage = "Choisissez une équipe.")] public string Team { get; set; } = string.Empty;
         public DateTime? AvailableOn { get; set; }
+        public TimeSpan? AvailableAt { get; set; }
+        public DateTime? PeriodStart { get; set; }
+        public DateTime? PeriodEnd { get; set; }
+        public string ProjectColor { get; set; } = "#4f46e5";
         public string Context { get; set; } = string.Empty;
+        public IReadOnlyList<string> Tags { get; set; } = Array.Empty<string>();
         public bool Newsletter { get; set; } = true;
         public bool Accepted { get; set; }
         public double DetailLevel { get; set; } = 50;

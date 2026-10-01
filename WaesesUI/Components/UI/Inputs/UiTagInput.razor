@@ -1,0 +1,63 @@
+@namespace WaesesUI
+
+<UiFormField For="@Id" Label="@Label" HelperText="@HelperText" Error="@ErrorMessage" Required="@Required" Class="@Class">
+    <div class="ui-tag-input" @onclick="FocusInput">
+        @foreach (var tag in Values)
+        {
+            <UiChip Text="@tag" Dismissible="true" OnDismiss="() => RemoveAsync(tag)" />
+        }
+        <input @ref="_inputRef" id="@Id" value="@_draft" placeholder="@Placeholder" disabled="@Disabled" aria-label="@Label" @oninput="UpdateDraft" @onkeydown="HandleKeyDown" @onblur="HandleBlur" @attributes="AdditionalAttributes" />
+    </div>
+</UiFormField>
+
+@code {
+    private ElementReference _inputRef;
+    private string _draft = string.Empty;
+
+    [Parameter] public string? Id { get; set; } = $"tags-{Guid.NewGuid():N}";
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public string? Placeholder { get; set; } = "Ajouter une valeur...";
+    [Parameter] public string? HelperText { get; set; }
+    [Parameter] public string? ErrorMessage { get; set; }
+    [Parameter] public bool Required { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public IReadOnlyList<string> Values { get; set; } = Array.Empty<string>();
+    [Parameter] public EventCallback<IReadOnlyList<string>> ValuesChanged { get; set; }
+    [Parameter] public char Separator { get; set; } = ',';
+    [Parameter] public int MaxTags { get; set; } = 0;
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private void UpdateDraft(ChangeEventArgs args) => _draft = args.Value?.ToString() ?? string.Empty;
+
+    private async Task HandleKeyDown(KeyboardEventArgs args)
+    {
+        if (args.Key is "Enter" or "Tab" || args.Key.Length == 1 && args.Key[0] == Separator)
+        {
+            await CommitAsync();
+        }
+        else if (args.Key == "Backspace" && string.IsNullOrEmpty(_draft) && Values.Count > 0)
+        {
+            await RemoveAsync(Values[^1]);
+        }
+    }
+
+    private Task HandleBlur(FocusEventArgs _) => CommitAsync();
+
+    private async Task CommitAsync()
+    {
+        var newTags = _draft.Split(Separator, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        if (newTags.Length == 0) return;
+        var values = Values.ToList();
+        foreach (var tag in newTags.Distinct(StringComparer.OrdinalIgnoreCase))
+        {
+            if (!values.Contains(tag, StringComparer.OrdinalIgnoreCase) && (MaxTags <= 0 || values.Count < MaxTags)) values.Add(tag);
+        }
+        _draft = string.Empty;
+        await ValuesChanged.InvokeAsync(values);
+    }
+
+    private Task RemoveAsync(string tag) => ValuesChanged.InvokeAsync(Values.Where(value => !string.Equals(value, tag, StringComparison.OrdinalIgnoreCase)).ToArray());
+
+    private async Task FocusInput() => await _inputRef.FocusAsync();
+}

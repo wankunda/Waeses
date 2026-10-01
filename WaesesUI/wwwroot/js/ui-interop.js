@@ -1,6 +1,64 @@
 // UI Library JS Interop - Focus Trap & Keyboard handlers
 window.UiInterop = {
 
+    applyGlobalTheme: function (theme, density, palette) {
+        const root = document.documentElement;
+        if (!root._uiThemePrevious) {
+            root._uiThemePrevious = {
+                theme: root.getAttribute('data-theme'),
+                density: root.getAttribute('data-ui-density'),
+                style: root.getAttribute('style')
+            };
+        }
+
+        if (root._uiThemeSystemListener) {
+            window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', root._uiThemeSystemListener);
+            delete root._uiThemeSystemListener;
+        }
+
+        if (theme === 'light' || theme === 'dark') {
+            root.setAttribute('data-theme', theme);
+            root.style.colorScheme = theme;
+        } else {
+            const media = window.matchMedia('(prefers-color-scheme: dark)');
+            const applySystemTheme = function (event) {
+                const systemTheme = event.matches ? 'dark' : 'light';
+                root.setAttribute('data-theme', systemTheme);
+                root.style.colorScheme = systemTheme;
+            };
+            applySystemTheme(media);
+            media.addEventListener('change', applySystemTheme);
+            root._uiThemeSystemListener = applySystemTheme;
+        }
+
+        root.setAttribute('data-ui-density', density);
+        Object.entries(palette || {}).forEach(function (entry) {
+            root.style.setProperty('--' + entry[0], entry[1]);
+        });
+    },
+
+    clearGlobalTheme: function () {
+        const root = document.documentElement;
+        const previous = root._uiThemePrevious;
+        if (!previous) return;
+
+        if (root._uiThemeSystemListener) {
+            window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', root._uiThemeSystemListener);
+            delete root._uiThemeSystemListener;
+        }
+
+        if (previous.theme === null) root.removeAttribute('data-theme');
+        else root.setAttribute('data-theme', previous.theme);
+
+        if (previous.density === null) root.removeAttribute('data-ui-density');
+        else root.setAttribute('data-ui-density', previous.density);
+
+        if (previous.style === null) root.removeAttribute('style');
+        else root.setAttribute('style', previous.style);
+
+        delete root._uiThemePrevious;
+    },
+
     setupDrawer: function (drawerEl, toggleEl, dotNetRef) {
         if (!drawerEl) return;
 

@@ -83,9 +83,11 @@
 
     private string SizeClass => Size switch
     {
+        UiSize.Xs => "ui-modal-xs",
         UiSize.Sm => "ui-modal-sm",
         UiSize.Lg => "ui-modal-lg",
         UiSize.Xl => "ui-modal-xl",
+        UiSize.Max => "ui-modal-max",
         _ => ""
     };
 
@@ -164,6 +166,7 @@
         UiSize.Sm => "max-width: 400px;",
         UiSize.Lg => "max-width: 800px;",
         UiSize.Xl => "max-width: 1000px;",
+        UiSize.Max => "max-width: 100%;",
         _ => "max-width: 540px;"
     };
 

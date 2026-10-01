@@ -1,0 +1,41 @@
+@namespace WaesesUI
+
+<UiFormField For="@Id" Label="@Label" HelperText="@HelperText" Error="@CurrentError" Required="@Required" Class="@Class">
+    <div class="ui-date-range">
+        <input id="@Id" type="date" class="ui-input" value="@Format(Range.Start)" min="@Min" max="@Range.End?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)" disabled="@Disabled" aria-label="Date de début" @onchange="SetStart" @attributes="AdditionalAttributes" />
+        <span aria-hidden="true">–</span>
+        <input type="date" class="ui-input" value="@Format(Range.End)" min="@Range.Start?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)" max="@Max" disabled="@Disabled" aria-label="Date de fin" @onchange="SetEnd" />
+    </div>
+</UiFormField>
+
+@code {
+    [Parameter] public string? Id { get; set; } = $"date-range-{Guid.NewGuid():N}";
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public string? HelperText { get; set; }
+    [Parameter] public bool Required { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public DateTime? Start { get; set; }
+    [Parameter] public EventCallback<DateTime?> StartChanged { get; set; }
+    [Parameter] public DateTime? End { get; set; }
+    [Parameter] public EventCallback<DateTime?> EndChanged { get; set; }
+    [Parameter] public string? Min { get; set; }
+    [Parameter] public string? Max { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private UiDateRange Range => new(Start, End);
+    private string? CurrentError => Start.HasValue && End.HasValue && Start > End ? "La date de début doit précéder la date de fin." : null;
+    private static string Format(DateTime? value) => value?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) ?? string.Empty;
+
+    private async Task SetStart(ChangeEventArgs args)
+    {
+        await StartChanged.InvokeAsync(Parse(args.Value?.ToString()));
+    }
+
+    private async Task SetEnd(ChangeEventArgs args)
+    {
+        await EndChanged.InvokeAsync(Parse(args.Value?.ToString()));
+    }
+
+    private static DateTime? Parse(string? value) => DateTime.TryParseExact(value, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var date) ? date : null;
+}

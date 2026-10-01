@@ -1,0 +1,30 @@
+@namespace WaesesUI
+
+<div class="ui-form-group @Class">
+    @if (!string.IsNullOrWhiteSpace(Label))
+    {
+        <label class="ui-label" for="@For">@Label @if (Required) { <span class="ui-label-required">*</span> }</label>
+    }
+    @ChildContent
+    @if (!string.IsNullOrWhiteSpace(Error))
+    {
+        <div class="ui-error-text" role="alert">@Error</div>
+    }
+    else if (!string.IsNullOrWhiteSpace(HelperText))
+    {
+        <div class="ui-helper-text" id="@HelperId">@HelperText</div>
+    }
+</div>
+
+@code {
+    [Parameter] public string? For { get; set; }
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public string? HelperText { get; set; }
+    [Parameter] public string? Error { get; set; }
+    [Parameter] public bool Required { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string HelperId => $"{For ?? "field"}-help";
+}

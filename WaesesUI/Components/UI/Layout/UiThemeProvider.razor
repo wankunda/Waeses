@@ -1,0 +1,101 @@
+@namespace WaesesUI
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+<span hidden aria-hidden="true"></span>
+
+@code {
+    private bool _configurationChanged = true;
+    private string? _lastConfiguration;
+
+    [Parameter] public UiDensity Density { get; set; } = UiDensity.Comfortable;
+    [Parameter] public UiTheme Theme { get; set; } = UiTheme.System;
+    [Parameter] public UiColorPalette Primary { get; set; } = UiColors.Indigo;
+    [Parameter] public UiColorPalette Secondary { get; set; } = UiColors.BlueGray;
+    [Parameter] public UiColorPalette Success { get; set; } = UiColors.Green;
+    [Parameter] public UiColorPalette Danger { get; set; } = UiColors.Red;
+    [Parameter] public UiColorPalette Warning { get; set; } = UiColors.Amber;
+    [Parameter] public UiColorPalette Info { get; set; } = UiColors.LightBlue;
+
+    protected override void OnParametersSet()
+    {
+        var configuration = $"{Theme}|{Density}|{Primary.Name}|{Secondary.Name}|{Success.Name}|{Danger.Name}|{Warning.Name}|{Info.Name}";
+        _configurationChanged = !string.Equals(configuration, _lastConfiguration, StringComparison.Ordinal);
+        _lastConfiguration = configuration;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!_configurationChanged)
+        {
+            return;
+        }
+
+        _configurationChanged = false;
+        try
+        {
+            await JS.InvokeVoidAsync("UiInterop.applyGlobalTheme", Theme.ToString().ToLowerInvariant(), Density.ToString().ToLowerInvariant(), GetPaletteTokens());
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+    }
+
+    private Dictionary<string, string> GetPaletteTokens() => new()
+    {
+        ["primary"] = Primary.Default,
+        ["primary-hover"] = Primary.Darken1,
+        ["primary-active"] = Primary.Darken2,
+        ["primary-light"] = Primary.Lighten5,
+        ["primary-subtle"] = Primary.Lighten4,
+        ["primary-contrast"] = GetContrast(Primary.Default),
+        ["secondary"] = Secondary.Default,
+        ["secondary-hover"] = Secondary.Darken1,
+        ["secondary-light"] = Secondary.Lighten5,
+        ["secondary-contrast"] = GetContrast(Secondary.Default),
+        ["success"] = Success.Default,
+        ["success-hover"] = Success.Darken1,
+        ["success-light"] = Success.Lighten5,
+        ["success-contrast"] = GetContrast(Success.Default),
+        ["danger"] = Danger.Default,
+        ["danger-hover"] = Danger.Darken1,
+        ["danger-light"] = Danger.Lighten5,
+        ["danger-contrast"] = GetContrast(Danger.Default),
+        ["warning"] = Warning.Default,
+        ["warning-hover"] = Warning.Darken1,
+        ["warning-light"] = Warning.Lighten5,
+        ["warning-contrast"] = GetContrast(Warning.Default),
+        ["info"] = Info.Default,
+        ["info-hover"] = Info.Darken1,
+        ["info-light"] = Info.Lighten5,
+        ["info-contrast"] = GetContrast(Info.Default)
+    };
+
+    private static string GetContrast(string hex)
+    {
+        if (hex.Length != 7 || !hex.StartsWith('#'))
+        {
+            return "#ffffff";
+        }
+
+        var red = Convert.ToInt32(hex.Substring(1, 2), 16) / 255d;
+        var green = Convert.ToInt32(hex.Substring(3, 2), 16) / 255d;
+        var blue = Convert.ToInt32(hex.Substring(5, 2), 16) / 255d;
+        red = red <= .04045 ? red / 12.92 : Math.Pow((red + .055) / 1.055, 2.4);
+        green = green <= .04045 ? green / 12.92 : Math.Pow((green + .055) / 1.055, 2.4);
+        blue = blue <= .04045 ? blue / 12.92 : Math.Pow((blue + .055) / 1.055, 2.4);
+        var luminance = .2126 * red + .7152 * green + .0722 * blue;
+        return luminance > .42 ? "#0f172a" : "#ffffff";
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("UiInterop.clearGlobalTheme");
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+    }
+}

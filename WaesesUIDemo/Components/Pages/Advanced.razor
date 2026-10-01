@@ -43,6 +43,11 @@
 
     <UiCard Title="Média et localisation" Subtitle="Galerie, lightbox et culture courante">
         <UiImageGallery Items="_gallery" />
+        <div class="ui-flex-row mt-sm">
+            <UiButton Text="Thème global actif" Size="UiSize.Xs" />
+            <UiButton Text="Action standard" Size="UiSize.Md" Variant="UiButtonVariant.Outline" />
+            <UiBadge Text="Palette UiColors" Color="UiColor.Success" />
+        </div>
         <UiDivider />
         <UiLocaleSwitcher />
         <p class="text-secondary mt-sm"><UiLocalizedText Key="ui.loading" Fallback="Chargement..." /> · <UiLocalizedText Key="ui.copy" Fallback="Copier" /></p>
