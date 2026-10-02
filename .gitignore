@@ -1,5 +1,19 @@
-/nupkgs
-/WaesesUI/bin
-/WaesesUI/obj
-/WaesesUIDemo/bin
-/WaesesUIDemo/obj
+# Dossiers de compilation (.NET)
+[Bb]in/
+[Oo]bj/
+
+# Fichiers et dossiers Visual Studio
+.vs/
+*.user
+*.userprefs
+*.suo
+*.sln.docstates
+
+# Rapports de tests et logs
+[Tt]est[Rr]esults/
+*.log
+
+# Packages NuGet locaux
+*.nupkg
+*.snupkg
+/nupkgs/

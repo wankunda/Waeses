@@ -1,4 +1,0 @@
-wwwroot\js\ui-interop.js
-wwwroot\css\theme.css
-C:\Users\pkwan\source\repos\AppVerifyEUP\WaesesUI\wwwroot\js\ui-interop.js
-C:\Users\pkwan\source\repos\AppVerifyEUP\WaesesUI\wwwroot\css\theme.css
