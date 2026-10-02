@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <PackageId>WaesesUI</PackageId>
-    <Version>1.1</Version>
+    <Version>1.1.0</Version>
     <Authors>Wankunda</Authors>
     <Description>Bibliothèque Razor Class Library de composants UI réutilisables pour Blazor.</Description>
     <PackageTags>blazor;razor;components;ui;frontend</PackageTags>

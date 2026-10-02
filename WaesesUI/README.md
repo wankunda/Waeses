@@ -16,15 +16,19 @@ WaesesUI est une bibliotheque Razor Class Library pour les applications Blazor. 
 
 ## Installation
 
+Vous pouvez installer **WaesesUI** via NuGet en utilisant l'une des méthodes suivantes :
+
+### 1. Via .NET CLI
+```bash
+dotnet add package WaesesUI
+
+PowerShell
+Install-Package WaesesUI
+
 ### Reference de projet
+XML
+<PackageReference Include="WaesesUI" Version="1.0.0"/>
 
-Depuis une application situee au meme niveau que le dossier `WaesesUI` :
-
-```xml
-<ItemGroup>
-  <ProjectReference Include="../WaesesUI/WaesesUI.csproj" />
-</ItemGroup>
-```
 
 ### Services
 
