@@ -8,7 +8,7 @@
 <DemoPageHeader Eyebrow="03 · Données" Title="Rendre les informations actionnables" Description="Une table enrichie de recherche, tri, pagination et sélection, accompagnée de composants de progression et de média." />
 
 <UiCard Title="Membres de l'équipe" Subtitle="Recherche, tri et pagination intégrés">
-    <UiTable TItem="DemoMember" Items="_members" ShowSearch="true" SearchPlaceholder="Rechercher un membre..." Paginated="true" PageSize="5" Striped="true" Hoverable="true" OnRowClick="OpenMember">
+    <UiTable TItem="DemoMember" Items="_members" ShowSearch="true" SearchPlaceholder="Rechercher un membre..." Paginated="true" PageSize="5" Striped="false" Hoverable="true" OnRowClick="OpenMember">
         <HeaderContent>
             <UiTh TItem="DemoMember" Title="Membre" SortBy="member => member.Name" />
             <UiTh TItem="DemoMember" Title="Rôle" SortBy="member => member.Role" />
@@ -16,12 +16,12 @@
             <UiTh TItem="DemoMember" Title="Activité" Align="Alignement.Right" SortBy="member => member.Activity" />
         </HeaderContent>
         <RowTemplate Context="member">
-            <UiTd>
+            <UiTd Label="Membre">
                 <div class="ui-flex-row"><UiAvatar Initials="@member.Initials" Size="UiSize.Sm" BackgroundColor="@member.Color" /><span>@member.Name</span></div>
             </UiTd>
-            <UiTd>@member.Role</UiTd>
-            <UiTd><UiBadge Text="@member.Status" Color="@(member.Status == "Actif" ? UiColor.Success : UiColor.Neutral)" /></UiTd>
-            <UiTd Align="Alignement.Right">@member.Activity%</UiTd>
+            <UiTd Label="Rôle">@member.Role</UiTd>
+            <UiTd Label="Statut"><UiBadge Text="@member.Status" Color="@(member.Status == "Actif" ? UiColor.Success : UiColor.Neutral)" /></UiTd>
+            <UiTd Label="Activité" Align="Alignement.Right">@member.Activity%</UiTd>
         </RowTemplate>
     </UiTable>
 </UiCard>

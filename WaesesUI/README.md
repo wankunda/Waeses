@@ -169,6 +169,8 @@ Pour un texte long, utilisez `UiTextArea` avec `@bind-Value`, `Rows`, `MaxLength
 
 `UiTable` expose aussi `IsLoading`, `ErrorMessage` et `OnRetry` pour afficher les états de chargement et d'erreur sans dupliquer le rendu dans chaque page. `UiPagination` peut être utilisé seul pour les collections chargées côté serveur.
 
+Sur mobile, `UiTable` affiche chaque ligne sous forme de fiche et masque l'en-tête du tableau. Renseignez `Label` sur chaque `UiTd` pour afficher le nom de la colonne à côté de sa valeur dans cette présentation.
+
 ## Internationalisation
 
 `AddWaesesUIServices()` enregistre `IUiLocalizationService`. Utilisez `UiLocalizedText` pour un texte traduit, `UiLocaleSwitcher` pour changer de culture et le service pour formater les nombres et les dates :
@@ -229,4 +231,3 @@ Les collections sont disponibles sous `Icons.Material.Filled`, `Icons.Material.O
 - `UiAuthorizeView`, `UiAuthState` et `UiRedirectTo` sont reserves au projet WinForms selon les contraintes actuelles de la bibliotheque. Ils ne sont donc pas utilises par `WaesesUIDemo`.
 - `UiModal`, `UiNavMenu`, `UiAutocomplete` et certains composants de formulaire utilisent JavaScript interop. Lors de la deconnexion d'un circuit Blazor Server, les appels JavaScript de nettoyage peuvent echouer et doivent etre traites comme tels.
 - Les assets sous `_content/WaesesUI` sont servis automatiquement par le mecanisme des bibliotheques Razor.
-

@@ -2230,6 +2230,56 @@ a {
 
 .ui-table-state { padding: 1.5rem; }
 
+@media (max-width: 640px) {
+    .ui-table-responsive {
+        overflow-x: visible;
+    }
+
+    .ui-table {
+        display: block;
+    }
+
+    .ui-table thead {
+        display: none;
+    }
+
+    .ui-table tbody {
+        display: block;
+    }
+
+    .ui-table tbody tr {
+        display: block;
+        border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .ui-table tbody tr:last-child {
+        border-bottom: 0;
+    }
+
+    .ui-table tbody td {
+        display: block;
+        width: auto !important;
+        padding: 0.85rem 1rem;
+        border-bottom: 0;
+        text-align: left !important;
+    }
+
+    .ui-table tbody td[data-title] {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        text-align: right !important;
+    }
+
+    .ui-table tbody td[data-title]::before {
+        content: attr(data-title);
+        flex: 0 0 auto;
+        color: var(--text-secondary);
+        text-align: left;
+    }
+}
+
 /* Pagination Footer */
 .ui-table-footer {
     padding: 0.85rem 1.25rem;

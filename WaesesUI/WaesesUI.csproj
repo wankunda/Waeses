@@ -8,16 +8,17 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <PackageId>WaesesUI</PackageId>
-    <Version>1.1.1</Version>
+    <Version>1.1.2</Version>
     <Authors>Wankunda</Authors>
     <Description>Bibliothèque Razor Class Library de composants UI réutilisables pour Blazor.</Description>
-    <PackageTags>blazor;razor;components;ui;frontend</PackageTags>
+    <PackageTags>Blazor;Razor;UI;frontend;Components;Blazor Components;Blazor Library</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <PackageIcon>waesesUI.jpg</PackageIcon>
     <Company>WaEses</Company>
+    <Copyright>Copyright 2026 WaEses</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
