@@ -1,0 +1,24 @@
+@inherits LayoutComponentBase
+
+<UiSimpleLayout BrandText="WaesesUI" BrandIcon="💶" MainBody="@Body" />
+
+<UiToastContainer />
+<UiMessageBoxProvider />
+<UiThemeProvider Theme="UiTheme.System"
+                 Density="UiDensity.Comfortable"
+                 Primary="@UiColors.Indigo"
+                 Secondary="@UiColors.BlueGray"
+                 Success="@UiColors.Green"
+                 Danger="@UiColors.Red"
+                 Warning="@UiColors.Amber"
+                 Info="@UiColors.LightBlue" />
+
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">🗙</span>
+</div>
+
+@code {
+    
+}

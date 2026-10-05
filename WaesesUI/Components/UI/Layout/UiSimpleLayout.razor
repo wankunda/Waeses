@@ -3,12 +3,12 @@
 
 <main class="auth-layout">
     <header class="d-flex justify-space-between align-center position-sticky" style="background: var(--bg-surface); border-bottom: 1px solid var(--border-default); padding: 0.85rem 1.5rem; top: 0; z-index: 100; backdrop-filter: blur(10px);">
-        <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <div class="d-flex align-center justify-center gap-sm">
             @if (!string.IsNullOrWhiteSpace(BrandIcon))
             {
-                <span style="font-size: 1.5rem;">@BrandIcon</span>
+                <span style="font-weight: 800; font-size: 1.5rem;">@BrandIcon</span>
             }
-            <span style="font-weight: 800; font-size: 1.15rem; background: linear-gradient(135deg, var(--primary), var(--info)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            <span style="font-weight: 800; font-size: 1.5rem; background: linear-gradient(135deg, var(--primary), var(--info)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
                 @BrandText
             </span>
         </div>
@@ -35,12 +35,22 @@
     @MainBody
 </main>
 
+<footer class="d-flex justify-center align-center p-md"
+        style="background: var(--bg-surface); border-top: 1px solid var(--border-default);">
+    <span style="font-size: 0.85rem; color: var(--text-secondary);">
+        &copy; @DateTime.Now.Year Waeses. All rights reserved.
+    </span>
+    @Footer
+</footer>
+
+
 @code {
     [Parameter] public bool IsDarkMode { get; set; }
     [Parameter] public EventCallback<bool> IsDarkModeChanged { get; set; }
     [Parameter] public RenderFragment? MainBody { get; set; }
+    [Parameter] public RenderFragment? Footer { get; set; }
     [Parameter] public bool ShowThemeToggle { get; set; } = true;
-    [Parameter] public string BrandText { get; set; } = "Blazor UI";
+    [Parameter] public string BrandText { get; set; } = "Waeses UI";
     [Parameter] public string? BrandIcon { get; set; } = "⚡";
     [Parameter] public string DarkModeText { get; set; } = "🌙 Mode Sombre";
     [Parameter] public string LightModeText { get; set; } = "☀️ Mode Clair";

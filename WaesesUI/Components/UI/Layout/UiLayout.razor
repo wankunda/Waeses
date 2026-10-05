@@ -3,17 +3,19 @@
 @namespace WaesesUI
 
 <div class="page">
-        @NavMenu
+    @NavMenu
     <main class="min-h-100 d-flex flex-column">
-        <header class="d-flex justify-space-between align-center position-sticky" style="background: var(--bg-surface); border-bottom: 1px solid var(--border-default); padding: 0.85rem 1.5rem; top: 0; z-index: 100; backdrop-filter: blur(10px);">
-            <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <header class="d-flex justify-space-between align-center position-sticky"
+                style="background: var(--bg-surface); border-bottom: 1px solid var(--border-default); padding: 0.85rem 1.5rem; top: 0; z-index: 100; backdrop-filter: blur(10px);">
+            <div class="d-flex align-center justify-center gap-sm">
                 @if (!string.IsNullOrWhiteSpace(BrandIcon))
                 {
-                    <span style="font-size: 1.5rem;">@BrandIcon</span>
+                    <span style="font-weight: 800; font-size: 1.5rem;">@BrandIcon</span>
                 }
-                <span style="font-weight: 800; font-size: 1.15rem; background: linear-gradient(135deg, var(--primary), var(--info)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-                    @BrandText
-                </span>
+                <span style="font-weight: 800; font-size: 1.5rem; background: linear-gradient(135deg, var(--primary), var(--info)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                @BrandText
+            </span>
+
                 @if (!string.IsNullOrWhiteSpace(VersionText))
                 {
                     <span class="ui-badge ui-badge-primary" style="font-size: 0.7rem;">@VersionText</span>
@@ -23,10 +25,8 @@
             @if (ShowThemeToggle)
             {
                 <div class="d-flex align-center gap-sm">
-                    <button type="button"
-                            class="ui-btn ui-btn-secondary ui-btn-sm"
-                            style="border-radius: var(--radius-full); padding: 0.4rem 0.85rem;"
-                            @onclick="ToggleTheme">
+                    <button type="button" class="ui-btn ui-btn-secondary ui-btn-sm"
+                            style="border-radius: var(--radius-full); padding: 0.4rem 0.85rem;" @onclick="ToggleTheme">
                         @if (IsDarkMode)
                         {
                             <span>@LightModeText</span>
@@ -45,9 +45,16 @@
         </article>
     </main>
 </div>
+<footer class="d-flex justify-center align-center p-md"
+        style="background: var(--bg-surface); border-top: 1px solid var(--border-default);">
+    <span style="font-size: 0.85rem; color: var(--text-secondary);">
+        &copy; @DateTime.Now.Year Waeses. All rights reserved.
+    </span>
+    @Footer
+</footer>
 
 @code {
-    [Parameter] public string BrandText { get; set; } = "Blazor UI";
+    [Parameter] public string BrandText { get; set; } = "Waeses UI";
     [Parameter] public string? BrandIcon { get; set; } = "⚡";
     [Parameter] public string? VersionText { get; set; } = "1.0";
     [Parameter] public bool ShowThemeToggle { get; set; } = true;
@@ -56,6 +63,7 @@
     [Parameter] public string DarkModeText { get; set; } = "🌙 Mode Sombre";
     [Parameter] public string LightModeText { get; set; } = "☀️ Mode Clair";
     [Parameter] public RenderFragment? MainBody { get; set; }
+    [Parameter] public RenderFragment? Footer { get; set; }
     [Parameter] public RenderFragment? NavMenu { get; set; }
 
 
@@ -71,7 +79,7 @@
         }
     }
 
-    private async Task ToggleTheme() 
+    private async Task ToggleTheme()
     {
         await ThemeService.ToggleThemeAsync();
         IsDarkMode = ThemeService.IsDarkMode;
