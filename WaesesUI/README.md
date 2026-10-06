@@ -18,16 +18,36 @@ WaesesUI est une bibliotheque Razor Class Library pour les applications Blazor. 
 
 Vous pouvez installer **WaesesUI** via NuGet en utilisant l'une des méthodes suivantes :
 
-### 1. Via .NET CLI
+### Via .NET CLI
+
 ```bash
 dotnet add package WaesesUI
+```
 
-PowerShell
+### Via Package Manager Console
+
+```powershell
 Install-Package WaesesUI
+```
 
-### Reference de projet
-XML
-<PackageReference Include="WaesesUI" Version="1.0.0"/>
+### Via une référence de package
+
+```xml
+<PackageReference Include="WaesesUI" Version="1.1.3" />
+```
+
+### Mise à jour en production
+
+Les composants Razor de WaesesUI sont compilés dans l'application Blazor qui les consomme. Le Hot Reload est une fonctionnalité de développement et ne met pas à jour une application déjà publiée.
+
+Pour déployer une nouvelle version de la bibliothèque, publiez-la sous un nouveau numéro de version, mettez à jour la référence NuGet de l'application, puis reconstruisez et redéployez l'application :
+
+```bash
+dotnet add package WaesesUI --version X.Y.Z
+dotnet publish -c Release
+```
+
+Remplacez `X.Y.Z` par la nouvelle version publiée. Un simple rechargement du navigateur ne remplace pas les assemblies de l'application en production.
 
 
 ### Services
