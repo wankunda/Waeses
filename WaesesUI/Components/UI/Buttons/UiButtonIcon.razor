@@ -1,0 +1,36 @@
+@namespace WaesesUI
+
+    <button type="@Type"
+            class="ui-btn-fab ui-btn-@Variant.ToString().ToLower() ui-btn-fab-@Size.ToString().ToLower() @Class"
+            disabled="@(Disabled || Loading)"
+            @onclick="OnClick"
+            @attributes="AdditionalAttributes">
+        @if (Loading)
+        {
+            <span class="ui-spinner ui-spinner-sm" style="margin-right: 0.25rem;"></span>
+        }
+        @if (!string.IsNullOrEmpty(Icon) && !Loading)
+        {
+            @if (Icon.TrimStart().StartsWith("<"))
+            {
+                <UiIcon Icon="@Icon" Size="@Size" />
+            }
+            else
+            {
+                <span class="ui-btn-icon">@Icon</span>
+            }
+        }
+    </button>
+
+@code {
+    [Parameter] public UiButtonVariant Variant { get; set; } = UiButtonVariant.Primary;
+    [Parameter] public UiSize Size { get; set; } = UiSize.Md;
+    [Parameter] public string Type { get; set; } = "button";
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public bool Loading { get; set; }
+    [Parameter] public string? Icon { get; set; }
+    [Parameter] public string? Target { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+}

@@ -146,3 +146,51 @@
     .ui-stepper { overflow-x: auto; }
     .ui-step { min-width: 6rem; }
 }
+
+.ui-btn-fab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    border-radius: 50%;
+    border: 1px solid transparent;
+    cursor: pointer;
+    text-decoration: none;
+    user-select: none;
+    white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+    transition: transform var(--trans-fast), box-shadow var(--trans-fast), background-color var(--trans-fast), border-color var(--trans-fast), opacity var(--trans-fast);
+}
+
+.ui-btn-fab:active:not(:disabled) {
+    transform: scale(0.97);
+}
+
+.ui-btn-fab:disabled, .ui-btn-fab.ui-btn-disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    pointer-events: none;
+    box-shadow: none !important;
+    transform: none !important;
+}
+/* Sizes */
+.ui-btn-fab-xs {
+    padding: .4rem;
+}
+.ui-btn-fab-sm {
+    padding: .6rem;
+}
+
+.ui-btn-fab-md {
+    padding: 1.1rem;
+}
+
+.ui-btn-fab-lg {
+    padding: 1.8rem;
+}
+.ui-btn-fab-max {
+    padding: 2.5rem;
+}

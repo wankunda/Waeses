@@ -663,26 +663,32 @@ a {
 
 .h6 {
     font-size: 22px;
+    font-weight: 700;
 }
 
 .h5 {
     font-size: 30px;
+    font-weight: 700;
 }
 
 .h4 {
     font-size: 40px;
+    font-weight: 700;
 }
 
 .h3 {
     font-size: 50px;
+    font-weight: 700;
 }
 
 .h2 {
     font-size: 60px;
+    font-weight: 700;
 }
 
 .h1 {
     font-size: 70px;
+    font-weight: 700;
 }
 /* Height utilities */
 .h-100 {
@@ -762,6 +768,10 @@ a {
 }
 
 /* Sizes */
+.ui-btn-xs{
+    padding: .3rem .6rem;
+    height: 28px;
+}
 .ui-btn-sm {
     padding: 0.4rem 0.75rem;
     font-size: 0.8125rem;
@@ -779,6 +789,12 @@ a {
     font-size: 1.0625rem;
     height: 48px;
     border-radius: var(--radius-lg);
+}
+.ui-btn-max{
+    padding: 1rem 2rem;
+    font-size: 1.25rem;
+    height: 60px;
+    border-radius: var(--radius-xl);
 }
 
 /* Variants */
@@ -2002,10 +2018,12 @@ a {
     transition: color var(--trans-fast), transform var(--trans-fast);
 }
 
+.ui-icon-xs { width: 14px; height: 14px; }
 .ui-icon-sm { width: 18px; height: 18px; }
 .ui-icon-md { width: 24px; height: 24px; }
 .ui-icon-lg { width: 32px; height: 32px; }
 .ui-icon-xl { width: 48px; height: 48px; }
+.ui-icon-max { width: 100px; height: 100px; }
 
 /* ==========================================================================
    AVATAR & AVATAR GROUP
@@ -2522,7 +2540,7 @@ main article{
     }
 
     .sidebar {
-        width: 250px;
+        width: 260px;
         height: 100vh;
         position: sticky;
         top: 0;
@@ -2532,8 +2550,8 @@ main article{
 .nav-menu-shell {
 	position: relative;
 	z-index: 200;
-	width: 250px;
-	flex: 0 0 250px;
+	width: 260px;
+	flex: 0 0 260px;
 }
 
 .navbar-toggler {
@@ -2545,7 +2563,7 @@ main article{
 	top: 0;
 	display: flex;
 	flex-direction: column;
-	width: 250px;
+	width: 260px;
 	height: 100vh;
 	overflow: hidden;
 	background: var(--bg-surface-secondary);

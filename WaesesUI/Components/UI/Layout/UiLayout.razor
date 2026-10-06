@@ -10,9 +10,9 @@
             <div class="d-flex align-center justify-center gap-sm">
                 @if (!string.IsNullOrWhiteSpace(BrandIcon))
                 {
-                    <span style="font-weight: 800; font-size: 1.5rem;">@BrandIcon</span>
+                    <span class="h6">@BrandIcon</span>
                 }
-                <span style="font-weight: 800; font-size: 1.5rem; background: linear-gradient(135deg, var(--primary), var(--info)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                <span class="h6" style="background: linear-gradient(135deg, var(--primary), var(--info)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
                 @BrandText
             </span>
 
@@ -45,8 +45,8 @@
         </article>
     </main>
 </div>
-<footer class="d-flex justify-center align-center p-md"
-        style="background: var(--bg-surface); border-top: 1px solid var(--border-default);">
+<footer class="position-sticky w-100 d-flex justify-center align-center p-md"
+        style="background: var(--bg-surface); border-top: 1px solid var(--border-default); bottom: 0; z-index: 1000; left: 0; right: 0;">
     <span style="font-size: 0.85rem; color: var(--text-secondary);">
         &copy; @DateTime.Now.Year Waeses. All rights reserved.
     </span>

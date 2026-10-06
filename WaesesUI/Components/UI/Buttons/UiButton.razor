@@ -15,7 +15,7 @@
         {
             @if (Icon.TrimStart().StartsWith("<"))
             {
-                <UiIcon Icon="@Icon" Size="@(Size == UiSize.Sm ? UiSize.Sm : (Size == UiSize.Lg ? UiSize.Lg : UiSize.Md))" />
+                <UiIcon Icon="@Icon" Size="@(Size)" />
             }
             else
             {
