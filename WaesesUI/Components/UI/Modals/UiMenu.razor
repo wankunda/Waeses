@@ -1,0 +1,184 @@
+@namespace WaesesUI
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+<div class="ui-menu @AlignmentClass @(Dense ? "ui-menu-dense" : null) @Class" @ref="_rootRef" @attributes="AdditionalAttributes">
+    <button @ref="_triggerRef"
+            type="button"
+            class="ui-menu-trigger"
+            aria-expanded="@(_isOpen ? "true" : "false")"
+            aria-haspopup="menu"
+            aria-controls="@_menuId"
+            disabled="@Disabled"
+            @onclick="ToggleAsync">
+        @Trigger
+    </button>
+    @if (_isOpen)
+    {
+        <div @ref="_menuRef"
+             id="@_menuId"
+             class="ui-menu-content"
+             role="menu"
+             aria-label="@AriaLabel"
+             popover="manual"
+             style="@MenuStyle"
+             @onclick="HandleMenuClick">
+            @ChildContent
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public RenderFragment? Trigger { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string AriaLabel { get; set; } = "Menu d'actions";
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public bool Dense { get; set; }
+    [Parameter] public bool CloseOnItemClick { get; set; } = true;
+    [Parameter] public UiMenuAlignment Alignment { get; set; } = UiMenuAlignment.End;
+    [Parameter] public string? MaxHeight { get; set; } = "20rem";
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private readonly string _menuId = $"ui-menu-{Guid.NewGuid():N}";
+    private bool _isOpen;
+    private bool _initialized;
+    private bool _keyboardOpening;
+    private bool _restoreFocusAfterClose;
+    private ElementReference _rootRef;
+    private ElementReference _triggerRef;
+    private ElementReference _menuRef;
+    private DotNetObjectReference<UiMenu>? _dotNetRef;
+
+    private string AlignmentClass => Alignment == UiMenuAlignment.Start
+        ? "ui-menu-align-start"
+        : "ui-menu-align-end";
+
+    private string? MenuStyle => string.IsNullOrWhiteSpace(MaxHeight)
+        ? null
+        : $"max-height: {MaxHeight};";
+
+    protected override void OnParametersSet()
+    {
+        if (!_initialized || IsOpenChanged.HasDelegate)
+        {
+            _isOpen = IsOpen;
+            _initialized = true;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _dotNetRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("UiInterop.setupMenu", _rootRef, _dotNetRef);
+        }
+
+        if (_isOpen)
+        {
+            await JS.InvokeVoidAsync("UiInterop.showMenu", _rootRef, _triggerRef, _menuRef, Alignment == UiMenuAlignment.Start);
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("UiInterop.hideMenu", _rootRef);
+        }
+
+        if (_keyboardOpening && _isOpen)
+        {
+            _keyboardOpening = false;
+            await JS.InvokeVoidAsync("UiInterop.focusMenuItem", _menuRef, true);
+        }
+
+        if (_restoreFocusAfterClose && !_isOpen)
+        {
+            _restoreFocusAfterClose = false;
+            await JS.InvokeVoidAsync("UiInterop.focusElement", _triggerRef);
+        }
+    }
+
+    [JSInvokable]
+    public async Task CloseMenuFromOutside()
+    {
+        await SetOpenAsync(false);
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public async Task CloseMenuFromKeyboard()
+    {
+        _restoreFocusAfterClose = true;
+        await SetOpenAsync(false);
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public async Task OpenMenuFromKeyboard()
+    {
+        if (Disabled)
+        {
+            return;
+        }
+
+        if (_isOpen)
+        {
+            await JS.InvokeVoidAsync("UiInterop.focusMenuItem", _menuRef, true);
+            return;
+        }
+
+        _keyboardOpening = true;
+        await SetOpenAsync(true);
+        StateHasChanged();
+    }
+
+    private Task ToggleAsync()
+    {
+        if (Disabled)
+        {
+            return Task.CompletedTask;
+        }
+
+        return SetOpenAsync(!_isOpen);
+    }
+
+    private async Task HandleMenuClick()
+    {
+        if (!CloseOnItemClick)
+        {
+            return;
+        }
+
+        _restoreFocusAfterClose = true;
+        await SetOpenAsync(false);
+    }
+
+    private async Task SetOpenAsync(bool value)
+    {
+        if (_isOpen == value)
+        {
+            return;
+        }
+
+        _isOpen = value;
+        await IsOpenChanged.InvokeAsync(value);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_dotNetRef is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await JS.InvokeVoidAsync("UiInterop.teardownMenu", _rootRef);
+        }
+        catch (JSDisconnectedException) { }
+
+        _dotNetRef?.Dispose();
+        _dotNetRef = null;
+    }
+}

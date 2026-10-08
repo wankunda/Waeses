@@ -51,6 +51,12 @@ public enum UiDrawerPosition
     Right
 }
 
+public enum UiMenuAlignment
+{
+    Start,
+    End
+}
+
 public enum UiDateTimeMode
 {
     Date,

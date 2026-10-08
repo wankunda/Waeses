@@ -72,7 +72,13 @@
     <UiCard Title="Composants avancés" Subtitle="Modal, avatar-menu et icônes">
         <div class="ui-flex-row mt-sm">
             <UiButton Text="Ouvrir le modal" OnClick="OpenModal" />
-            <UiAvatarMenu Initials="AM" Size="UiSize.Lg" BackgroundColor="#173f5f">
+            <UiAvatarMenu Initials="AM"
+                          Alt="Profil d'Alice Martin"
+                          Status="AvatarStatus.Online"
+                          Size="UiSize.Lg"
+                          BackgroundColor="#173f5f"
+                          MenuAriaLabel="Actions du profil d'Alice"
+                          Alignment="UiMenuAlignment.Start">
                 <div class="ui-flex-col p-sm">
                     <strong>Alice Martin</strong>
                     <span>Administratrice</span>
@@ -80,6 +86,19 @@
                     <a href="/">Se déconnecter</a>
                 </div>
             </UiAvatarMenu>
+            <UiMenu  >
+                <Trigger>
+                      <UiIcon Icon="@Icons.Material.Filled.Menu" Size="UiSize.Sm" />
+                </Trigger>
+                <ChildContent>
+                                  <div class="ui-flex-col p-sm">
+                    <strong>Alice Martin</strong>
+                    <span>Administratrice</span>
+                    <a href="/formulaires">Mon profil</a>
+                    <a href="/">Se déconnecter</a>
+                </div>
+                </ChildContent>
+            </UiMenu>
             <UiIcon Icon="@Icons.Material.Filled.Home" Color="UiColor.Primary" Size="UiSize.Lg" Title="Accueil" />
             <UiIcon Icon="@Icons.Material.Filled.CheckCircle" Color="UiColor.Success" Size="UiSize.Lg" Title="Validé" />
         </div>

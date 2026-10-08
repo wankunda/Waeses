@@ -3,7 +3,7 @@
 <div class="ui-avatar ui-avatar-@Size.ToString().ToLower() ui-avatar-@Shape.ToString().ToLower() @Class"
      style="@GetCustomStyle()"
      @attributes="AdditionalAttributes">
-    @if (!string.IsNullOrEmpty(Src))
+    @if (!string.IsNullOrEmpty(Src) && !_imageFailed)
     {
         <img class="ui-avatar-img" src="@Src" alt="@Alt" @onerror="HandleImageError" />
     }
@@ -38,10 +38,21 @@
     [Parameter] public string? Class { get; set; }
     [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
+    private string? _lastSrc;
+    private bool _imageFailed;
+
+    protected override void OnParametersSet()
+    {
+        if (!string.Equals(_lastSrc, Src, StringComparison.Ordinal))
+        {
+            _lastSrc = Src;
+            _imageFailed = false;
+        }
+    }
+
     private void HandleImageError()
     {
-        Src = null;
-        StateHasChanged();
+        _imageFailed = true;
     }
 
     private string GetCustomStyle()

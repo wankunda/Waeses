@@ -20,6 +20,20 @@
             <UiChip Text="Nouveau" Color="UiColor.Info" Dismissible="true" />
             <UiChip Text="Design system" Color="UiColor.Primary" />
         </div>
+        <div class="ui-flex-row mt-sm">
+            <UiMenu AriaLabel="Actions du projet" Alignment="UiMenuAlignment.Start">
+                <Trigger><span>Actions du projet <span aria-hidden="true">▾</span></span></Trigger>
+                <ChildContent>
+                    <button type="button" role="menuitem" @onclick="SetMenuAction">Renommer le projet</button>
+                    <button type="button" role="menuitem" @onclick="SetMenuAction">Dupliquer le projet</button>
+                    <a href="/avances" role="menuitem">Ouvrir les détails</a>
+                </ChildContent>
+            </UiMenu>
+            @if (!string.IsNullOrEmpty(_menuAction))
+            {
+                <span class="text-secondary" role="status">@_menuAction</span>
+            }
+        </div>
         <UiCallout Title="Une composition locale" Color="UiColor.Info" Class="mt-xs mb-xs">Les callouts, listes et séparateurs partagent les tokens du thème.</UiCallout>
         <UiList TItem="string" Items="_team">
             <ItemTemplate Context="member">
@@ -56,6 +70,7 @@
 
 @code {
     private int _activeStep = 1;
+    private string? _menuAction;
     private readonly IReadOnlyList<UiBreadcrumbItem> _breadcrumbs = new[]
     {
         new UiBreadcrumbItem("Accueil", "/"), new UiBreadcrumbItem("Avancé", "/avances", Microsoft.AspNetCore.Components.Routing.NavLinkMatch.All)
@@ -76,4 +91,6 @@
         new UiGalleryItem("https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1000&q=80", "Salle de réunion", "Un second aperçu média.")
     };
     private const string CodeSample = "<UiBreadcrumbs Items=\"_items\" />\n<UiCallout Title=\"Information\">Contenu local.</UiCallout>";
+
+    private void SetMenuAction() => _menuAction = "Action sélectionnée";
 }

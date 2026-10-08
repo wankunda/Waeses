@@ -90,7 +90,7 @@ Les composants sont organises par familles :
 | Formulaires | `UiFormField`, `UiInput`, `UiTextArea`, `UiSelect`, `UiMultiSelect`, `UiCombobox`, `UiColorPicker`, `UiTimePicker`, `UiDateRangePicker`, `UiTagInput`, `UiLocaleSwitcher`, `UiAutocomplete`, `UiDateTimePicker`, `UiCheckbox`, `UiSwitch`, `UiSlider`, `UiRadioGroup`, `UiRadioOption`, `UiInputFile` |
 | Contenu | `UiCard`, `UiList`, `UiListItem`, `UiChip`, `UiDivider`, `UiCodeBlock`, `UiCopyButton`, `UiImage`, `UiImageGallery`, `UiLightbox`, `UiCarousel`, `UiFilePreview`, `UiAvatar`, `UiAvatarGroup`, `UiAvatarMenu` |
 | Feedback | `UiAlert`, `UiCallout`, `UiTimeline`, `UiLocalizedText`, `UiSpinner`, `UiSkeleton`, `UiEmptyState`, `UiErrorState`, `UiLoadingOverlay`, `UiTooltip`, `UiAccordion`, `UiAccordionItem`, `UiToastContainer`, `UiMessageBoxProvider` |
-| Overlays | `UiModal`, `UiPopover`, `UiDropdownMenu`, `UiDrawer` |
+| Overlays | `UiModal`, `UiPopover`, `UiMenu`, `UiDropdownMenu`, `UiDrawer` |
 | Donnees | `UiTable`, `UiTh`, `UiPagination`, `UiProgress`, `UiProgressCircle` |
 | Onglets | `UiTabs`, `UiTabPanel` |
 | Icones | `UiIcon` et les collections de la classe `Icons` |
@@ -140,6 +140,27 @@ Les boutons utilisent `Size`. Les champs natifs peuvent recevoir les classes `ui
 ```
 
 Pour un ecran autonome, comme une page de connexion, utilisez `UiSimpleLayout` avec le fragment `MainBody`.
+
+## Menus
+
+`UiMenu` ouvre un menu contextuel ancre a son declencheur. Il se ferme apres la selection d'un element, a l'exterieur ou avec `Escape`. Les fleches haut/bas parcourent les elements, et `Home`/`End` vont au premier/dernier. Utilisez des boutons ou des liens dans le menu et marquez-les `role="menuitem"` :
+
+```razor
+<UiMenu AriaLabel="Actions du document"
+        Alignment="UiMenuAlignment.End"
+        Dense="true"
+        MaxHeight="18rem">
+    <Trigger><span>Actions <span aria-hidden="true">▾</span></span></Trigger>
+    <ChildContent>
+        <button type="button" role="menuitem" @onclick="EditDocument">Modifier</button>
+        <a href="/documents" role="menuitem">Voir les documents</a>
+    </ChildContent>
+</UiMenu>
+```
+
+L'etat peut etre controle avec `@bind-IsOpen`. `UiDropdownMenu` reste disponible comme alias retrocompatible de `UiMenu`.
+
+`UiAvatarMenu` utilise ce meme comportement avec un avatar comme declencheur. Il conserve les parametres de `UiAvatar` (`Src`, `Alt`, `Initials`, `Size`, `Shape`, `Status`, `BackgroundColor`) et permet de controler le menu avec `@bind-IsOpen`, `Disabled`, `Alignment`, `Dense` et `MenuAriaLabel`.
 
 ## Formulaires
 

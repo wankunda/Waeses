@@ -136,6 +136,143 @@ window.UiInterop = {
         document.addEventListener('keydown', rootEl._uiHandleOverlayKeydown);
     },
 
+    setupMenu: function (rootEl, dotNetRef) {
+        if (!rootEl) return;
+
+        rootEl._uiMenuDotNetRef = dotNetRef;
+        rootEl._uiMenuHandleOutsideClick = function (event) {
+            const menu = rootEl.querySelector('[role="menu"]');
+            if (!rootEl.contains(event.target) && menu && menu.matches(':popover-open')) {
+                rootEl._uiMenuDotNetRef.invokeMethodAsync('CloseMenuFromOutside');
+            }
+        };
+        rootEl._uiMenuHandleKeydown = function (event) {
+            const trigger = rootEl.querySelector('.ui-menu-trigger');
+            const menu = rootEl.querySelector('[role="menu"]');
+            const isOpen = menu && menu.matches(':popover-open');
+
+            if (event.key === 'Escape' && isOpen && rootEl.contains(document.activeElement)) {
+                event.preventDefault();
+                rootEl._uiMenuDotNetRef.invokeMethodAsync('CloseMenuFromKeyboard');
+                return;
+            }
+
+            if (event.target === trigger && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) {
+                event.preventDefault();
+                rootEl._uiMenuDotNetRef.invokeMethodAsync('OpenMenuFromKeyboard');
+                return;
+            }
+
+            if (!menu || !menu.contains(event.target)) return;
+            if (event.key === 'Tab') {
+                rootEl._uiMenuDotNetRef.invokeMethodAsync('CloseMenuFromOutside');
+                return;
+            }
+
+            const items = Array.from(menu.querySelectorAll(
+                '[role="menuitem"], button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'
+            )).filter(function (item) {
+                return item.getClientRects().length > 0 &&
+                    item.getAttribute('aria-disabled') !== 'true' &&
+                    !item.hasAttribute('disabled');
+            });
+            if (items.length === 0) return;
+
+            const currentIndex = items.indexOf(document.activeElement);
+            let nextIndex = currentIndex;
+            if (event.key === 'ArrowDown') nextIndex = (currentIndex + 1) % items.length;
+            else if (event.key === 'ArrowUp') nextIndex = (currentIndex - 1 + items.length) % items.length;
+            else if (event.key === 'Home') nextIndex = 0;
+            else if (event.key === 'End') nextIndex = items.length - 1;
+            else return;
+
+            event.preventDefault();
+            items[nextIndex].focus();
+        };
+
+        document.addEventListener('pointerdown', rootEl._uiMenuHandleOutsideClick, true);
+        document.addEventListener('keydown', rootEl._uiMenuHandleKeydown, true);
+    },
+
+    showMenu: function (rootEl, trigger, menu, alignStart) {
+        if (!rootEl || !trigger || !menu) return;
+
+        if (!menu.matches(':popover-open')) {
+            menu.showPopover();
+        }
+
+        rootEl._uiMenuPosition = function () {
+            if (!menu.isConnected || !menu.matches(':popover-open')) return;
+
+            const triggerRect = trigger.getBoundingClientRect();
+            const menuRect = menu.getBoundingClientRect();
+            const viewportPadding = 8;
+            const gap = 4;
+            const preferredLeft = alignStart
+                ? triggerRect.left
+                : triggerRect.right - menuRect.width;
+            const left = Math.max(
+                viewportPadding,
+                Math.min(preferredLeft, window.innerWidth - menuRect.width - viewportPadding)
+            );
+            const top = triggerRect.bottom + gap + menuRect.height <= window.innerHeight - viewportPadding
+                ? triggerRect.bottom + gap
+                : Math.max(viewportPadding, triggerRect.top - menuRect.height - gap);
+
+            menu.style.left = `${left}px`;
+            menu.style.top = `${top}px`;
+        };
+
+        if (!rootEl._uiMenuPositionHandler) {
+            rootEl._uiMenuPositionHandler = function () {
+                if (rootEl._uiMenuPosition) rootEl._uiMenuPosition();
+            };
+            window.addEventListener('scroll', rootEl._uiMenuPositionHandler, true);
+            window.addEventListener('resize', rootEl._uiMenuPositionHandler);
+        }
+
+        rootEl._uiMenuPosition();
+        requestAnimationFrame(rootEl._uiMenuPosition);
+    },
+
+    hideMenu: function (rootEl) {
+        if (!rootEl || !rootEl._uiMenuPositionHandler) return;
+        window.removeEventListener('scroll', rootEl._uiMenuPositionHandler, true);
+        window.removeEventListener('resize', rootEl._uiMenuPositionHandler);
+        delete rootEl._uiMenuPositionHandler;
+        delete rootEl._uiMenuPosition;
+    },
+
+    teardownMenu: function (rootEl) {
+        if (!rootEl) return;
+        window.UiInterop.hideMenu(rootEl);
+        if (rootEl._uiMenuHandleOutsideClick) {
+            document.removeEventListener('pointerdown', rootEl._uiMenuHandleOutsideClick, true);
+            delete rootEl._uiMenuHandleOutsideClick;
+        }
+        if (rootEl._uiMenuHandleKeydown) {
+            document.removeEventListener('keydown', rootEl._uiMenuHandleKeydown, true);
+            delete rootEl._uiMenuHandleKeydown;
+        }
+        delete rootEl._uiMenuDotNetRef;
+    },
+
+    focusMenuItem: function (menuEl, first) {
+        if (!menuEl) return;
+        const items = Array.from(menuEl.querySelectorAll(
+            '[role="menuitem"], button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'
+        )).filter(function (item) {
+            return item.getClientRects().length > 0 &&
+                item.getAttribute('aria-disabled') !== 'true' &&
+                !item.hasAttribute('disabled');
+        });
+        if (items.length > 0) items[first ? 0 : items.length - 1].focus();
+    },
+
+    focusElement: function (element) {
+        if (element && typeof element.focus === 'function') element.focus();
+    },
+
     teardownOverlay: function (rootEl) {
         if (!rootEl) return;
         if (rootEl._uiHandleOverlayOutsideClick) {
