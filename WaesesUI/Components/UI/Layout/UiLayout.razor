@@ -12,9 +12,10 @@
                 {
                     <span class="h6">@BrandIcon</span>
                 }
-                <span class="h6" style="background: linear-gradient(135deg, var(--primary), var(--info)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-                @BrandText
-            </span>
+                <span class="h6"
+                      style="background: linear-gradient(135deg, var(--primary), var(--info)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                    @BrandText
+                </span>
 
                 @if (!string.IsNullOrWhiteSpace(VersionText))
                 {
@@ -23,21 +24,17 @@
             </div>
 
             @if (ShowThemeToggle)
-            {
-                <div class="d-flex align-center gap-sm">
+        {
+            <div class="d-flex align-center gap-sm">
+                <UiTooltip Text="@ModeText" Position="TooltipPosition.Left">
                     <button type="button" class="ui-btn ui-btn-secondary ui-btn-sm"
                             style="border-radius: var(--radius-full); padding: 0.4rem 0.85rem;" @onclick="ToggleTheme">
-                        @if (IsDarkMode)
-                        {
-                            <span>@LightModeText</span>
-                        }
-                        else
-                        {
-                            <span>@DarkModeText</span>
-                        }
+                        <span>@ModeIcon</span>
+                            <span class="mode-theme-text">@ModeText</span>
                     </button>
-                </div>
-            }
+                </UiTooltip>
+            </div>
+        }
         </header>
 
         <article style="flex: 1;">
@@ -60,8 +57,8 @@
     [Parameter] public bool ShowThemeToggle { get; set; } = true;
     [Parameter] public bool IsDarkMode { get; set; }
     [Parameter] public EventCallback<bool> IsDarkModeChanged { get; set; }
-    [Parameter] public string DarkModeText { get; set; } = "🌙 Mode Sombre";
-    [Parameter] public string LightModeText { get; set; } = "☀️ Mode Clair";
+    string ModeText => IsDarkMode ? "Mode Clair" : "Mode Sombre";
+    string ModeIcon => IsDarkMode ? "☀️" : "🌙";
     [Parameter] public RenderFragment? MainBody { get; set; }
     [Parameter] public RenderFragment? Footer { get; set; }
     [Parameter] public RenderFragment? NavMenu { get; set; }

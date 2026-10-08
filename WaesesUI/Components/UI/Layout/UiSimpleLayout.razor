@@ -2,13 +2,15 @@
 @namespace WaesesUI
 
 <main class="auth-layout">
-    <header class="d-flex justify-space-between align-center position-sticky" style="background: var(--bg-surface); border-bottom: 1px solid var(--border-default); padding: 0.85rem 1.5rem; top: 0; z-index: 100; backdrop-filter: blur(10px);">
+    <header class="d-flex justify-space-between align-center position-sticky"
+            style="background: var(--bg-surface); border-bottom: 1px solid var(--border-default); padding: 0.85rem 1.5rem; top: 0; z-index: 100; backdrop-filter: blur(10px);">
         <div class="d-flex align-center justify-center gap-sm">
             @if (!string.IsNullOrWhiteSpace(BrandIcon))
             {
                 <span class="h6">@BrandIcon</span>
             }
-            <span class="h6" style="background: linear-gradient(135deg, var(--primary), var(--info)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            <span class="h6"
+                  style="background: linear-gradient(135deg, var(--primary), var(--info)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
                 @BrandText
             </span>
         </div>
@@ -16,19 +18,13 @@
         @if (ShowThemeToggle)
         {
             <div class="d-flex align-center gap-sm">
-                <button type="button"
-                        class="ui-btn ui-btn-secondary ui-btn-sm"
-                        style="border-radius: var(--radius-full); padding: 0.4rem 0.85rem;"
-                        @onclick="ToggleTheme">
-                    @if (IsDarkMode)
-                    {
-                        <span>@LightModeText</span>
-                    }
-                    else
-                    {
-                        <span>@DarkModeText</span>
-                    }
-                </button>
+                <UiTooltip Text="@ModeText" Position="TooltipPosition.Left">
+                    <button type="button" class="ui-btn ui-btn-secondary ui-btn-sm"
+                            style="border-radius: var(--radius-full); padding: 0.4rem 0.85rem;" @onclick="ToggleTheme">
+                        <span>@ModeIcon</span>
+                            <span class="mode-theme-text">@ModeText</span>
+                    </button>
+                </UiTooltip>
             </div>
         }
     </header>
@@ -52,8 +48,8 @@
     [Parameter] public bool ShowThemeToggle { get; set; } = true;
     [Parameter] public string BrandText { get; set; } = "Waeses UI";
     [Parameter] public string? BrandIcon { get; set; } = "⚡";
-    [Parameter] public string DarkModeText { get; set; } = "🌙 Mode Sombre";
-    [Parameter] public string LightModeText { get; set; } = "☀️ Mode Clair";
+    string ModeText => IsDarkMode ? "Mode Clair" : "Mode Sombre";
+    string ModeIcon => IsDarkMode ? "☀️" : "🌙";
 
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

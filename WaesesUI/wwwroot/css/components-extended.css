@@ -145,6 +145,9 @@
     .ui-date-range { grid-template-columns: 1fr; }
     .ui-stepper { overflow-x: auto; }
     .ui-step { min-width: 6rem; }
+    .mode-theme-text{
+        display: none;
+    }
 }
 
 .ui-btn-fab {
