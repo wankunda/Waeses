@@ -12,13 +12,13 @@
         <DocExample Example="typeof(MessageBoxExample)" />
     </DocSection>
 
-    <DocSection Title="Notifications" Description="`IToastService.ShowToast` affiche une notification éphémère. Durée, position et nombre maximal par défaut se règlent avec `UiOptions`.">
+    <DocSection Title="Notifications" Description="`IToastService.ShowToast` affiche une notification éphémère. Durée et nombre maximal par défaut se règlent avec `UiOptions` ; la position par défaut avec `UiToastContainer.Position` (un toast peut imposer la sienne avec `position:`).">
         <DocExample Example="typeof(ToastExample)" />
     </DocSection>
 
     <DocSection Title="API">
         <ApiTable Component="typeof(UiDialogProvider)" Note="Il ne se configure pas : les options de chaque dialogue se passent à `ShowAsync` avec `UiDialogOptions`." />
-        <ApiTable Component="typeof(UiToastContainer)" Note="Durée, position et nombre maximal de toasts se règlent avec `UiOptions` (voir l'installation)." />
+        <ApiTable Component="typeof(UiToastContainer)" Note="`Position` : position des toasts qui n'en demandent pas une (sinon `UiOptions.ToastPosition`). Durée et nombre maximal : `UiOptions`." />
         <ApiTable Component="typeof(UiMessageBoxProvider)" Note="Les libellés par défaut (Confirmer, Annuler, OK) se règlent avec `UiOptions`." />
     </DocSection>
 </DocPage>

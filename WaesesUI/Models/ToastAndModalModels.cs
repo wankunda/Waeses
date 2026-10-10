@@ -9,7 +9,8 @@ public class ToastModel
     public int DurationMs { get; set; } = 4000;
     public bool ShowProgressBar { get; set; } = true;
     public bool PauseOnHover { get; set; } = true;
-    public ToastPosition Position { get; set; } = ToastPosition.BottomRight;
+    /// <summary>Position propre à ce toast. Null : il suit celle de <c>UiToastContainer.Position</c>, puis <c>UiOptions.ToastPosition</c>.</summary>
+    public ToastPosition? Position { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }
 

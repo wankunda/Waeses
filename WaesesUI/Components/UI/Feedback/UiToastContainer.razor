@@ -1,9 +1,10 @@
 @inject IToastService ToastService
+@inject UiOptions Options
 @implements IDisposable
 @namespace WaesesUI
 
 @{
-    var grouped = ToastService.Toasts.GroupBy(t => t.Position);
+    var grouped = ToastService.Toasts.GroupBy(t => t.Position ?? Position ?? Options.ToastPosition);
 }
 
 @foreach (var group in grouped)
@@ -17,6 +18,12 @@
 }
 
 @code {
+    /// <summary>
+    /// Position des toasts qui n'en demandent pas une eux-mêmes (<c>ShowToast(..., position: ...)</c> ou <see cref="ToastModel.Position"/>).
+    /// Par défaut : <see cref="UiOptions.ToastPosition"/>.
+    /// </summary>
+    [Parameter] public ToastPosition? Position { get; set; }
+
     protected override void OnInitialized()
     {
         ToastService.OnChange += HandleStateChanged;

@@ -4,6 +4,12 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Les
 
 ## [Non publié]
 
+### Ajouté
+- `UiToastContainer.Position` : position par défaut des toasts qui n'en précisent pas une. Un toast affiché avec `position:` (ou `ToastModel.Position`) garde la sienne. Ordre de priorité : position du toast, puis `UiToastContainer.Position`, puis `UiOptions.ToastPosition`.
+
+### Modifié
+- `ToastModel.Position` est maintenant nullable (`ToastPosition?`, null par défaut) : `null` signifie « position par défaut du conteneur ». `IToastService.ShowToast` ne remplace plus un `position` absent par `UiOptions.ToastPosition` ; c'est le conteneur qui le fait à l'affichage. Le code qui lisait `toast.Position` doit gérer `null`.
+
 ### Corrigé
 - `UiThemeProvider` : changer `Theme` (ou la densité, les palettes) pouvait ne jamais réappliquer le thème. L'indicateur « configuration changée » était recalculé à chaque `OnParametersSet` ; si le parent se re-rendait deux fois avant `OnAfterRenderAsync` (courant dans un BlazorWebView), le second appel l'écrasait. Le composant compare maintenant la configuration voulue à celle déjà appliquée.
 

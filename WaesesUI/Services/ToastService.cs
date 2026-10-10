@@ -29,7 +29,7 @@ public class ToastService : IToastService
             Type = type,
             Title = title,
             DurationMs = durationMs ?? _options.ToastDurationMs,
-            Position = position ?? _options.ToastPosition,
+            Position = position,   // null : la position par défaut est résolue à l'affichage (UiToastContainer, puis UiOptions)
             ShowProgressBar = showProgressBar,
             PauseOnHover = pauseOnHover
         };
