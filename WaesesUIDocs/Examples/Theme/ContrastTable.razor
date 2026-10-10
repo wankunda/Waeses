@@ -1,0 +1,56 @@
+@* Les rapports sont calculés ici, avec UiColorMath : rien n'est écrit en dur. *@
+
+<div class="api-table-wrap" style="width: 100%;">
+    <table class="ui-table ui-table-compact">
+        <caption class="api-caption">Couleur en texte sur fond blanc (mode clair) — 4,5:1 minimum pour WCAG AA</caption>
+        <thead>
+            <tr>
+                <th scope="col">Couleur</th>
+                <th scope="col">Thème par défaut</th>
+                <th scope="col">Rapport</th>
+                <th scope="col">UiThemeDefinition.Accessible()</th>
+                <th scope="col">Rapport</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var (name, original, accessible) in Rows)
+            {
+                <tr>
+                    <td>@name</td>
+                    <td><span style="display: inline-block; width: .9rem; height: .9rem; vertical-align: middle; border: 1px solid var(--border-strong); background: @original;"></span> @original</td>
+                    <td>@Describe(original)</td>
+                    <td><span style="display: inline-block; width: .9rem; height: .9rem; vertical-align: middle; border: 1px solid var(--border-strong); background: @accessible;"></span> @accessible</td>
+                    <td>@Describe(accessible)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    private const string White = "#ffffff";
+
+    // Valeurs de theme.css en mode clair, face à celles du préréglage.
+    private IEnumerable<(string Name, string Default, string Accessible)> Rows
+    {
+        get
+        {
+            var accessible = UiThemeDefinition.Accessible().Light;
+            return new[]
+            {
+                ("Primaire", "#5144e4", accessible.Primary!),
+                ("Secondaire", "#64748b", accessible.Secondary!),
+                ("Succès", "#10b981", accessible.Success!),
+                ("Danger", "#ef4444", accessible.Danger!),
+                ("Avertissement", "#f59e0b", accessible.Warning!),
+                ("Information", "#06b6d4", accessible.Info!)
+            };
+        }
+    }
+
+    private static string Describe(string color)
+    {
+        var ratio = UiColorMath.ContrastRatio(color, White);
+        return $"{ratio:0.0}:1 — {(ratio >= 4.5 ? "conforme" : "insuffisant")}";
+    }
+}

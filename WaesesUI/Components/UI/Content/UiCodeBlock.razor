@@ -1,16 +1,19 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
-<div class="ui-code-block @Class" @attributes="AdditionalAttributes">
+<div class="ui-code-block @Class" style="@Style" @attributes="AdditionalAttributes">
     <div class="ui-code-header">
         <span>@(string.IsNullOrWhiteSpace(Language) ? "Code" : Language)</span>
         <UiCopyButton Text="@Code" />
     </div>
-    <pre><code>@Code</code></pre>
+    <pre tabindex="0" role="region" aria-label="@CodeLabel"><code>@Code</code></pre>
 </div>
 
 @code {
+    /// <summary>Code affiché tel quel, dans une police à chasse fixe, avec un bouton pour le copier.</summary>
     [Parameter] public string Code { get; set; } = string.Empty;
+    /// <summary>Nom du langage, affiché dans l'en-tête et dans le nom accessible.</summary>
     [Parameter] public string? Language { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string CodeLabel => string.IsNullOrWhiteSpace(Language) ? "Code" : $"Code {Language}";
 }

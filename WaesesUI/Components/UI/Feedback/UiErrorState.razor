@@ -1,6 +1,7 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
-<section class="ui-error-state @Class" role="alert" @attributes="AdditionalAttributes">
+<section class="ui-error-state @Class" role="alert" style="@Style" @attributes="AdditionalAttributes">
     <UiIcon Icon="@Icons.Material.Filled.Error" Size="UiSize.Lg" Color="UiColor.Danger" aria-hidden="true" />
     <div>
         <h3>@Title</h3>
@@ -13,10 +14,12 @@
 </section>
 
 @code {
+    /// <summary>Titre de l'état d'erreur.</summary>
     [Parameter] public string Title { get; set; } = "Une erreur est survenue";
+    /// <summary>Message détaillant l'erreur.</summary>
     [Parameter] public string Message { get; set; } = "Impossible de charger les données.";
+    /// <summary>Libellé du bouton pour réessayer.</summary>
     [Parameter] public string RetryText { get; set; } = "Réessayer";
+    /// <summary>Appelé au clic sur le bouton « Réessayer ». Le bouton n'apparaît que si un gestionnaire est fourni.</summary>
     [Parameter] public EventCallback OnRetry { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

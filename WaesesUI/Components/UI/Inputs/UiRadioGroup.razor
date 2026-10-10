@@ -1,29 +1,74 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 @typeparam TValue
+@inject IJSRuntime JS
 
 <CascadingValue Value="this" IsFixed="true">
-    <div class="ui-flex-col @Class" @attributes="AdditionalAttributes">
+    <div class="ui-flex-col @Class" style="@Style" @attributes="AdditionalAttributes">
         @if (!string.IsNullOrEmpty(Label))
         {
-            <label class="ui-label">@Label</label>
+            <span id="@_labelId" class="ui-label">@Label</span>
         }
-        <div class="ui-flex-row">
+        <div class="ui-flex-row" role="radiogroup" aria-labelledby="@(string.IsNullOrEmpty(Label) ? null : _labelId)">
             @ChildContent
         </div>
     </div>
 </CascadingValue>
 
 @code {
+    private readonly string _labelId = $"ui-radiogroup-{Guid.NewGuid():N}";
+    private readonly List<UiRadioOption<TValue>> _options = new();
+
+    /// <summary>Libellé du groupe, qui nomme le <c>radiogroup</c> pour les lecteurs d'écran.</summary>
     [Parameter] public string? Label { get; set; }
+
+    /// <summary>Couleur de toutes les options (une option peut définir la sienne).</summary>
+    [Parameter] public UiColor? Color { get; set; }
     [Parameter] public TValue? Value { get; set; }
     [Parameter] public EventCallback<TValue?> ValueChanged { get; set; }
+    /// <summary>Les <c>UiRadioOption</c> du groupe.</summary>
     [Parameter] public RenderFragment? ChildContent { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    internal void Register(UiRadioOption<TValue> option)
+    {
+        if (!_options.Contains(option)) _options.Add(option);
+    }
+
+    internal void Unregister(UiRadioOption<TValue> option) => _options.Remove(option);
+
+    /// <summary>Vrai si l'option doit etre dans l'ordre de tabulation (roving tabindex).</summary>
+    internal bool IsTabStop(UiRadioOption<TValue> option)
+    {
+        var enabled = _options.Where(o => !o.Disabled).ToList();
+        var selected = enabled.FirstOrDefault(o => o.IsChecked);
+        return (selected ?? enabled.FirstOrDefault()) == option;
+    }
+
+    /// <summary>Fleches : selectionne et focalise l'option suivante/precedente non desactivee (circulaire).</summary>
+    internal async Task MoveAsync(UiRadioOption<TValue> from, int step)
+    {
+        var enabled = _options.Where(o => !o.Disabled).ToList();
+        if (enabled.Count == 0) return;
+        var current = enabled.IndexOf(from);
+        var target = enabled[((current < 0 ? 0 : current) + step + enabled.Count) % enabled.Count];
+        await SelectValueAsync(target.Value);
+        try { await JS.InvokeVoidAsync("UiInterop.focusById", target.ElementId); }
+        catch (JSDisconnectedException) { }
+    }
 
     public async Task SelectValueAsync(TValue? val)
     {
         Value = val;
         await ValueChanged.InvokeAsync(Value);
+        NotifyOptions();
+    }
+
+    // Le groupe se cascade lui-même en valeur fixe : sans cette notification, une option dont les paramètres n'ont pas changé
+    // n'est jamais redessinée, et l'ancienne option reste cochée à côté de la nouvelle.
+    protected override void OnParametersSet() => NotifyOptions();
+
+    private void NotifyOptions()
+    {
+        foreach (var option in _options.ToList()) option.Refresh();
     }
 }

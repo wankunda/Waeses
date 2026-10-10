@@ -1,0 +1,21 @@
+<div class="ui-flex-col" style="gap: 1.25rem;">
+    <div class="ui-flex-row" style="align-items: center; flex-wrap: wrap; gap: .75rem;">
+        <UiAvatar Initials="AM" Size="UiSize.Sm" BackgroundColor="#173f5f" Alt="Alice Martin" />
+        <UiAvatar Initials="BR" Size="UiSize.Md" BackgroundColor="#a33b1f" Alt="Benoît Roy" />
+        <UiAvatar Initials="CP" Size="UiSize.Lg" BackgroundColor="#20639b" Shape="AvatarShape.Square" Alt="Chloé Petit" />
+        <UiAvatar Src="@ExampleImages.Placeholder("#0b7c56", "DN", 120, 120)" Alt="David Nguyen" Size="UiSize.Lg" />
+    </div>
+
+    <div class="ui-flex-row" style="align-items: center; flex-wrap: wrap; gap: .75rem;">
+        @foreach (var status in new[] { AvatarStatus.Online, AvatarStatus.Busy, AvatarStatus.Away, AvatarStatus.Offline })
+        {
+            <UiAvatar Initials="@status.ToString()[..2]" Status="status" Size="UiSize.Lg" BackgroundColor="#475569" Alt="@status.ToString()" />
+        }
+    </div>
+
+    <UiAvatarGroup ExtraCount="4">
+        <UiAvatar Initials="AM" BackgroundColor="#173f5f" Alt="Alice Martin" />
+        <UiAvatar Initials="BR" BackgroundColor="#a33b1f" Alt="Benoît Roy" />
+        <UiAvatar Initials="CP" BackgroundColor="#20639b" Alt="Chloé Petit" />
+    </UiAvatarGroup>
+</div>

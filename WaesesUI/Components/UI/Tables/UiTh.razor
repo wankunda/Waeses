@@ -1,9 +1,14 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 @typeparam TItem
 
-<th class="@(IsSortable ? "ui-th-sortable" : "") @(IsSorted ? "ui-th-sorted" : "") @Class"
+<th scope="col"
+    class="@(IsSortable ? "ui-th-sortable" : "") @(IsSorted ? "ui-th-sorted" : "") @Class"
     style="text-align: @Align.ToString().ToLower(); @Style"
+    aria-sort="@AriaSort"
+    tabindex="@(IsSortable ? 0 : null)"
     @onclick="HandleClick"
+    @onkeydown="HandleKeyDown"
     @attributes="AdditionalAttributes">
     <div class="ui-th-content" style="@(Align == Alignement.Right ? "justify-content: flex-end;" : (Align == Alignement.Center ? "justify-content: center;" : ""))">
         @if (ChildContent != null)
@@ -17,10 +22,14 @@
 
         @if (IsSortable)
         {
-            <span class="ui-th-sort-icon">
-                @if (IsSorted)
+            <span class="ui-th-sort-icon" aria-hidden="true">
+                @if (SortState is { } state)
                 {
-                    @(IsAscending ? "▲" : "▼")
+                    @(state.Descending ? "▼" : "▲")
+                    @if (state.Total > 1)
+                    {
+                        <sup>@state.Position</sup>
+                    }
                 }
                 else
                 {
@@ -33,27 +42,37 @@
 
 @code {
     [CascadingParameter] public UiTable<TItem>? Table { get; set; }
+    /// <summary>Texte de l'en-tête. Ignoré si <c>ChildContent</c> est fourni.</summary>
     [Parameter] public string? Title { get; set; }
+
+    /// <summary>Sélecteur de tri côté client.</summary>
     [Parameter] public Func<TItem, object>? SortBy { get; set; }
+
+    /// <summary>Clé de tri : identifie la colonne ; obligatoire avec <c>ServerData</c> (transmise dans <see cref="UiSortDefinition"/>).</summary>
     [Parameter] public string? SortKey { get; set; }
+    /// <summary>Autorise le tri sur cette colonne (nécessite <c>SortBy</c>, ou <c>SortKey</c> avec une source serveur).</summary>
     [Parameter] public bool Sortable { get; set; } = true;
+    /// <summary>Alignement du contenu et de l'en-tête.</summary>
     [Parameter] public Alignement Align { get; set; } = Alignement.Left;
+    /// <summary>Contenu personnalisé de l'en-tête.</summary>
     [Parameter] public RenderFragment? ChildContent { get; set; }
-    [Parameter] public string? Style { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
-    private bool IsSortable => Sortable && (SortBy != null || !string.IsNullOrEmpty(SortKey));
-    private bool IsSorted => Table != null && ((SortBy != null && Table.CurrentSortSelector == SortBy) || (!string.IsNullOrEmpty(SortKey) && Table.CurrentSortKey == SortKey));
-    private bool IsAscending => Table?.IsSortAscending ?? true;
+    private bool IsSortable => Sortable && Table != null && (SortBy != null || (Table.IsServerMode && !string.IsNullOrEmpty(SortKey)));
+    private (int Position, bool Descending, int Total)? SortState => Table?.GetSortState(SortBy, SortKey);
+    private bool IsSorted => SortState != null;
 
-    private async Task HandleClick()
+    private string? AriaSort => !IsSortable ? null : SortState switch
     {
-        if (!IsSortable || Table == null) return;
+        { Descending: true } => "descending",
+        { } => "ascending",
+        _ => "none"
+    };
 
-        if (SortBy != null)
-        {
-            await Table.SetSortAsync(SortBy, SortKey);
-        }
-    }
+    private Task HandleClick(MouseEventArgs e) => SortAsync(e.ShiftKey);
+
+    private Task HandleKeyDown(KeyboardEventArgs e) =>
+        e.Key == "Enter" ? SortAsync(e.ShiftKey) : Task.CompletedTask;
+
+    private Task SortAsync(bool additive) =>
+        IsSortable ? Table!.ToggleSortAsync(SortBy, SortKey, additive) : Task.CompletedTask;
 }

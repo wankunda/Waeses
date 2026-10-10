@@ -1,0 +1,18 @@
+@page "/composants/graphiques"
+
+<DocPage Href="composants/graphiques">
+    <DocSection Title="Les quatre graphiques" Description="Chaque graphique est un SVG `role=&quot;img&quot;` nommé par `AriaLabel`, qui s'adapte à la largeur de son conteneur, avec une infobulle (`title`) par point ou par part. Le nom accessible résume le graphique : pour des valeurs précises, proposez aussi un tableau.">
+        <DocExample Example="typeof(ChartsExample)" />
+    </DocSection>
+
+    <DocSection Title="Format des valeurs" Description="`ValueFormat` (chaîne de format .NET) ou `ValueFormatter` (fonction) mettent en forme les valeurs affichées.">
+        <DocExample Example="typeof(ChartFormatExample)" />
+    </DocSection>
+
+    <DocSection Title="API">
+        <ApiTable Component="typeof(UiBarChart)" />
+        <ApiTable Component="typeof(UiLineChart)" />
+        <ApiTable Component="typeof(UiPieChart)" />
+        <ApiTable Component="typeof(UiDonutChart)" />
+    </DocSection>
+</DocPage>

@@ -1,6 +1,7 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
-<div class="ui-chart ui-chart-pie @Class" @attributes="AdditionalAttributes">
+<div class="ui-chart ui-chart-pie @Class" style="@Style" @attributes="AdditionalAttributes">
     <svg class="ui-chart-svg" viewBox="0 0 220 220" role="img" aria-label="@AriaLabel">
         @if (Total > 0)
         {
@@ -22,10 +23,10 @@
 </div>
 
 @code {
+    /// <summary>Parts du graphique (libellé, valeur et couleur facultative).</summary>
     [Parameter] public IReadOnlyList<UiChartData> Data { get; set; } = Array.Empty<UiChartData>();
+    /// <summary>Nom accessible du graphique.</summary>
     [Parameter] public string AriaLabel { get; set; } = "Graphique circulaire";
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private double Total => Data.Sum(item => Math.Max(item.Value, 0));
 

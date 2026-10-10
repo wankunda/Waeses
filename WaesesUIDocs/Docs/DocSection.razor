@@ -1,0 +1,18 @@
+<section class="docs-section" aria-labelledby="@_id">
+    <h2 id="@_id">@Title</h2>
+    @if (!string.IsNullOrEmpty(Description))
+    {
+        <p class="docs-text"><DocText Text="@Description" /></p>
+    }
+    @ChildContent
+</section>
+
+@code {
+    private string _id = string.Empty;
+
+    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
+    [Parameter] public string? Description { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    protected override void OnParametersSet() => _id = "section-" + DocsCatalog.Normalize(Title).Replace(' ', '-');
+}

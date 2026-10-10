@@ -1,0 +1,14 @@
+<UiDropdownMenu AriaLabel="Formats d'export">
+    <Trigger><span>Exporter ▾</span></Trigger>
+    <ChildContent>
+        <button type="button" @onclick="@(() => _format = "PDF")">PDF</button>
+        <button type="button" @onclick="@(() => _format = "CSV")">CSV</button>
+        <button type="button" @onclick="@(() => _format = "Excel")">Excel</button>
+    </ChildContent>
+</UiDropdownMenu>
+
+<p class="text-secondary">Format choisi : <strong>@_format</strong></p>
+
+@code {
+    private string _format = "aucun";
+}

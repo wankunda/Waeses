@@ -1,6 +1,7 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
-<span class="ui-badge ui-badge-@Color.ToString().ToLower() @Class" @attributes="AdditionalAttributes">
+<span class="ui-badge @ToneClass @Class" style="@Style" @attributes="AdditionalAttributes">
     @if (Dot)
     {
         <span class="ui-badge-dot"></span>
@@ -16,10 +17,17 @@
 </span>
 
 @code {
+    /// <summary>Texte du badge. Ignoré si <c>ChildContent</c> est fourni.</summary>
     [Parameter] public string? Text { get; set; }
+    /// <summary>Contenu libre du badge.</summary>
     [Parameter] public RenderFragment? ChildContent { get; set; }
+    /// <summary>Apparence : <c>Filled</c> (plein), <c>Outlined</c> (contour) ou <c>Text</c> (fond teinté). Sans valeur : rendu historique.</summary>
+    [Parameter] public UiVariant? Variant { get; set; }
+
+    private string ToneClass => UiStyle.ToneClasses("ui-badge", Color, Variant);
+
+    /// <summary>Couleur du badge.</summary>
     [Parameter] public UiColor Color { get; set; } = UiColor.Primary;
+    /// <summary>Affiche une simple pastille sans texte.</summary>
     [Parameter] public bool Dot { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

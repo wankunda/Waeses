@@ -1,54 +1,225 @@
 @namespace WaesesUI
+@inherits UiComponentBase
+@implements IDisposable
 
-<section class="ui-carousel @Class" aria-roledescription="carrousel" aria-label="@AriaLabel" @attributes="AdditionalAttributes">
+<section class="@CssClass"
+         style="@Style"
+         tabindex="0"
+         aria-roledescription="carrousel"
+         aria-label="@AriaLabel"
+         @onkeydown="HandleKeyDown"
+         @onmouseenter="() => SetPaused(true)"
+         @onmouseleave="() => SetPaused(false)"
+         @onfocusin="() => SetPaused(true)"
+         @onfocusout="() => SetPaused(false)"
+         @attributes="AdditionalAttributes">
     @if (Items.Count > 0)
     {
-        <div class="ui-carousel-stage" aria-live="polite">
-            <UiImage Src="@CurrentItem.Src" Alt="@CurrentItem.Alt" Ratio="@Ratio" Lazy="false" />
-            @if (!string.IsNullOrWhiteSpace(CurrentItem.Caption)) { <div class="ui-carousel-caption">@CurrentItem.Caption</div> }
-            @if (Items.Count > 1)
-            {
-                <button type="button" class="ui-carousel-control previous" aria-label="@PreviousText" @onclick="Previous">‹</button>
-                <button type="button" class="ui-carousel-control next" aria-label="@NextText" @onclick="Next">›</button>
-            }
-        </div>
-        <div class="ui-carousel-footer">
-            <span>@(_activeIndex + 1) / @Items.Count</span>
-            <div class="ui-carousel-dots" role="tablist" aria-label="Sélection de l’image">
+        <div class="ui-carousel-stage"
+             aria-live="@(IsCycling ? "off" : "polite")"
+             @ontouchstart="HandleTouchStart"
+             @ontouchend="HandleTouchEnd">
+            <div class="ui-carousel-track" style="@TrackStyle">
                 @for (var index = 0; index < Items.Count; index++)
                 {
-                    var capturedIndex = index;
-                    <button type="button" role="tab" class="@(capturedIndex == _activeIndex ? "active" : "")" aria-label="Image @(capturedIndex + 1)" aria-selected="@(capturedIndex == _activeIndex)" @onclick="() => Select(capturedIndex)"></button>
+                    var item = Items[index];
+                    var isActive = index == SafeIndex;
+                    <div class="@(isActive ? "ui-carousel-slide active" : "ui-carousel-slide")"
+                         role="group"
+                         aria-roledescription="diapositive"
+                         aria-label="@SlideLabel(index)"
+                         aria-hidden="@(isActive ? null : "true")"
+                         @key="index">
+                        @if (ItemTemplate != null)
+                        {
+                            @ItemTemplate(item)
+                        }
+                        else
+                        {
+                            <UiImage Src="@item.Src" Alt="@item.Alt" Ratio="@Ratio" Lazy="@(!isActive)" />
+                            @if (!string.IsNullOrWhiteSpace(item.Caption))
+                            {
+                                <div class="ui-carousel-caption">@item.Caption</div>
+                            }
+                        }
+                    </div>
                 }
             </div>
+            @if (ShowArrows && Items.Count > 1)
+            {
+                <button type="button" class="ui-carousel-control previous" aria-label="@PreviousText"
+                        disabled="@(!Loop && SafeIndex == 0)" @onclick="PreviousAsync">‹</button>
+                <button type="button" class="ui-carousel-control next" aria-label="@NextText"
+                        disabled="@(!Loop && SafeIndex == Items.Count - 1)" @onclick="NextAsync">›</button>
+            }
         </div>
+        @if (ShowBullets || ShowCounter)
+        {
+            <div class="ui-carousel-footer">
+                @if (ShowCounter) { <span>@(SafeIndex + 1) / @Items.Count</span> } else { <span></span> }
+                @if (ShowBullets)
+                {
+                    <div class="ui-carousel-dots">
+                        @for (var index = 0; index < Items.Count; index++)
+                        {
+                            var capturedIndex = index;
+                            <button type="button"
+                                    class="@(capturedIndex == SafeIndex ? "active" : "")"
+                                    aria-label="@SlideLabel(capturedIndex)"
+                                    aria-current="@(capturedIndex == SafeIndex ? "true" : null)"
+                                    @onclick="() => SelectAsync(capturedIndex)"></button>
+                        }
+                    </div>
+                }
+            </div>
+        }
     }
 </section>
 
 @code {
+    private int _index;
+    private int _lastIndexParameter = -1;
+    private bool _paused;
+    private int _touchStartX;
+    private bool _touching;
+    private Timer? _timer;
+    private (bool Cycle, int Interval, int Count) _timerConfig;
+
+    /// <summary>Diapositives du carrousel.</summary>
     [Parameter] public IReadOnlyList<UiCarouselItem> Items { get; set; } = Array.Empty<UiCarouselItem>();
+
+    /// <summary>Contenu personnalisé d'une diapositive (remplace l'image et la légende).</summary>
+    [Parameter] public RenderFragment<UiCarouselItem>? ItemTemplate { get; set; }
+
+    /// <summary>Index affiché. Optionnel : sans liaison, le carrousel garde son propre état.</summary>
     [Parameter] public int ActiveIndex { get; set; }
+    /// <summary>Appelé quand la diapositive affichée change ; reçoit son index.</summary>
     [Parameter] public EventCallback<int> ActiveIndexChanged { get; set; }
+    /// <summary>Rapport largeur/hauteur des images.</summary>
     [Parameter] public ImageRatio Ratio { get; set; } = ImageRatio.Widescreen;
+    /// <summary>Animation de passage : glissement, fondu ou aucune.</summary>
+    [Parameter] public UiCarouselTransition Transition { get; set; } = UiCarouselTransition.Slide;
+
+    /// <summary>Revient à la première diapositive après la dernière (et inversement).</summary>
+    [Parameter] public bool Loop { get; set; } = true;
+    /// <summary>Passe automatiquement à la diapositive suivante. Suspendu au survol et au focus avec <c>PauseOnHover</c>.</summary>
+    [Parameter] public bool AutoCycle { get; set; }
+    /// <summary>Délai en millisecondes entre deux diapositives automatiques.</summary>
+    [Parameter] public int AutoCycleInterval { get; set; } = 5000;
+
+    /// <summary>Suspend le défilement automatique au survol et au focus.</summary>
+    [Parameter] public bool PauseOnHover { get; set; } = true;
+    /// <summary>Affiche les flèches précédent/suivant.</summary>
+    [Parameter] public bool ShowArrows { get; set; } = true;
+    /// <summary>Affiche les pastilles de navigation.</summary>
+    [Parameter] public bool ShowBullets { get; set; } = true;
+    /// <summary>Affiche le compteur « 2 / 5 ».</summary>
+    [Parameter] public bool ShowCounter { get; set; } = true;
+
+    /// <summary>Navigation par glissement tactile.</summary>
+    [Parameter] public bool EnableSwipe { get; set; } = true;
+    /// <summary>Nom accessible du carrousel.</summary>
     [Parameter] public string AriaLabel { get; set; } = "Carrousel";
+    /// <summary>Nom accessible de la flèche précédente.</summary>
     [Parameter] public string PreviousText { get; set; } = "Image précédente";
+    /// <summary>Nom accessible de la flèche suivante.</summary>
     [Parameter] public string NextText { get; set; } = "Image suivante";
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
-    private int _activeIndex;
-    private int SafeIndex => Math.Clamp(_activeIndex, 0, Math.Max(Items.Count - 1, 0));
-    private UiCarouselItem CurrentItem => Items[SafeIndex];
+    private int SafeIndex => Math.Clamp(_index, 0, Math.Max(Items.Count - 1, 0));
+    private bool IsCycling => AutoCycle && Items.Count > 1;
 
-    protected override void OnParametersSet() => _activeIndex = Items.Count == 0 ? 0 : Math.Clamp(ActiveIndex, 0, Items.Count - 1);
+    private string CssClass => CssBuilder.Default("ui-carousel")
+        .Add($"ui-carousel-transition-{Transition.ToString().ToLowerInvariant()}")
+        .Add(Class)
+        .Build();
 
-    private Task Previous() => SelectAsync((SafeIndex - 1 + Items.Count) % Items.Count);
-    private Task Next() => SelectAsync((SafeIndex + 1) % Items.Count);
-    private Task Select(int index) => SelectAsync(index);
+    private string? TrackStyle => Transition == UiCarouselTransition.Slide
+        ? $"transform: translateX(-{SafeIndex * 100}%);"
+        : null;
+
+    private string SlideLabel(int index) => $"{index + 1} / {Items.Count}";
+
+    protected override void OnParametersSet()
+    {
+        // Le paramètre ne pilote l'état que lorsqu'il change : un re-rendu du parent ne ramène plus à l'index initial.
+        if (ActiveIndex != _lastIndexParameter)
+        {
+            _lastIndexParameter = ActiveIndex;
+            _index = ActiveIndex;
+        }
+        _index = Items.Count == 0 ? 0 : Math.Clamp(_index, 0, Items.Count - 1);
+        ConfigureTimer();
+    }
+
+    private void ConfigureTimer()
+    {
+        var config = (IsCycling, Math.Max(AutoCycleInterval, 500), Items.Count);
+        if (config == _timerConfig && (_timer != null || !config.Item1)) return;
+
+        _timerConfig = config;
+        _timer?.Dispose();
+        _timer = null;
+        if (config.Item1)
+        {
+            _timer = new Timer(_ => _ = InvokeAsync(TickAsync), null, config.Item2, config.Item2);
+        }
+    }
+
+    private async Task TickAsync()
+    {
+        if (_paused || Items.Count < 2) return;
+        await NextAsync();
+    }
+
+    private void SetPaused(bool paused)
+    {
+        if (PauseOnHover) _paused = paused;
+    }
+
+    private Task PreviousAsync() => MoveAsync(-1);
+    private Task NextAsync() => MoveAsync(1);
+
+    private Task MoveAsync(int step)
+    {
+        if (Items.Count < 2) return Task.CompletedTask;
+        var target = SafeIndex + step;
+        if (Loop) target = (target % Items.Count + Items.Count) % Items.Count;
+        else if (target < 0 || target >= Items.Count) return Task.CompletedTask;
+        return SelectAsync(target);
+    }
 
     private async Task SelectAsync(int index)
     {
-        _activeIndex = index;
+        if (index == SafeIndex || index < 0 || index >= Items.Count) return;
+        _index = index;
         await ActiveIndexChanged.InvokeAsync(index);
+        StateHasChanged();
     }
+
+    private Task HandleKeyDown(KeyboardEventArgs e) => e.Key switch
+    {
+        "ArrowLeft" => PreviousAsync(),
+        "ArrowRight" => NextAsync(),
+        "Home" => SelectAsync(0),
+        "End" => SelectAsync(Items.Count - 1),
+        _ => Task.CompletedTask
+    };
+
+    private void HandleTouchStart(TouchEventArgs e)
+    {
+        if (!EnableSwipe || e.Touches.Length != 1) return;
+        _touchStartX = (int)e.Touches[0].ClientX;
+        _touching = true;
+    }
+
+    private async Task HandleTouchEnd(TouchEventArgs e)
+    {
+        if (!_touching || e.ChangedTouches.Length == 0) return;
+        _touching = false;
+        var delta = (int)e.ChangedTouches[0].ClientX - _touchStartX;
+        if (Math.Abs(delta) < 40) return;
+        await (delta < 0 ? NextAsync() : PreviousAsync());
+    }
+
+    public void Dispose() => _timer?.Dispose();
 }

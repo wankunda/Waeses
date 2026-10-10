@@ -1,14 +1,22 @@
 @namespace WaesesUI
+@inherits UiComponentBase
+@inject IJSRuntime JS
 
 <CascadingValue Value="this" IsFixed="true">
-    <div class="ui-tabs @Class" @attributes="AdditionalAttributes">
-        <div class="ui-tab-nav">
+    <div class="ui-tabs @Class" style="@Style" @attributes="AdditionalAttributes">
+        <div class="ui-tab-nav" role="tablist" aria-label="@AriaLabel">
             @foreach (var panel in _panels)
             {
                 <button type="button"
+                        id="@panel.TabId"
+                        role="tab"
                         class="ui-tab-btn @(panel == _activePanel ? "active" : "")"
+                        aria-selected="@(panel == _activePanel ? "true" : "false")"
+                        aria-controls="@(panel == _activePanel ? panel.PanelId : null)"
+                        tabindex="@(panel == _activePanel ? 0 : -1)"
                         disabled="@panel.Disabled"
-                        @onclick="() => SelectPanel(panel)">
+                        @onclick="() => SelectPanel(panel)"
+                        @onkeydown="e => HandleKeyDown(e, panel)">
                     @if (!string.IsNullOrEmpty(panel.Icon))
                     {
                         <span>@panel.Icon</span>
@@ -31,10 +39,12 @@
     private readonly List<UiTabPanel> _panels = new();
     private UiTabPanel? _activePanel;
 
+    /// <summary>Les <c>UiTabPanel</c> du groupe d'onglets.</summary>
     [Parameter] public RenderFragment? ChildContent { get; set; }
-    [Parameter] public string? Class { get; set; }
+    /// <summary>Appelé quand l'onglet actif change ; reçoit l'index de l'onglet.</summary>
     [Parameter] public EventCallback<int> OnTabChanged { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+    /// <summary>Nom accessible de la liste d'onglets.</summary>
+    [Parameter] public string? AriaLabel { get; set; }
 
     public void AddPanel(UiTabPanel panel)
     {
@@ -65,6 +75,22 @@
         _activePanel = panel;
         StateHasChanged();
         await OnTabChanged.InvokeAsync(_panels.IndexOf(panel));
+    }
+
+    // Fleches gauche/droite : active et focalise l'onglet voisin non desactive (navigation circulaire).
+    private async Task HandleKeyDown(KeyboardEventArgs e, UiTabPanel from)
+    {
+        var step = e.Key switch { "ArrowRight" => 1, "ArrowLeft" => -1, _ => 0 };
+        if (step == 0) return;
+
+        var enabled = _panels.Where(p => !p.Disabled).ToList();
+        if (enabled.Count < 2) return;
+
+        var current = enabled.IndexOf(from);
+        var target = enabled[((current < 0 ? 0 : current) + step + enabled.Count) % enabled.Count];
+        await SelectPanel(target);
+        try { await JS.InvokeVoidAsync("UiInterop.focusById", target.TabId); }
+        catch (JSDisconnectedException) { }
     }
 
     public bool IsActive(UiTabPanel panel) => _activePanel == panel;

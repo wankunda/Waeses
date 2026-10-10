@@ -1,0 +1,26 @@
+<UiForm Model="_model" Context="form" OnValidSubmit="SaveAsync">
+    <div class="ui-flex-col" style="gap: 1rem; width: 100%; max-width: 28rem;">
+        <UiInput @bind-Value="_model.Title" Label="Titre" Validation="@(title => string.IsNullOrWhiteSpace(title) ? "Le titre est obligatoire." : null)" />
+
+        @* Pendant l'enregistrement, IsSubmitting est vrai : le bouton est désactivé et un second envoi est ignoré. *@
+        <UiButton Type="submit" Text="@(form.IsSubmitting ? "Enregistrement…" : "Enregistrer")" Loading="form.IsSubmitting" />
+
+        <p class="text-secondary">Enregistrements effectués : <strong>@_saved</strong></p>
+    </div>
+</UiForm>
+
+@code {
+    private sealed class Draft
+    {
+        public string? Title { get; set; }
+    }
+
+    private readonly Draft _model = new();
+    private int _saved;
+
+    private async Task SaveAsync()
+    {
+        await Task.Delay(1200);   // appel réseau simulé
+        _saved++;
+    }
+}

@@ -1,0 +1,8 @@
+@inject IToastService Toasts
+
+<div class="ui-flex-row" style="flex-wrap: wrap; gap: .5rem;">
+    <UiButton Text="Succès" Color="UiColor.Success" OnClick="@(() => Toasts.ShowToast("Enregistré avec succès.", ToastType.Success))" />
+    <UiButton Text="Information" Color="UiColor.Info" OnClick="@(() => Toasts.ShowToast("Nouvelle version disponible.", ToastType.Info, "Mise à jour"))" />
+    <UiButton Text="Avertissement" Color="UiColor.Warning" OnClick="@(() => Toasts.ShowToast("Connexion instable.", ToastType.Warning))" />
+    <UiButton Text="Erreur (10 s)" Color="UiColor.Danger" OnClick="@(() => Toasts.ShowToast("Échec de l'envoi.", ToastType.Danger, durationMs: 10_000))" />
+</div>

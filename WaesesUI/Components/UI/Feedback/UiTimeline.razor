@@ -1,10 +1,11 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
-<ol class="ui-timeline @Class" aria-label="@AriaLabel" @attributes="AdditionalAttributes">
+<ol class="ui-timeline @Class" aria-label="@AriaLabel" style="@Style" @attributes="AdditionalAttributes">
     @foreach (var item in Items)
     {
         <li class="ui-timeline-item">
-            <span class="ui-timeline-marker ui-timeline-marker-@item.Color.ToString().ToLower()" aria-hidden="true"></span>
+            <span class="ui-timeline-marker ui-timeline-marker-@item.Color.ToString().ToLower() @item.Color.ToCssClass()" aria-hidden="true"></span>
             <div class="ui-timeline-content">
                 @if (!string.IsNullOrWhiteSpace(item.Date)) { <time>@item.Date</time> }
                 <strong>@item.Title</strong>
@@ -15,8 +16,8 @@
 </ol>
 
 @code {
+    /// <summary>Événements de la chronologie.</summary>
     [Parameter] public IReadOnlyList<UiTimelineItem> Items { get; set; } = Array.Empty<UiTimelineItem>();
+    /// <summary>Nom accessible de la chronologie.</summary>
     [Parameter] public string AriaLabel { get; set; } = "Chronologie";
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

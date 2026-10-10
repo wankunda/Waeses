@@ -1,0 +1,75 @@
+name: Documentation
+
+# Publie le site WaesesUIDocs (Blazor WebAssembly, fichiers statiques) sur GitHub Pages.
+# Prérequis, une seule fois : Settings > Pages > Source = « GitHub Actions ».
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'WaesesUI/**'
+      - 'WaesesUIDocs/**'
+      - '.github/workflows/docs.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            9.0.x
+            10.0.x
+
+      - name: Tests de la documentation
+        run: dotnet test WaesesUI.Tests --configuration Release --filter "FullyQualifiedName~Docs"
+
+      - name: Publication
+        run: dotnet publish WaesesUIDocs/WaesesUIDocs.csproj --configuration Release --output release
+
+      # Le site publié (celui qui sera déployé) est testé dans un vrai Chromium : navigation, composants, accessibilité (axe-core).
+      - name: Installer Chromium pour Playwright
+        run: |
+          dotnet build WaesesUIDocs.E2E --configuration Release
+          pwsh WaesesUIDocs.E2E/bin/Release/net10.0/playwright.ps1 install --with-deps chromium
+
+      - name: Tests de bout en bout
+        env:
+          DOCS_E2E_SITE: ${{ github.workspace }}/release/wwwroot
+        run: dotnet test WaesesUIDocs.E2E --configuration Release --no-build
+
+      # Le site est servi sous https://<compte>.github.io/<dépôt>/ : la base du routeur doit le savoir.
+      - name: Adapter la base du site
+        run: |
+          sed -i 's|<base href="/" />|<base href="/${{ github.event.repository.name }}/" />|' release/wwwroot/index.html
+          # Les variantes précompressées d'index.html ne correspondraient plus au fichier modifié.
+          rm -f release/wwwroot/index.html.br release/wwwroot/index.html.gz
+          # GitHub Pages n'a pas de repli SPA : 404.html permet d'ouvrir directement une page (lien profond).
+          cp release/wwwroot/index.html release/wwwroot/404.html
+          touch release/wwwroot/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: release/wwwroot
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

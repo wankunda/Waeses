@@ -1,0 +1,42 @@
+@page "/composants/listes-avancees"
+
+<DocPage Href="composants/listes-avancees">
+    <DocSection Title="Quel composant choisir ?">
+        <div class="api-table-wrap">
+            <table class="ui-table ui-table-compact">
+                <caption class="api-caption">Choisir une liste</caption>
+                <thead><tr><th scope="col">Composant</th><th scope="col">Quand l'utiliser</th><th scope="col">Valeur</th></tr></thead>
+                <tbody>
+                    <tr><td><code>UiSelect</code></td><td>Quelques options connues d'avance ; liste native, très bien gérée sur mobile.</td><td>Une valeur</td></tr>
+                    <tr><td><code>UiCombobox</code></td><td>Liste en mémoire à filtrer en tapant.</td><td>Une valeur</td></tr>
+                    <tr><td><code>UiAutocomplete</code></td><td>Grand volume ou recherche côté serveur (<code>SearchFunc</code> asynchrone).</td><td>Une valeur</td></tr>
+                    <tr><td><code>UiMultiSelect</code></td><td>Choisir plusieurs valeurs dans une liste fermée.</td><td>Une liste de valeurs</td></tr>
+                    <tr><td><code>UiTagInput</code></td><td>Saisir librement plusieurs étiquettes.</td><td>Une liste de textes</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </DocSection>
+
+    <DocSection Title="Liste filtrable" Description="`UiCombobox` filtre ses options pendant la saisie. Il fournit les rôles `combobox`, `listbox` et `option`, avec `aria-activedescendant` pour l'option active. La liste s'affiche via `UiPopoverProvider` quand il est présent (jamais rognée), sinon sous le champ.">
+        <DocExample Example="typeof(ComboboxExample)" />
+    </DocSection>
+
+    <DocSection Title="Recherche locale ou asynchrone" Description="`UiAutocomplete` accepte une liste (`Items`) ou une fonction de recherche (`SearchFunc`), appelée après `DebounceDelay` ; la requête précédente est annulée quand une nouvelle frappe arrive.">
+        <DocExample Example="typeof(AutocompleteExample)" />
+    </DocSection>
+
+    <DocSection Title="Sélection multiple" Description="`UiMultiSelect` affiche les valeurs choisies sous forme de puces retirables.">
+        <DocExample Example="typeof(MultiSelectExample)" />
+    </DocSection>
+
+    <DocSection Title="Étiquettes" Description="`UiTagInput` valide une étiquette avec Entrée, Tab ou le séparateur, ignore les doublons (sans tenir compte de la casse) et respecte `MaxTags`.">
+        <DocExample Example="typeof(TagInputExample)" />
+    </DocSection>
+
+    <DocSection Title="API">
+        <ApiTable Component="typeof(UiCombobox<,>)" />
+        <ApiTable Component="typeof(UiAutocomplete<,>)" />
+        <ApiTable Component="typeof(UiMultiSelect<,>)" />
+        <ApiTable Component="typeof(UiTagInput)" />
+    </DocSection>
+</DocPage>

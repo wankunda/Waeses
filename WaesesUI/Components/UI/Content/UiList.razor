@@ -1,7 +1,8 @@
 @typeparam TItem
 @namespace WaesesUI
+@inherits UiComponentBase
 
-<ul class="ui-list @Class" @attributes="AdditionalAttributes">
+<ul class="ui-list @Class" style="@Style" @attributes="AdditionalAttributes">
     @if (Items.Any())
     {
         @foreach (var item in Items)
@@ -16,9 +17,10 @@
 </ul>
 
 @code {
+    /// <summary>Éléments de la liste.</summary>
     [Parameter] public IEnumerable<TItem> Items { get; set; } = Array.Empty<TItem>();
+    /// <summary>Gabarit d'un élément de la liste.</summary>
     [Parameter] public RenderFragment<TItem>? ItemTemplate { get; set; }
+    /// <summary>Contenu affiché quand la liste est vide.</summary>
     [Parameter] public RenderFragment? EmptyContent { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

@@ -1,0 +1,17 @@
+@page "/composants/liste-de-choix"
+
+<DocPage Href="composants/liste-de-choix">
+    <DocSection Title="Options typées" Description="La valeur d'une `UiSelectOption` a le type de la valeur liée (énumération, `Guid`, `decimal`, nullable…). Le format est invariant des deux côtés : `1.5m` s'écrit `1.5` dans le HTML quelle que soit la culture et se relit correctement.">
+        <DocExample Example="typeof(SelectOptions)" />
+    </DocSection>
+
+    <DocSection Title="Générer les options depuis une liste" Description="`Items` crée une option par valeur. Le libellé par défaut est l'attribut `[Description]` d'une énumération, sinon `ToString()` ; `ItemText` le remplace et `ItemDisabled` désactive des éléments.">
+        <DocExample Example="typeof(SelectItems)" />
+        <p class="docs-text"><code>Items</code> est une liste de valeurs. Pour des objets avec un identifiant, utilisez <code>UiCombobox</code> ou <code>UiAutocomplete</code>, ou une boucle <code>@@foreach</code> de <code>UiSelectOption</code>.</p>
+    </DocSection>
+
+    <DocSection Title="API">
+        <ApiTable Component="typeof(UiSelect<>)" />
+        <ApiTable Component="typeof(UiSelectOption<>)" />
+    </DocSection>
+</DocPage>

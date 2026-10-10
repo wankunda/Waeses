@@ -1,0 +1,54 @@
+@inherits LayoutComponentBase
+
+@* Les providers sont ceux que les exemples (dialogues, toasts, popovers) attendent dans le layout. *@
+<UiLayout BrandText="WaesesUI" BrandIcon="👽" VersionText="@Version" ShowFooter="false" MainBody="@Body">
+    <NavMenu>
+        <UiNavMenu BrandText="Documentation" BrandHref="" NavigationItems="@_items" AriaLabel="Pages de la documentation">
+            <HeaderContent>
+                <div class="docs-search">
+                    <label class="ui-sr-only" for="docs-search-input">Rechercher dans la documentation</label>
+                    <input id="docs-search-input" type="search" class="ui-input" placeholder="Rechercher…" autocomplete="off"
+                           value="@_query" @oninput="OnSearch" />
+                    @if (_items.Count == 0)
+                    {
+                        <p class="docs-search-empty" role="status">Aucun résultat pour « @_query ».</p>
+                    }
+                </div>
+            </HeaderContent>
+        </UiNavMenu>
+    </NavMenu>
+</UiLayout>
+
+<UiToastContainer />
+<UiMessageBoxProvider />
+<UiDialogProvider />
+<UiPopoverProvider />
+<UiThemeProvider Theme="UiTheme.System" Definition="_theme" />
+
+@code {
+    // Palette conforme WCAG AA : le site de documentation est contrôlé par axe-core (tests E2E).
+    private readonly UiThemeDefinition _theme = UiThemeDefinition.Accessible();
+
+    private string _query = string.Empty;
+    private IReadOnlyList<NavigationItem> _items = DocsCatalog.ToNavigation(DocsCatalog.Entries);
+
+    /// <summary>Version de la bibliothèque documentée.</summary>
+    private static string Version
+    {
+        get
+        {
+            var informational = typeof(UiButton).Assembly
+                .GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false)
+                .OfType<System.Reflection.AssemblyInformationalVersionAttribute>()
+                .FirstOrDefault()?.InformationalVersion;
+            var plus = informational?.IndexOf('+') ?? -1;
+            return "v" + (plus >= 0 ? informational![..plus] : informational ?? "?");
+        }
+    }
+
+    private void OnSearch(ChangeEventArgs e)
+    {
+        _query = e.Value?.ToString() ?? string.Empty;
+        _items = DocsCatalog.ToNavigation(DocsCatalog.Search(_query));
+    }
+}

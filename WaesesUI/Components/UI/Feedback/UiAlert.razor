@@ -1,8 +1,9 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
 @if (_visible)
 {
-    <div class="ui-alert ui-alert-@Color.ToString().ToLower() @Class" role="alert" @attributes="AdditionalAttributes">
+    <div class="ui-alert @ToneClass @Class" role="alert" style="@Style" @attributes="AdditionalAttributes">
         @if (ShowIcon)
         {
             <div style="font-size: 1.15rem; line-height: 1;">
@@ -25,7 +26,7 @@
         </div>
         @if (Dismissible)
         {
-            <button type="button" class="ui-alert-close" aria-label="Close" @onclick="Close">
+            <button type="button" class="ui-alert-close" aria-label="@CloseLabel" @onclick="Close">
                 ✕
             </button>
         }
@@ -35,15 +36,28 @@
 @code {
     private bool _visible = true;
 
+    /// <summary>Titre de l'alerte, affiché en gras au-dessus du message.</summary>
     [Parameter] public string? Title { get; set; }
+    /// <summary>Texte de l'alerte. Ignoré si <c>ChildContent</c> est fourni.</summary>
     [Parameter] public string? Message { get; set; }
+    /// <summary>Contenu libre de l'alerte (remplace <c>Message</c>).</summary>
     [Parameter] public RenderFragment? ChildContent { get; set; }
+    /// <summary>Apparence : <c>Filled</c> (plein), <c>Outlined</c> (contour) ou <c>Text</c> (fond teinté). Sans valeur : rendu historique.</summary>
+    [Parameter] public UiVariant? Variant { get; set; }
+
+    private string ToneClass => UiStyle.ToneClasses("ui-alert", Color, Variant);
+
+    /// <summary>Couleur sémantique : <c>Info</c>, <c>Success</c>, <c>Warning</c>, <c>Danger</c>…</summary>
     [Parameter] public UiColor Color { get; set; } = UiColor.Primary;
+    /// <summary>Affiche un bouton de fermeture. L'alerte disparaît au clic, puis <c>OnDismissed</c> est appelé.</summary>
     [Parameter] public bool Dismissible { get; set; }
+    /// <summary>Affiche l'icône correspondant à la couleur.</summary>
     [Parameter] public bool ShowIcon { get; set; } = true;
+    /// <summary>Nom accessible du bouton de fermeture (avec <c>Dismissible</c>).</summary>
+    [Parameter] public string CloseLabel { get; set; } = "Fermer";
+
+    /// <summary>Appelé après la fermeture de l'alerte par l'utilisateur.</summary>
     [Parameter] public EventCallback OnDismissed { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private async Task Close()
     {

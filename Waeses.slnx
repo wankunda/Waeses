@@ -1,4 +1,6 @@
 <Solution>
   <Project Path="WaesesUI/WaesesUI.csproj" />
-  <Project Path="WaesesUIDemo/WaesesUIDemo.csproj" />
+  <Project Path="WaesesUIDocs/WaesesUIDocs.csproj" />
+  <Project Path="WaesesUIDocs.E2E/WaesesUIDocs.E2E.csproj" />
+  <Project Path="WaesesUI.Tests/WaesesUI.Tests.csproj" />
 </Solution>

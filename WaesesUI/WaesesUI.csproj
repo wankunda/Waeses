@@ -8,7 +8,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <PackageId>WaesesUI</PackageId>
-    <Version>1.1.6</Version>
+    <Version>1.2.0</Version>
     <Authors>Wankunda</Authors>
     <Description>Bibliothèque Razor Class Library de composants UI réutilisables pour Blazor.</Description>
     <PackageTags>Blazor;Razor;UI;frontend;Components;Blazor Components;Blazor Library</PackageTags>
@@ -21,8 +21,31 @@
     <Copyright>Copyright 2026 WaEses</Copyright>
   </PropertyGroup>
 
+  <!-- Publication : métadonnées NuGet, symboles et build reproductible (SourceLink est intégré au SDK .NET 8+). -->
+  <PropertyGroup>
+    <RepositoryUrl>https://github.com/wankunda/Waeses</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/wankunda/Waeses</PackageProjectUrl>
+    <PackageReleaseNotes>Voir CHANGELOG.md</PackageReleaseNotes>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+
+  <!-- Microsoft.Build.Tasks.Git est une dépendance implicite du SDK (SourceLink), utilisée au build uniquement et non livrée dans le paquet. -->
+  <ItemGroup>
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-23fw-v26w-5fgq" />
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
   <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="" />
+    <None Include="CHANGELOG.md" Pack="true" PackagePath="" />
     <None Include="LICENSE.txt" Pack="true" PackagePath="" />
     <None Include="waesesUI.jpg" Pack="true" PackagePath="" />
   </ItemGroup>

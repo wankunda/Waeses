@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsPackable>false</IsPackable>
+        <RootNamespace>WaesesUIDocs.E2E</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Using Include="Xunit" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+        <PackageReference Include="xunit" Version="2.9.3" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="3.1.0" />
+        <PackageReference Include="Microsoft.Playwright" Version="1.52.0" />
+        <PackageReference Include="Deque.AxeCore.Playwright" Version="4.11.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <!-- Pour lire DocsCatalog (liste des pages) ; le site testé, lui, est publié puis servi tel quel. -->
+        <ProjectReference Include="..\WaesesUIDocs\WaesesUIDocs.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+
+</Project>

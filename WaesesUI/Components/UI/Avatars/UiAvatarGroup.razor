@@ -1,6 +1,7 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
-<div class="ui-avatar-group @Class" @attributes="AdditionalAttributes">
+<div class="ui-avatar-group @Class" style="@Style" @attributes="AdditionalAttributes">
     @ChildContent
     @if (ExtraCount > 0)
     {
@@ -11,8 +12,8 @@
 </div>
 
 @code {
+    /// <summary>Les <c>UiAvatar</c> du groupe, affichés en chevauchement.</summary>
     [Parameter] public RenderFragment? ChildContent { get; set; }
+    /// <summary>Nombre d'avatars non affichés ; si supérieur à 0, une pastille « +N » est ajoutée.</summary>
     [Parameter] public int ExtraCount { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

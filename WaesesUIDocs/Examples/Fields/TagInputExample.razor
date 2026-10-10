@@ -1,0 +1,10 @@
+<div class="ui-flex-col" style="gap: 1rem; width: 100%; max-width: 28rem;">
+    <UiTagInput Label="Étiquettes" @bind-Values="_tags" MaxTags="5" Placeholder="Ajouter une étiquette…"
+                HelperText="Entrée, Tab ou virgule pour valider ; Retour arrière retire la dernière. Cinq au maximum." />
+
+    <p class="text-secondary">Étiquettes : <strong>@string.Join(" · ", _tags)</strong></p>
+</div>
+
+@code {
+    private IReadOnlyList<string> _tags = new[] { "blazor", "ui" };
+}

@@ -1,0 +1,52 @@
+<UiTable TItem="Order" ServerData="LoadAsync" ShowSearch="true" PageSize="5" AriaLabel="Commandes" SearchDebounceMs="300">
+    <HeaderContent>
+        <UiTh TItem="Order" Title="N°" SortKey="number" />
+        <UiTh TItem="Order" Title="Client" SortKey="customer" />
+        <UiTh TItem="Order" Title="Total" SortKey="total" Align="Alignement.Right" />
+    </HeaderContent>
+    <RowTemplate Context="order">
+        <UiTd Label="N°">@order.Number</UiTd>
+        <UiTd Label="Client">@order.Customer</UiTd>
+        <UiTd Label="Total" Align="Alignement.Right">@order.Total.ToString("C2")</UiTd>
+    </RowTemplate>
+</UiTable>
+
+<p class="text-secondary">Avec <code>ServerData</code>, les colonnes triables déclarent une <code>SortKey</code> ; la table envoie page, tri et recherche.</p>
+
+@code {
+    private sealed record Order(int Number, string Customer, decimal Total);
+
+    private static readonly string[] Customers = { "Atelier Nord", "Boulangerie Rey", "Cabinet Leroy", "Dupont & Fils" };
+
+    private static readonly List<Order> Orders = Enumerable.Range(1, 60)
+        .Select(i => new Order(2000 + i, Customers[i % Customers.Length], 20 + i * 11 % 300))
+        .ToList();
+
+    private async Task<UiTableData<Order>> LoadAsync(UiTableState state, CancellationToken cancellationToken)
+    {
+        await Task.Delay(300, cancellationToken);
+
+        IEnumerable<Order> query = Orders;
+        if (!string.IsNullOrWhiteSpace(state.Search))
+        {
+            query = query.Where(o => o.Customer.Contains(state.Search, StringComparison.OrdinalIgnoreCase));
+        }
+
+        foreach (var sort in state.Sorts)
+        {
+            query = (sort.Key, sort.Descending) switch
+            {
+                ("number", false) => query.OrderBy(o => o.Number),
+                ("number", true) => query.OrderByDescending(o => o.Number),
+                ("customer", false) => query.OrderBy(o => o.Customer),
+                ("customer", true) => query.OrderByDescending(o => o.Customer),
+                ("total", false) => query.OrderBy(o => o.Total),
+                ("total", true) => query.OrderByDescending(o => o.Total),
+                _ => query
+            };
+        }
+
+        var all = query.ToList();
+        return new UiTableData<Order>(all.Skip((state.Page - 1) * state.PageSize).Take(state.PageSize).ToList(), all.Count);
+    }
+}

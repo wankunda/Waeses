@@ -1,0 +1,406 @@
+/* Extended controls, sizing tokens, carousel and density variants. */
+:root {
+    --space-2xs: .25rem;
+    --space-xl: 4rem;
+    --control-height-xs: 1.75rem;
+    --control-height-sm: 2rem;
+    --control-height-md: 2.5rem;
+    --control-height-lg: 3rem;
+    --control-font-xs: .75rem;
+    --control-font-sm: .8125rem;
+    --control-font-md: .9375rem;
+    --control-font-lg: 1rem;
+    --density-factor: 1;
+}
+
+[data-ui-density="compact"] { --density-factor: .82; }
+[data-ui-density="comfortable"] { --density-factor: 1; }
+[data-ui-density="spacious"] { --density-factor: 1.18; }
+
+.ui-theme-provider[data-theme="light"] {
+    color-scheme: light;
+    --primary: hsl(245, 75%, 58%);
+    --primary-hover: hsl(245, 75%, 50%);
+    --primary-active: hsl(245, 75%, 42%);
+    --primary-light: hsl(245, 85%, 95%);
+    --primary-subtle: hsl(245, 65%, 90%);
+    --primary-contrast: #ffffff;
+    --secondary: #64748b;
+    --secondary-hover: #475569;
+    --secondary-light: #f1f5f9;
+    --secondary-contrast: #ffffff;
+    --success: #10b981;
+    --success-hover: #059669;
+    --success-light: #ecfdf5;
+    --success-contrast: #ffffff;
+    --danger: #ef4444;
+    --danger-hover: #dc2626;
+    --danger-light: #fef2f2;
+    --danger-contrast: #ffffff;
+    --warning: #f59e0b;
+    --warning-hover: #d97706;
+    --warning-light: #fffbeb;
+    --warning-contrast: #ffffff;
+    --info: #06b6d4;
+    --info-hover: #0891b2;
+    --info-light: #ecfeff;
+    --info-contrast: #ffffff;
+    --bg-app: #f8fafc;
+    --bg-surface: #ffffff;
+    --bg-surface-elevated: #ffffff;
+    --bg-surface-secondary: #f1f5f9;
+    --bg-surface-tertiary: #e2e8f0;
+    --bg-glass: rgba(255, 255, 255, .75);
+    --bg-backdrop: rgba(15, 23, 42, .5);
+    --text-main: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+    --text-inverse: #ffffff;
+    --border-subtle: #f1f5f9;
+    --border-default: #e2e8f0;
+    --border-strong: #cbd5e1;
+    --border-focus: var(--primary);
+}
+
+.ui-theme-provider[data-theme="dark"] {
+    color-scheme: dark;
+    --primary: hsl(245, 80%, 65%);
+    --primary-hover: hsl(245, 80%, 72%);
+    --primary-active: hsl(245, 80%, 58%);
+    --primary-light: rgba(99, 102, 241, .16);
+    --primary-subtle: rgba(99, 102, 241, .25);
+    --primary-contrast: #0f172a;
+    --secondary: #94a3b8;
+    --secondary-hover: #cbd5e1;
+    --secondary-light: rgba(148, 163, 184, .12);
+    --secondary-contrast: #0f172a;
+    --success: #34d399;
+    --success-hover: #6ee7b7;
+    --success-light: rgba(16, 185, 129, .15);
+    --success-contrast: #064e3b;
+    --danger: #f87171;
+    --danger-hover: #fca5a5;
+    --danger-light: rgba(239, 68, 68, .15);
+    --danger-contrast: #450a0a;
+    --warning: #fbbf24;
+    --warning-hover: #fcd34d;
+    --warning-light: rgba(245, 158, 11, .15);
+    --warning-contrast: #451a03;
+    --info: #38bdf8;
+    --info-hover: #7dd3fc;
+    --info-light: rgba(6, 182, 212, .15);
+    --info-contrast: #082f49;
+    --bg-app: #090d16;
+    --bg-surface: #111827;
+    --bg-surface-elevated: #1a2234;
+    --bg-surface-secondary: #1f293d;
+    --bg-surface-tertiary: #2a374f;
+    --bg-glass: rgba(17, 24, 39, .85);
+    --bg-backdrop: rgba(3, 7, 18, .75);
+    --text-main: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --text-inverse: #0f172a;
+    --border-subtle: #1a2436;
+    --border-default: #26334d;
+    --border-strong: #3b4d70;
+    --border-focus: var(--primary);
+}
+
+.ui-btn-xs { height: var(--control-height-xs); padding: .25rem .55rem; font-size: var(--control-font-xs); }
+.ui-btn-lg { min-height: calc(var(--control-height-lg) * var(--density-factor)); }
+.ui-input, .ui-select { min-height: calc(var(--control-height-md) * var(--density-factor)); padding: calc(.45rem * var(--density-factor)) calc(.75rem * var(--density-factor)); font-size: var(--control-font-md); }
+.ui-input-xs, .ui-select-xs { min-height: var(--control-height-xs); padding: .2rem .45rem; font-size: var(--control-font-xs); }
+.ui-input-sm, .ui-select-sm { min-height: var(--control-height-sm); padding: .3rem .6rem; font-size: var(--control-font-sm); }
+.ui-input-lg, .ui-select-lg { min-height: calc(var(--control-height-lg) * var(--density-factor)); padding: .7rem 1rem; font-size: var(--control-font-lg); }
+.ui-icon-xs { width: 14px; height: 14px; }
+.ui-avatar-xs { width: 24px; height: 24px; font-size: .65rem; }
+.ui-spinner-xs { width: 12px; height: 12px; border-width: 1.5px; }
+.ui-modal-xs { max-width: 320px; }
+
+.ui-color-picker { display: grid; grid-template-columns: 3.5rem minmax(0, 1fr); gap: .6rem; }
+.ui-color-swatch { width: 100%; height: var(--control-height-md); padding: .2rem; border: 1px solid var(--border-default); border-radius: var(--radius-md); background: var(--bg-surface); cursor: pointer; }
+.ui-date-range { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: .6rem; }
+.ui-tag-input { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; min-height: calc(var(--control-height-md) * var(--density-factor)); padding: .4rem .55rem; border: 1px solid var(--border-default); border-radius: var(--radius-md); background: var(--bg-surface); cursor: text; }
+.ui-tag-input:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+.ui-tag-input > input { flex: 1 1 8rem; min-width: 6rem; padding: .25rem; border: 0; outline: 0; color: var(--text-main); background: transparent; font: inherit; }
+.ui-combobox { position: relative; }
+.ui-combobox-options { position: absolute; z-index: 1000; top: calc(100% + .3rem); left: 0; right: 0; max-height: 16rem; overflow: auto; padding: .35rem; margin: 0; list-style: none; border: 1px solid var(--border-default); border-radius: var(--radius-md); background: var(--bg-surface); box-shadow: var(--shadow-md); }
+.ui-combobox-option { padding: .55rem .7rem; border-radius: var(--radius-sm); cursor: pointer; }
+.ui-combobox-option:hover, .ui-combobox-option.active { background: var(--primary-light); }
+.ui-combobox-empty { padding: .7rem; color: var(--text-muted); text-align: center; }
+/* Carrousel : piste flex déplacée par translateX (slide) ou diapositives superposées (fade). */
+.ui-carousel { width: 100%; border-radius: var(--radius-md); }
+.ui-carousel:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
+.ui-carousel-track { display: flex; width: 100%; transition: transform .45s var(--trans-smooth, ease); }
+.ui-carousel-slide { position: relative; flex: 0 0 100%; min-width: 0; touch-action: pan-y; user-select: none; }
+.ui-carousel-slide:not(.active) { visibility: hidden; pointer-events: none; transition: visibility 0s linear .45s; }
+.ui-carousel-transition-fade .ui-carousel-track { display: grid; transition: none; }
+.ui-carousel-transition-fade .ui-carousel-slide { grid-area: 1 / 1; opacity: 0; transition: opacity .45s ease, visibility 0s linear .45s; }
+.ui-carousel-transition-fade .ui-carousel-slide.active { opacity: 1; transition-delay: 0s; }
+.ui-carousel-transition-none .ui-carousel-track, .ui-carousel-transition-none .ui-carousel-slide { transition: none; }
+.ui-carousel-control:disabled { opacity: .45; cursor: not-allowed; }
+.ui-carousel-control:focus-visible, .ui-carousel-dots button:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+    .ui-carousel-track, .ui-carousel-slide { transition: none !important; }
+}
+.ui-carousel-stage { position: relative; overflow: hidden; border-radius: var(--radius-md); background: var(--bg-surface-secondary); }
+.ui-carousel-stage .ui-image-wrapper { display: block; width: 100%; }
+.ui-carousel-caption { pointer-events: none; position: absolute; right: 0; bottom: 0; left: 0; padding: .8rem 1rem; color: #fff; background: linear-gradient(transparent, rgba(0,0,0,.72)); }
+.ui-carousel-control { position: absolute; top: 50%; display: grid; place-items: center; width: 2.5rem; height: 2.5rem; transform: translateY(-50%); color: var(--text-main); background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: 50%; box-shadow: var(--shadow-md); cursor: pointer; font-size: 1.5rem; }
+.ui-carousel-control.previous { left: .75rem; }
+.ui-carousel-control.next { right: .75rem; }
+.ui-carousel-footer { display: flex; justify-content: space-between; align-items: center; padding-top: .55rem; color: var(--text-secondary); font-size: .8rem; }
+.ui-carousel-dots { display: flex; gap: .4rem; }
+.ui-carousel-dots button { width: .55rem; height: .55rem; padding: 0; border: 0; border-radius: 50%; background: var(--border-strong); cursor: pointer; }
+.ui-carousel-dots button.active { background: var(--primary); }
+
+@media (max-width: 560px) {
+    .ui-date-range { grid-template-columns: 1fr; }
+    .ui-stepper { overflow-x: auto; }
+    .ui-step { min-width: 6rem; }
+    .mode-theme-text{
+        display: none;
+    }
+}
+
+.ui-btn-fab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    border-radius: 50%;
+    border: 1px solid transparent;
+    cursor: pointer;
+    text-decoration: none;
+    user-select: none;
+    white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+    transition: transform var(--trans-fast), box-shadow var(--trans-fast), background-color var(--trans-fast), border-color var(--trans-fast), opacity var(--trans-fast);
+}
+
+.ui-btn-fab:active:not(:disabled) {
+    transform: scale(0.97);
+}
+
+.ui-btn-fab:disabled, .ui-btn-fab.ui-btn-disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    pointer-events: none;
+    box-shadow: none !important;
+    transform: none !important;
+}
+/* Sizes */
+.ui-btn-fab-xs {
+    padding: .4rem;
+}
+.ui-btn-fab-sm {
+    padding: .6rem;
+}
+
+.ui-btn-fab-md {
+    padding: 1.1rem;
+}
+
+.ui-btn-fab-lg {
+    padding: 1.8rem;
+}
+.ui-btn-fab-max {
+    padding: 2.5rem;
+}
+
+/* ==========================================================================
+   Calendrier (UiCalendar) et sélecteur de date (UiDatePicker)
+   ========================================================================== */
+.ui-cal { width: 18.5rem; max-width: 100%; padding: .6rem; box-sizing: border-box; color: var(--text-main); background: var(--bg-surface-elevated, var(--bg-surface)); border: 1px solid var(--border-default); border-radius: var(--radius-md); user-select: none; }
+.ui-cal-header { display: flex; align-items: center; justify-content: space-between; gap: .25rem; margin-bottom: .4rem; }
+.ui-cal-nav { display: inline-flex; align-items: center; justify-content: center; width: 2.25rem; height: 2.25rem; padding: 0; color: var(--text-secondary); background: transparent; border: 0; border-radius: var(--radius-full); cursor: pointer; }
+.ui-cal-nav:hover:not(:disabled) { color: var(--text-main); background: var(--bg-surface-secondary); }
+.ui-cal-nav:disabled { opacity: .35; cursor: not-allowed; }
+.ui-cal-title { flex: 1; padding: .4rem .5rem; color: var(--text-main); background: transparent; border: 0; border-radius: var(--radius-sm); font: inherit; font-weight: 600; cursor: pointer; }
+.ui-cal-title:hover { background: var(--bg-surface-secondary); }
+.ui-cal :is(button):focus-visible { outline: 2px solid var(--border-focus); outline-offset: 1px; }
+
+.ui-cal-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.ui-cal-weekdays { margin-bottom: 2px; }
+.ui-cal-weekday { padding: .3rem 0; color: var(--text-muted); font-size: .72rem; font-weight: 600; text-align: center; text-transform: uppercase; letter-spacing: .03em; }
+.ui-cal-day { aspect-ratio: 1; min-height: 2.1rem; padding: 0; color: var(--text-main); background: transparent; border: 1px solid transparent; border-radius: var(--radius-full); font: inherit; font-size: .875rem; cursor: pointer; transition: background-color var(--trans-fast), color var(--trans-fast); }
+.ui-cal-day:hover:not(.ui-cal-day-disabled):not(.ui-cal-day-selected) { background: var(--bg-surface-secondary); }
+.ui-cal-day-outside { color: var(--text-muted); }
+.ui-cal-day-today { border-color: var(--primary); font-weight: 700; }
+.ui-cal-day-selected { color: var(--primary-contrast); background: var(--primary); border-color: var(--primary); font-weight: 700; }
+.ui-cal-day-disabled { opacity: .35; text-decoration: line-through; cursor: not-allowed; }
+
+.ui-cal-pick { display: grid; grid-template-columns: repeat(3, 1fr); gap: .35rem; padding: .25rem 0; }
+.ui-cal-pick-item { padding: .7rem .25rem; color: var(--text-main); background: transparent; border: 1px solid transparent; border-radius: var(--radius-md); font: inherit; font-size: .9rem; cursor: pointer; }
+.ui-cal-pick-item:hover:not(:disabled) { background: var(--bg-surface-secondary); }
+.ui-cal-pick-item:disabled { opacity: .35; cursor: not-allowed; }
+.ui-cal-pick-current { border-color: var(--primary); }
+.ui-cal-pick-selected { color: var(--primary-contrast); background: var(--primary); border-color: var(--primary); }
+.ui-cal-pick-selected:hover:not(:disabled) { background: var(--primary-hover); }
+
+.ui-cal-footer { display: flex; justify-content: center; margin-top: .4rem; padding-top: .4rem; border-top: 1px solid var(--border-subtle); }
+.ui-cal-today { padding: .35rem .9rem; color: var(--primary); background: transparent; border: 0; border-radius: var(--radius-full); font: inherit; font-size: .85rem; font-weight: 600; cursor: pointer; }
+.ui-cal-today:hover:not(:disabled) { background: var(--primary-light); }
+.ui-cal-today:disabled { opacity: .35; cursor: not-allowed; }
+
+.ui-datepicker { position: relative; width: 100%; }
+.ui-datepicker .ui-input-wrapper { position: relative; }
+.ui-datepicker-trigger { display: flex; align-items: center; justify-content: space-between; gap: .5rem; text-align: left; cursor: pointer; }
+.ui-datepicker-trigger:disabled { cursor: not-allowed; }
+.ui-datepicker-empty .ui-datepicker-text { color: var(--text-muted); }
+.ui-datepicker-clear { position: absolute; top: 50%; right: 2.6rem; display: inline-flex; align-items: center; justify-content: center; width: 1.6rem; height: 1.6rem; padding: 0; color: var(--text-muted); background: transparent; border: 0; border-radius: var(--radius-full); transform: translateY(-50%); cursor: pointer; }
+.ui-datepicker-clear:hover { color: var(--text-main); background: var(--bg-surface-secondary); }
+.ui-datepicker-clear:focus-visible { outline: 2px solid var(--border-focus); }
+.ui-datepicker-popup { position: fixed; inset: auto; top: 0; left: 0; z-index: 1100; margin: 0; padding: 0; background: transparent; border: 0; box-shadow: var(--shadow-lg); border-radius: var(--radius-md); overflow: visible; max-width: calc(100vw - 1rem); }
+.ui-datepicker-popup:popover-open { display: block; }
+
+/* Popover rendu par UiPopoverProvider : position fixe, placée par JS (transform), jamais rognée. */
+.ui-popover-provider { display: contents; }
+.ui-popover-layer { position: fixed; top: 0; left: 0; z-index: 10000; max-width: calc(100vw - 1rem); visibility: hidden; }
+.ui-popover-layer[data-positioned] { visibility: visible; }
+.ui-popover-surface { min-width: 10rem; max-height: calc(100vh - 1rem); overflow: auto; padding: .75rem; color: var(--text-main); background: var(--bg-surface-elevated); border: 1px solid var(--border-default); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); }
+.ui-popover-inline { position: absolute; z-index: 1100; top: calc(100% + .5rem); right: 0; min-width: 14rem; padding: .75rem; color: var(--text-main); background: var(--bg-surface-elevated); border: 1px solid var(--border-default); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); }
+
+/* Accessibilite : en-tete d'accordeon (bouton), onglets, radios et tooltips au focus clavier. */
+button.ui-accordion-header { width: 100%; border: 0; font: inherit; text-align: left; }
+.ui-accordion-header:focus-visible,
+.ui-tab-btn:focus-visible,
+.ui-choice-item:focus-visible,
+.ui-tab-pane:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
+.ui-tooltip-wrapper:focus-within .ui-tooltip-content { visibility: visible; opacity: 1; transform: scale(1); }
+.ui-tooltip-wrapper:focus-within .ui-tooltip-top,
+.ui-tooltip-wrapper:focus-within .ui-tooltip-bottom { transform: translateX(-50%) scale(1); }
+.ui-tooltip-wrapper:focus-within .ui-tooltip-left,
+.ui-tooltip-wrapper:focus-within .ui-tooltip-right { transform: translateY(-50%) scale(1); }
+
+/* Table : lignes dépliables, lignes cliquables, tri au clavier, texte réservé aux lecteurs d'écran. */
+.ui-sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.ui-table-row-clickable { cursor: pointer; }
+.ui-table-expand-col { width: 40px; text-align: center; }
+.ui-table-expand-btn { display: inline-grid; place-items: center; width: 1.75rem; height: 1.75rem; border: 0; border-radius: var(--radius-sm); color: var(--text-secondary); background: transparent; font: inherit; cursor: pointer; }
+.ui-table-expand-btn:hover { background: var(--bg-surface-secondary); }
+.ui-table-expand-btn:focus-visible, .ui-th-sortable:focus-visible { outline: 2px solid var(--border-focus); outline-offset: -2px; }
+.ui-table-detail-row > td { padding: 1rem 1.25rem; background: var(--bg-surface-secondary); }
+.ui-th-sort-icon sup { margin-left: .1rem; font-size: .65em; }
+
+/* Listes déroulantes rendues par UiPopoverProvider : la surface porte déjà fond, bordure et ombre. */
+.ui-popover-surface.ui-listbox-surface { padding: .35rem; max-height: min(16rem, calc(100vh - 1rem)); }
+.ui-listbox-surface .ui-combobox-options,
+.ui-listbox-surface .ui-multiselect-menu { position: static; z-index: auto; max-height: none; overflow: visible; margin: 0; padding: 0; border: 0; background: transparent; box-shadow: none; list-style: none; }
+.ui-popover-layer:has(.ui-listbox-surface) { max-width: min(32rem, calc(100vw - 1rem)); }
+.ui-listbox-surface .ui-autocomplete-dropdown { position: static; z-index: auto; width: auto; max-height: none; overflow: visible; margin: 0; padding: 0; border: 0; background: transparent; box-shadow: none; }
+
+/* ==========================================================================
+   Color + Appearance (UiColor x UiVariant) : les classes ui-color-* posent des variables,
+   les apparences (boutons, champs) ne lisent que ces variables.
+   ========================================================================== */
+.ui-color-primary { --ui-c: var(--primary); --ui-c-hover: var(--primary-hover); --ui-c-light: var(--primary-light); --ui-c-contrast: var(--primary-contrast); }
+.ui-color-secondary { --ui-c: var(--secondary); --ui-c-hover: var(--secondary-hover); --ui-c-light: var(--secondary-light); --ui-c-contrast: var(--secondary-contrast); }
+.ui-color-success { --ui-c: var(--success); --ui-c-hover: var(--success-hover); --ui-c-light: var(--success-light); --ui-c-contrast: var(--success-contrast); }
+.ui-color-danger { --ui-c: var(--danger); --ui-c-hover: var(--danger-hover); --ui-c-light: var(--danger-light); --ui-c-contrast: var(--danger-contrast); }
+.ui-color-warning { --ui-c: var(--warning); --ui-c-hover: var(--warning-hover); --ui-c-light: var(--warning-light); --ui-c-contrast: var(--warning-contrast); }
+.ui-color-info { --ui-c: var(--info); --ui-c-hover: var(--info-hover); --ui-c-light: var(--info-light); --ui-c-contrast: var(--info-contrast); }
+.ui-color-neutral { --ui-c: var(--text-secondary); --ui-c-hover: var(--text-main); --ui-c-light: var(--bg-surface-secondary); --ui-c-contrast: var(--text-inverse); }
+
+.ui-btn-filled { background: var(--ui-c, var(--primary)); color: var(--ui-c-contrast, var(--primary-contrast)); border-color: var(--ui-c, var(--primary)); }
+.ui-btn-filled:hover:not(:disabled):not(.ui-btn-disabled) { background: var(--ui-c-hover, var(--primary-hover)); border-color: var(--ui-c-hover, var(--primary-hover)); }
+.ui-btn-outlined { background: transparent; color: var(--ui-c, var(--primary)); border-color: var(--ui-c, var(--primary)); }
+.ui-btn-outlined:hover:not(:disabled):not(.ui-btn-disabled) { background: var(--ui-c-light, var(--primary-light)); }
+.ui-btn-text { background: transparent; color: var(--ui-c, var(--primary)); border-color: transparent; }
+.ui-btn-text:hover:not(:disabled):not(.ui-btn-disabled) { background: var(--ui-c-light, var(--primary-light)); }
+.ui-btn-block { display: flex; width: 100%; }
+.ui-btn-end-icon { margin-left: .25rem; }
+
+/* Champs : Outlined = rendu historique ; Filled et Text modifient le contrôle, Color la mise en avant au focus. */
+.ui-form-group[class*="ui-color-"] :is(.ui-input, .ui-select):focus:not(.ui-input-error) { border-color: var(--ui-c); box-shadow: 0 0 0 3px var(--ui-c-light); }
+.ui-field-filled :is(.ui-input, .ui-select) { background: var(--bg-surface-secondary); border-color: transparent; border-bottom-color: var(--border-strong); border-radius: var(--radius-sm) var(--radius-sm) 0 0; }
+.ui-field-filled :is(.ui-input, .ui-select):focus:not(.ui-input-error) { background: var(--bg-surface-tertiary); border-bottom-color: var(--ui-c, var(--primary)); box-shadow: none; }
+.ui-field-text :is(.ui-input, .ui-select) { background: transparent; border-color: transparent; border-bottom-color: var(--border-strong); border-radius: 0; box-shadow: none; padding-left: 0; padding-right: 0; }
+.ui-field-text :is(.ui-input, .ui-select):focus:not(.ui-input-error) { border-bottom-color: var(--ui-c, var(--primary)); box-shadow: none; }
+
+/* ==========================================================================
+   Harmonisation Color / Variant des composants restants
+   ========================================================================== */
+
+/* Puces, badges, alertes, encadrés : apparence choisie via UiVariant (ui-v-*) ; sinon rendu historique. */
+:is(.ui-chip, .ui-badge, .ui-alert, .ui-callout).ui-v-text { color: var(--ui-c); background: var(--ui-c-light); }
+:is(.ui-chip, .ui-badge, .ui-alert, .ui-callout).ui-v-filled { color: var(--ui-c-contrast); background: var(--ui-c); border-color: var(--ui-c); }
+:is(.ui-chip, .ui-badge, .ui-alert, .ui-callout).ui-v-outlined { color: var(--ui-c); background: transparent; border-color: var(--ui-c); }
+:is(.ui-chip, .ui-badge).ui-v-outlined { box-shadow: inset 0 0 0 1px var(--ui-c); }
+:is(.ui-alert, .ui-callout).ui-v-filled :is(strong, .ui-alert-title, .ui-alert-content, div div),
+:is(.ui-alert, .ui-callout).ui-v-filled .ui-alert-close { color: inherit; }
+.ui-alert.ui-v-text, .ui-alert.ui-v-outlined { border-color: var(--ui-c); }
+
+/* Couleurs absentes du rendu historique (aucune règle pour ces combinaisons). */
+.ui-chip-secondary { color: var(--secondary); background: var(--secondary-light); }
+.ui-chip-warning { color: var(--warning); background: var(--warning-light); }
+.ui-chip-info { color: var(--info); background: var(--info-light); }
+.ui-callout-primary { color: var(--primary); background: var(--primary-light); }
+.ui-callout-secondary { color: var(--secondary); background: var(--secondary-light); }
+.ui-callout-neutral { color: var(--text-secondary); background: var(--bg-surface-secondary); }
+
+/* Progression et timeline : toutes les couleurs, via les variables communes. */
+.ui-progress-fill[class*="ui-color-"] { background: linear-gradient(90deg, var(--ui-c), var(--ui-c-hover)); }
+.ui-timeline-marker[class*="ui-color-"] { background: var(--ui-c); color: var(--ui-c); }
+
+/* Case à cocher, interrupteur, radio, curseur : la couleur remplace --primary. */
+.ui-checkbox-checked[class*="ui-color-"] .ui-checkbox-box { background-color: var(--ui-c); border-color: var(--ui-c); box-shadow: 0 2px 6px color-mix(in srgb, var(--ui-c) 30%, transparent); }
+.ui-checkbox-checked[class*="ui-color-"] .ui-checkbox-box svg { color: var(--ui-c-contrast); }
+.ui-switch-active[class*="ui-color-"] .ui-switch-track { background-color: var(--ui-c); border-color: var(--ui-c); }
+.ui-radio-checked[class*="ui-color-"] .ui-radio-outer { border-color: var(--ui-c); background-color: var(--ui-c); box-shadow: 0 2px 6px color-mix(in srgb, var(--ui-c) 30%, transparent); }
+.ui-slider-container[class*="ui-color-"] .ui-slider::-webkit-slider-thumb { background: var(--ui-c); box-shadow: 0 0 0 4px var(--ui-c-light), 0 2px 6px rgba(0, 0, 0, 0.2); }
+.ui-slider-container[class*="ui-color-"] .ui-slider::-moz-range-thumb { background: var(--ui-c); border: 0; box-shadow: 0 0 0 4px var(--ui-c-light), 0 2px 6px rgba(0, 0, 0, 0.2); }
+.ui-slider-container[class*="ui-color-"] .ui-slider-val { color: var(--ui-c); }
+
+/* Champs composites (étiquettes, multi-sélection) : mêmes apparences que les champs simples. */
+.ui-form-group[class*="ui-color-"] .ui-tag-input:focus-within,
+.ui-form-group[class*="ui-color-"] .ui-multiselect-trigger:focus { border-color: var(--ui-c); box-shadow: 0 0 0 3px var(--ui-c-light); }
+.ui-field-filled :is(.ui-tag-input, .ui-multiselect-trigger) { background: var(--bg-surface-secondary); border-color: transparent; border-bottom-color: var(--border-strong); border-radius: var(--radius-sm) var(--radius-sm) 0 0; }
+.ui-field-filled :is(.ui-tag-input:focus-within, .ui-multiselect-trigger:focus) { background: var(--bg-surface-tertiary); border-bottom-color: var(--ui-c, var(--primary)); box-shadow: none; }
+.ui-field-text :is(.ui-tag-input, .ui-multiselect-trigger) { background: transparent; border-color: transparent; border-bottom-color: var(--border-strong); border-radius: 0; box-shadow: none; padding-left: 0; padding-right: 0; }
+.ui-field-text :is(.ui-tag-input:focus-within, .ui-multiselect-trigger:focus) { border-bottom-color: var(--ui-c, var(--primary)); box-shadow: none; }
+
+/* ==========================================================================
+   UiDataGrid
+   ========================================================================== */
+.ui-datagrid-scroll { overflow: auto; }
+.ui-datagrid-scroll:focus-visible { outline: 2px solid var(--border-focus); outline-offset: -2px; }
+.ui-datagrid-sticky thead th { position: sticky; z-index: 2; background: var(--bg-surface-secondary); }
+.ui-datagrid-sticky thead tr:first-child th { top: 0; }
+.ui-datagrid-sticky thead tr.ui-datagrid-filter-row th { top: var(--ui-datagrid-header-height, 2.75rem); }
+.ui-datagrid-loading tbody { opacity: .55; transition: opacity var(--trans-fast); pointer-events: none; }
+.ui-datagrid-select-col, .ui-datagrid-actions-col { width: 44px; text-align: center; white-space: nowrap; }
+.ui-datagrid-actions-col { width: 5.5rem; }
+.ui-datagrid-select-col input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: var(--primary); }
+.ui-datagrid-filter-row th { padding: .35rem .5rem; background: var(--bg-surface); font-weight: 400; }
+.ui-datagrid-filter { display: flex; flex-direction: column; gap: .25rem; min-width: 7rem; }
+.ui-datagrid-filter .ui-select, .ui-datagrid-filter .ui-input { min-height: 1.9rem; padding: .2rem .5rem; font-size: .8rem; }
+.ui-datagrid-group-row > td { padding: 0; background: var(--bg-surface-secondary); }
+.ui-datagrid-group-toggle { display: flex; align-items: center; gap: .5rem; width: 100%; padding: .6rem 1rem; border: 0; color: var(--text-main); background: transparent; font: inherit; font-weight: 700; text-align: left; cursor: pointer; }
+.ui-datagrid-group-toggle:focus-visible, .ui-datagrid-action:focus-visible { outline: 2px solid var(--border-focus); outline-offset: -2px; }
+.ui-datagrid-action { display: inline-grid; place-items: center; width: 1.9rem; height: 1.9rem; border: 0; border-radius: var(--radius-sm); color: var(--text-secondary); background: transparent; font: inherit; cursor: pointer; }
+.ui-datagrid-action:hover { color: var(--text-main); background: var(--bg-surface-secondary); }
+.ui-datagrid-row-editing > td { background: var(--primary-light); }
+.ui-datagrid-columns-trigger { padding: .45rem .8rem; border: 1px solid var(--border-default); border-radius: var(--radius-md); color: var(--text-main); font-size: .85rem; font-weight: 600; }
+.ui-datagrid-columns-list { display: flex; flex-direction: column; gap: .35rem; min-width: 10rem; }
+.ui-datagrid-columns-item { display: flex; align-items: center; gap: .5rem; cursor: pointer; font-size: .9rem; }
+.ui-datagrid-columns-item input { accent-color: var(--primary); }
+
+/* Menu de navigation : titres de groupe et zone d'en-tête. */
+.nav-group-title { padding: 1rem 1.5rem .35rem; color: var(--text-secondary); font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.nav-group-title:first-child { padding-top: .35rem; }
+.nav-header { padding: .5rem 1rem; }
+
+/* UiMultiSelect : la zone est un conteneur (puces + bouton de bascule), le focus se lit sur toute la zone. */
+.ui-multiselect-trigger:focus-within { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+.ui-multiselect-trigger.ui-multiselect-disabled { opacity: .55; cursor: not-allowed; }
+.ui-multiselect-toggle { display: flex; flex: 1 1 auto; align-items: center; align-self: stretch; justify-content: space-between; gap: .5rem; min-width: 2rem; padding: 0; border: 0; color: inherit; background: transparent; font: inherit; text-align: left; cursor: inherit; }
+.ui-multiselect-toggle:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; border-radius: var(--radius-sm); }
+.ui-multiselect-toggle .ui-multiselect-chevron { margin-left: auto; }
+.ui-form-group[class*="ui-color-"] .ui-multiselect-trigger:focus-within { border-color: var(--ui-c); box-shadow: 0 0 0 3px var(--ui-c-light); }
+.ui-field-filled .ui-multiselect-trigger:focus-within { background: var(--bg-surface-tertiary); border-bottom-color: var(--ui-c, var(--primary)); box-shadow: none; }
+.ui-field-text .ui-multiselect-trigger:focus-within { border-bottom-color: var(--ui-c, var(--primary)); box-shadow: none; }

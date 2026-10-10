@@ -1,0 +1,13 @@
+<div class="ui-flex-col" style="gap: 1rem; width: 100%; max-width: 28rem;">
+    <UiInput @bind-Value="_code" Label="Code promo" HelperText="Commence par WAE-. Modifiez le champ pour valider." Validation="Validate" />
+    <UiInput @bind-Value="_forced" Label="Erreur imposée par l'appelant" ErrorMessage="Ce champ est verrouillé par l'administrateur." />
+</div>
+
+@code {
+    private string? _code;
+    private string? _forced = "valeur";
+
+    // Renvoie le message d'erreur, ou null / vide si la valeur est valide.
+    private string? Validate(string? value) =>
+        string.IsNullOrEmpty(value) || value.StartsWith("WAE-") ? null : "Le code doit commencer par WAE-.";
+}

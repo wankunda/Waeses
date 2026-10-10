@@ -1,0 +1,28 @@
+@page "/guides/formulaires"
+
+<DocPage Href="guides/formulaires">
+    <DocSection Title="Trois niveaux de validation" Description="WaesesUI s'appuie sur `EditContext` : tout ce qui valide un champ (attributs `DataAnnotations`, paramètre `Validation`, `ErrorMessage` imposé) apparaît de la même façon sous le champ et dans `UiForm`.">
+        <ul>
+            <li>Les attributs <code>[Required]</code>, <code>[Range]</code>… sur le modèle, vérifiés par <code>UiForm</code>.</li>
+            <li>Le paramètre <code>Validation</code> d'un champ : une règle spécifique à ce champ, sans classe supplémentaire.</li>
+            <li>Le paramètre <code>ErrorMessage</code> : une erreur imposée par l'appelant (par exemple renvoyée par le serveur).</li>
+        </ul>
+        <UiCodeBlock Code="@Snippets.DataAnnotationsModel" Language="csharp" />
+    </DocSection>
+
+    <DocSection Title="Un formulaire complet" Description="`UiForm` expose `IsValid` (liable avec `@@bind-IsValid`), `Errors`, `IsSubmitting` et `ResetValidation()`.">
+        <DocExample Example="typeof(FormValidation)" />
+    </DocSection>
+
+    <DocSection Title="Règle de validation sur un champ" Description="Hors formulaire, une règle `Validation` ne s'affiche qu'après la première modification, pour ne pas accueillir l'utilisateur avec une erreur.">
+        <DocExample Example="typeof(InputValidation)" />
+    </DocSection>
+
+    <DocSection Title="Envoi asynchrone" Description="Pendant l'exécution de `OnValidSubmit`, `IsSubmitting` est vrai et un second envoi est ignoré.">
+        <DocExample Example="typeof(FormAsyncSubmit)" />
+    </DocSection>
+
+    <DocSection Title="Accessibilité" Description="Les champs posent `aria-invalid`, `aria-describedby` (vers l'erreur ou l'aide) et `aria-required`. Les messages d'erreur sont annoncés (`role=&quot;alert&quot;`).">
+        <p class="docs-text">Pour vos propres champs, héritez de <code>UiInputBase&lt;TValue&gt;</code> : vous récupérez les paramètres communs, la validation, l'identifiant généré et ces attributs.</p>
+    </DocSection>
+</DocPage>

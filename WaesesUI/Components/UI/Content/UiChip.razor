@@ -1,6 +1,7 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
-<span class="ui-chip ui-chip-@Color.ToString().ToLower() @Class" @attributes="AdditionalAttributes">
+<span class="ui-chip @ToneClass @Class" style="@Style" @attributes="AdditionalAttributes">
     @if (!string.IsNullOrWhiteSpace(Icon)) { <UiIcon Icon="@Icon" Size="UiSize.Sm" aria-hidden="true" /> }
     <span>@Text</span>
     @if (Dismissible)
@@ -10,11 +11,19 @@
 </span>
 
 @code {
+    /// <summary>Texte de la puce.</summary>
     [Parameter] public string Text { get; set; } = string.Empty;
+    /// <summary>Icône (ou texte court) affichée avant le texte.</summary>
     [Parameter] public string? Icon { get; set; }
+    /// <summary>Apparence : <c>Filled</c> (plein), <c>Outlined</c> (contour) ou <c>Text</c> (fond teinté). Sans valeur : rendu historique.</summary>
+    [Parameter] public UiVariant? Variant { get; set; }
+
+    private string ToneClass => UiStyle.ToneClasses("ui-chip", Color, Variant);
+
+    /// <summary>Couleur de la puce.</summary>
     [Parameter] public UiColor Color { get; set; } = UiColor.Neutral;
+    /// <summary>Affiche un bouton pour retirer la puce ; <c>OnDismiss</c> est alors appelé.</summary>
     [Parameter] public bool Dismissible { get; set; }
+    /// <summary>Appelé au clic sur le bouton de retrait.</summary>
     [Parameter] public EventCallback OnDismiss { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

@@ -3,15 +3,19 @@ namespace WaesesUI;
 public interface IMessageBoxService
 {
     event Action<MessageBoxOptions, TaskCompletionSource<bool>>? OnShow;
-    Task<bool> ShowAsync(string title, string message, MessageBoxType type = MessageBoxType.Confirm, string confirmText = "Confirmer", string cancelText = "Annuler");
-    Task<bool> ShowAlertAsync(string title, string message, MessageBoxType type = MessageBoxType.Info, string confirmText = "OK");
+    Task<bool> ShowAsync(string title, string message, MessageBoxType type = MessageBoxType.Confirm, string? confirmText = null, string? cancelText = null);
+    Task<bool> ShowAlertAsync(string title, string message, MessageBoxType type = MessageBoxType.Info, string? confirmText = null);
 }
 
 public class MessageBoxService : IMessageBoxService
 {
+    private readonly UiOptions _options;
+
+    public MessageBoxService(UiOptions? options = null) => _options = options ?? new UiOptions();
+
     public event Action<MessageBoxOptions, TaskCompletionSource<bool>>? OnShow;
 
-    public Task<bool> ShowAsync(string title, string message, MessageBoxType type = MessageBoxType.Confirm, string confirmText = "Confirmer", string cancelText = "Annuler")
+    public Task<bool> ShowAsync(string title, string message, MessageBoxType type = MessageBoxType.Confirm, string? confirmText = null, string? cancelText = null)
     {
         var tcs = new TaskCompletionSource<bool>();
         var options = new MessageBoxOptions
@@ -19,16 +23,16 @@ public class MessageBoxService : IMessageBoxService
             Title = title,
             Message = message,
             Type = type,
-            ConfirmText = confirmText,
-            CancelText = cancelText,
-            ShowCancel = type == MessageBoxType.Confirm
+            ConfirmText = confirmText ?? _options.ConfirmText,
+            CancelText = cancelText ?? _options.CancelText,
+            ShowCancel = true
         };
 
         OnShow?.Invoke(options, tcs);
         return tcs.Task;
     }
 
-    public Task<bool> ShowAlertAsync(string title, string message, MessageBoxType type = MessageBoxType.Info, string confirmText = "OK")
+    public Task<bool> ShowAlertAsync(string title, string message, MessageBoxType type = MessageBoxType.Info, string? confirmText = null)
     {
         var tcs = new TaskCompletionSource<bool>();
         var options = new MessageBoxOptions
@@ -36,7 +40,7 @@ public class MessageBoxService : IMessageBoxService
             Title = title,
             Message = message,
             Type = type,
-            ConfirmText = confirmText,
+            ConfirmText = confirmText ?? _options.OkText,
             CancelText = string.Empty,
             ShowCancel = false
         };

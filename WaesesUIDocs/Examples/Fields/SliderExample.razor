@@ -1,0 +1,9 @@
+<div class="ui-flex-col" style="gap: 1rem; width: 100%; max-width: 28rem;">
+    <UiSlider @bind-Value="_volume" Label="Volume" Min="0" Max="100" Step="5" Unit="%" />
+    <UiSlider @bind-Value="_temperature" Label="Température" Min="16" Max="26" Step="0.5" Unit=" °C" Color="UiColor.Warning" />
+</div>
+
+@code {
+    private double _volume = 40;
+    private double _temperature = 20.5;
+}

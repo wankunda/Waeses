@@ -1,14 +1,15 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 @implements IDisposable
 @inject IUiLocalizationService Localization
 
-<span class="@Class" @attributes="AdditionalAttributes">@Localization.Get(Key, Fallback)</span>
+<span class="@Class" style="@Style" @attributes="AdditionalAttributes">@Localization.Get(Key, Fallback)</span>
 
 @code {
+    /// <summary>Clé de la ressource à traduire.</summary>
     [Parameter] public string Key { get; set; } = string.Empty;
+    /// <summary>Texte affiché si la clé est introuvable dans la culture courante.</summary>
     [Parameter] public string Fallback { get; set; } = string.Empty;
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     protected override void OnInitialized() => Localization.OnCultureChanged += HandleCultureChanged;
     private void HandleCultureChanged() => InvokeAsync(StateHasChanged);

@@ -1,0 +1,54 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>WaesesUIDocs</RootNamespace>
+    <!-- Les exemples sont des composants affichés tels quels : un avertissement de nullabilité y serait un mauvais exemple. -->
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.12" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.12" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WaesesUI\WaesesUI.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="WaesesUI.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Le tableau de paramètres est généré par réflexion : le trimming ne doit pas retirer les propriétés non utilisées de la bibliothèque. -->
+    <TrimmerRootAssembly Include="WaesesUI" />
+    <!-- Les exemples sont instanciés par réflexion (DynamicComponent) : sans cela, le trimming retire leurs constructeurs. -->
+    <TrimmerRootAssembly Include="WaesesUIDocs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Code source des exemples, affiché à côté de leur rendu (clé = chemin relatif sous Examples/). -->
+    <EmbeddedResource Include="Examples\**\*.razor" LogicalName="Examples/%(RecursiveDir)%(Filename)%(Extension)" />
+
+</ItemGroup>
+
+  <!--
+    Commentaires XML de la bibliothèque, lus pour documenter les paramètres. L'inclusion se fait pendant le build (et non à
+    l'évaluation du projet) : sur un dépôt fraîchement cloné, le fichier n'existe qu'après la compilation de WaesesUI.
+  -->
+  <Target Name="EmbedLibraryXmlDocs" BeforeTargets="AssignTargetPaths" DependsOnTargets="ResolveReferences">
+    <ItemGroup>
+      <_LibraryDll Include="@(ReferencePath)" Condition="'%(Filename)' == 'WaesesUI'" />
+    </ItemGroup>
+    <PropertyGroup>
+      <_LibraryXmlPath>@(_LibraryDll->'%(RootDir)%(Directory)%(Filename).xml')</_LibraryXmlPath>
+    </PropertyGroup>
+    <ItemGroup>
+      <EmbeddedResource Include="$(_LibraryXmlPath)" LogicalName="WaesesUI.xml" Condition="'$(_LibraryXmlPath)' != '' And Exists('$(_LibraryXmlPath)')" />
+    </ItemGroup>
+  </Target>
+
+</Project>

@@ -1,0 +1,221 @@
+@inherits UiInputBase<DateTime?>
+@implements IAsyncDisposable
+@namespace WaesesUI
+@inject IJSRuntime JS
+
+<div class="ui-form-group @FieldClass @Class" style="@Style">
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <label class="ui-label" for="@Id">
+            @Label
+            @if (Required)
+            {
+                <span class="ui-label-required">*</span>
+            }
+        </label>
+    }
+
+    <div class="ui-datepicker" @ref="_rootRef">
+        <div class="ui-input-wrapper">
+            <button type="button"
+                    id="@Id"
+                    @ref="_triggerRef"
+                    class="ui-input ui-datepicker-trigger @(HasError ? "ui-input-error" : null) @(CurrentValue is null ? "ui-datepicker-empty" : null)"
+                    disabled="@Disabled"
+                    aria-haspopup="dialog"
+                    aria-invalid="@AriaInvalid"
+                    aria-describedby="@DescribedBy"
+                    aria-expanded="@(_isOpen ? "true" : "false")"
+                    @onclick="ToggleAsync">
+                <span class="ui-datepicker-text">@DisplayText</span>
+                <UiIcon Icon="@Icons.Material.Filled.CalendarMonth" Size="UiSize.Sm" />
+            </button>
+
+            @if (Clearable && CurrentValue is not null && !Disabled && !ReadOnly)
+            {
+                <button type="button" class="ui-datepicker-clear" aria-label="@ClearLabel" @onclick="ClearAsync">
+                    <UiIcon Icon="@Icons.Material.Filled.Close" Size="UiSize.Xs" />
+                </button>
+            }
+        </div>
+
+        @if (_isOpen)
+        {
+            <div @ref="_popupRef"
+                 class="ui-datepicker-popup"
+                 role="dialog"
+                 aria-label="@Label"
+                 popover="manual"
+                 @onkeydown="HandlePopupKeyDownAsync">
+                <UiCalendar @ref="_calendar"
+                            Value="CurrentValue"
+                            ValueChanged="HandleDateChosenAsync"
+                            Min="Min"
+                            Max="Max"
+                            IsDateDisabled="IsDateDisabled"
+                            FirstDayOfWeek="FirstDayOfWeek"
+                            ShowToday="ShowToday" />
+            </div>
+        }
+    </div>
+
+    <UiInputMessages Error="@(HasError ? GetFirstError() : null)" HelperText="@HelperText" ErrorId="@ErrorId" HelperId="@HelperId" />
+</div>
+
+@code {
+    protected override string IdPrefix => "datepicker";
+
+    /// <summary>Texte affiché tant qu'aucune date n'est choisie.</summary>
+    [Parameter] public string Placeholder { get; set; } = "Choisir une date";
+
+    /// <summary>Affiche un bouton pour effacer la date.</summary>
+    [Parameter] public bool Clearable { get; set; } = true;
+    /// <summary>Nom accessible du bouton d'effacement.</summary>
+    [Parameter] public string ClearLabel { get; set; } = "Effacer la date";
+
+    /// <summary>Format .NET de la date affichée dans le champ (par exemple <c>"dd MMMM yyyy"</c>). Null : date courte de la culture.</summary>
+    [Parameter] public string? Format { get; set; }
+
+    /// <summary>Première date sélectionnable.</summary>
+    [Parameter] public DateTime? Min { get; set; }
+
+    /// <summary>Dernière date sélectionnable.</summary>
+    [Parameter] public DateTime? Max { get; set; }
+
+    /// <summary>Indique les dates non sélectionnables (week-ends, jours fériés…).</summary>
+    [Parameter] public Func<DateTime, bool>? IsDateDisabled { get; set; }
+    /// <summary>Premier jour de la semaine. Par défaut, celui de la culture courante.</summary>
+    [Parameter] public DayOfWeek? FirstDayOfWeek { get; set; }
+    /// <summary>Affiche le bouton « Aujourd'hui » dans le calendrier.</summary>
+    [Parameter] public bool ShowToday { get; set; } = true;
+
+    private ElementReference _rootRef;
+    private ElementReference _triggerRef;
+    private ElementReference _popupRef;
+    private UiCalendar? _calendar;
+    private DotNetObjectReference<UiDatePicker>? _dotNetRef;
+    private bool _isOpen;
+    private bool _openedNow;
+    private bool _restoreFocus;
+    private bool _jsReady;
+
+    private string DisplayText => CurrentValue is { } date
+        ? date.ToString(Format ?? "d", CultureInfo.CurrentCulture)
+        : Placeholder;
+
+    protected override bool TryParseValueFromString(string? value, out DateTime? result, [System.Diagnostics.CodeAnalysis.NotNullWhen(false)] out string? validationErrorMessage)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            result = null;
+            validationErrorMessage = null;
+            return true;
+        }
+
+        if (DateTime.TryParse(value, CultureInfo.CurrentCulture, DateTimeStyles.None, out var date))
+        {
+            result = date.Date;
+            validationErrorMessage = null;
+            return true;
+        }
+
+        result = null;
+        validationErrorMessage = "Date invalide.";
+        return false;
+    }
+
+    protected override string? FormatValueAsString(DateTime? value) =>
+        value?.ToString("d", CultureInfo.CurrentCulture);
+
+    // ---------- Ouverture et fermeture ----------
+    private Task ToggleAsync()
+    {
+        if (Disabled || ReadOnly) return Task.CompletedTask;
+
+        _isOpen = !_isOpen;
+        _openedNow = _isOpen;
+        return Task.CompletedTask;
+    }
+
+    private Task ClearAsync()
+    {
+        CurrentValue = null;
+        return Task.CompletedTask;
+    }
+
+    private Task HandleDateChosenAsync(DateTime? date)
+    {
+        CurrentValue = date?.Date;
+        Close(restoreFocus: true);
+        return Task.CompletedTask;
+    }
+
+    private Task HandlePopupKeyDownAsync(KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape") Close(restoreFocus: true);
+        return Task.CompletedTask;
+    }
+
+    private void Close(bool restoreFocus)
+    {
+        _isOpen = false;
+        _restoreFocus = restoreFocus;
+    }
+
+    /// <summary>Appelé par ui-interop.js : clic à l'extérieur ou Échap.</summary>
+    [JSInvokable]
+    public Task CloseOverlay()
+    {
+        if (!_isOpen) return Task.CompletedTask;
+
+        Close(restoreFocus: false);
+        return InvokeAsync(StateHasChanged);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _dotNetRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("UiInterop.setupOverlay", _rootRef, _dotNetRef);
+            _jsReady = true;
+        }
+
+        if (_isOpen)
+        {
+            // Positionne la fenêtre sous le champ (et la garde alignée au défilement)
+            await JS.InvokeVoidAsync("UiInterop.showMenu", _rootRef, _triggerRef, _popupRef, true);
+
+            if (_openedNow)
+            {
+                _openedNow = false;
+                if (_calendar is not null) await _calendar.FocusAsync();
+            }
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("UiInterop.hideMenu", _rootRef);
+
+            if (_restoreFocus)
+            {
+                _restoreFocus = false;
+                await JS.InvokeVoidAsync("UiInterop.focusElement", _triggerRef);
+            }
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (!_jsReady) return;
+
+        try
+        {
+            await JS.InvokeVoidAsync("UiInterop.hideMenu", _rootRef);
+            await JS.InvokeVoidAsync("UiInterop.teardownOverlay", _rootRef);
+        }
+        catch (JSDisconnectedException) { }
+
+        _dotNetRef?.Dispose();
+        _dotNetRef = null;
+    }
+}

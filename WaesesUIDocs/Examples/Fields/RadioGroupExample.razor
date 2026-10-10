@@ -1,0 +1,13 @@
+<div class="ui-flex-col" style="gap: 1rem;">
+    <UiRadioGroup @bind-Value="_plan" Label="Formule" Color="UiColor.Success">
+        <UiRadioOption Value="@("gratuite")" Label="Gratuite" />
+        <UiRadioOption Value="@("pro")" Label="Pro" />
+        <UiRadioOption Value="@("entreprise")" Label="Entreprise (sur devis)" Disabled="true" />
+    </UiRadioGroup>
+
+    <p class="text-secondary">Formule choisie : <strong>@_plan</strong>. Les flèches du clavier passent d'une option à l'autre.</p>
+</div>
+
+@code {
+    private string? _plan = "gratuite";
+}

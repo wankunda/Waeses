@@ -1,0 +1,53 @@
+@* Exemple vivant : le composant s'exécute, et son code source (le même fichier) se déplie dessous. *@
+<div class="doc-example">
+    @if (!string.IsNullOrEmpty(Title))
+    {
+        <h3 class="doc-example-title">@Title</h3>
+    }
+    @if (!string.IsNullOrEmpty(Description))
+    {
+        <p class="docs-text"><DocText Text="@Description" /></p>
+    }
+
+    <div class="doc-example-preview">
+        <ErrorBoundary>
+            <ChildContent>
+                <DynamicComponent Type="Example" />
+            </ChildContent>
+            <ErrorContent Context="exception">
+                <UiAlert Color="UiColor.Danger" Title="L'exemple a échoué" Message="@exception.Message" />
+            </ErrorContent>
+        </ErrorBoundary>
+    </div>
+
+    <details class="doc-example-code" open="@ShowCode">
+        <summary>Code</summary>
+        @foreach (var (name, source) in Sources)
+        {
+            @if (Sources.Count > 1)
+            {
+                <p class="doc-example-file">@name</p>
+            }
+            <UiCodeBlock Code="@source" Language="razor" />
+        }
+    </details>
+</div>
+
+@code {
+    /// <summary>Composant d'exemple (un fichier <c>.razor</c> du dossier Examples).</summary>
+    [Parameter, EditorRequired] public Type Example { get; set; } = default!;
+
+    /// <summary>Autres fichiers nécessaires à l'exemple (composant de dialogue, modèle…), affichés à la suite.</summary>
+    [Parameter] public Type[]? Companions { get; set; }
+
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? Description { get; set; }
+
+    /// <summary>Déplie le code d'emblée.</summary>
+    [Parameter] public bool ShowCode { get; set; }
+
+    private IReadOnlyList<(string Name, string Source)> Sources => new[] { Example }
+        .Concat(Companions ?? Array.Empty<Type>())
+        .Select(type => (Name: type.Name + ".razor", Source: ExampleSource.For(type) ?? $"// Source introuvable pour {type.Name}"))
+        .ToList();
+}

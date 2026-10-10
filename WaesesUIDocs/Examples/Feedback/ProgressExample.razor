@@ -1,0 +1,15 @@
+<div class="ui-flex-col" style="gap: 1.25rem; width: 100%; max-width: 32rem;">
+    <UiProgress Value="_value" Label="Envoi des fichiers" />
+    <UiProgress Value="64" Label="Migration" Color="UiColor.Info" Size="UiSize.Lg" Striped="true" Animated="true" />
+    <UiProgress Value="30" Max="60" Label="Étape 30 sur 60" Color="UiColor.Warning" Size="UiSize.Sm" ShowValue="false" />
+
+    <div class="ui-flex-row" style="align-items: center; gap: 1.5rem;">
+        <UiProgressCircle Value="_value" />
+        <UiProgressCircle Value="82" Diameter="96" StrokeWidth="8" Color="UiColor.Success" />
+        <UiButton Text="Avancer de 10 %" Size="UiSize.Sm" OnClick="() => _value = Math.Min(100, _value + 10)" />
+    </div>
+</div>
+
+@code {
+    private double _value = 40;
+}

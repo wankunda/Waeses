@@ -1,6 +1,7 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
-<div class="ui-progress-container @Class" @attributes="AdditionalAttributes">
+<div class="ui-progress-container @Class" style="@Style" @attributes="AdditionalAttributes">
     @if (!string.IsNullOrEmpty(Label) || ShowValue)
     {
         <div class="ui-progress-header">
@@ -15,8 +16,8 @@
         </div>
     }
 
-    <div class="ui-progress-track ui-progress-track-@Size.ToString().ToLower() @(Striped ? "ui-progress-striped" : "") @(Animated ? "ui-progress-animated" : "")">
-        <div class="ui-progress-fill ui-progress-fill-@Color.ToString().ToLower()"
+    <div role="progressbar" aria-label="@(Label ?? AriaLabel)" aria-valuemin="0" aria-valuemax="100" aria-valuenow="@Math.Round(ClampedValue, 1).ToString(System.Globalization.CultureInfo.InvariantCulture)" class="ui-progress-track ui-progress-track-@Size.ToString().ToLower() @(Striped ? "ui-progress-striped" : "") @(Animated ? "ui-progress-animated" : "")">
+        <div class="ui-progress-fill ui-progress-fill-@Color.ToString().ToLower() @Color.ToCssClass()"
              style="width: @ClampedValue.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)%;">
         </div>
     </div>
@@ -24,15 +25,22 @@
 
 @code {
     [Parameter] public double Value { get; set; }
+    /// <summary>Nom accessible de la barre quand <c>Label</c> n'est pas défini.</summary>
+    [Parameter] public string? AriaLabel { get; set; }
+    /// <summary>Valeur correspondant à 100 %.</summary>
     [Parameter] public double Max { get; set; } = 100;
+    /// <summary>Libellé affiché au-dessus de la barre, et nom accessible.</summary>
     [Parameter] public string? Label { get; set; }
+    /// <summary>Affiche le pourcentage.</summary>
     [Parameter] public bool ShowValue { get; set; } = true;
+    /// <summary>Couleur de la barre.</summary>
     [Parameter] public UiColor Color { get; set; } = UiColor.Primary;
+    /// <summary>Épaisseur de la barre.</summary>
     [Parameter] public UiSize Size { get; set; } = UiSize.Md;
+    /// <summary>Affiche des rayures sur la barre.</summary>
     [Parameter] public bool Striped { get; set; }
+    /// <summary>Anime les rayures (nécessite <c>Striped</c>).</summary>
     [Parameter] public bool Animated { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private double ClampedValue
     {

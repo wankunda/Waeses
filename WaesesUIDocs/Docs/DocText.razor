@@ -1,0 +1,63 @@
+@* Texte courant avec `code en ligne` entre accents graves et [liens](adresse) internes. *@
+@foreach (var piece in Pieces)
+{
+    switch (piece.Kind)
+    {
+        case PieceKind.Code:
+            <code>@piece.Text</code>
+            break;
+        case PieceKind.Link:
+            <a href="@piece.Href">@piece.Text</a>
+            break;
+        default:
+            @piece.Text
+            break;
+    }
+}
+
+@code {
+    private enum PieceKind { Text, Code, Link }
+
+    private readonly record struct Piece(PieceKind Kind, string Text, string? Href = null);
+
+    /// <summary>
+    /// Texte avec `code` entre accents graves et [liens](adresse). Les entités HTML (<c>&amp;quot;</c>, <c>&amp;lt;</c>…) sont décodées :
+    /// elles permettent d'écrire des guillemets ou des chevrons dans un paramètre de composant Razor.
+    /// Un lien n'est rendu que pour une adresse relative ou en https ; sinon son texte est affiché tel quel.
+    /// </summary>
+    [Parameter, EditorRequired] public string Text { get; set; } = string.Empty;
+
+    private IEnumerable<Piece> Pieces
+    {
+        get
+        {
+            var decoded = System.Net.WebUtility.HtmlDecode(Text);
+            var position = 0;
+            foreach (System.Text.RegularExpressions.Match link in LinkPattern.Matches(decoded))
+            {
+                foreach (var piece in Plain(decoded[position..link.Index])) yield return piece;
+
+                var href = link.Groups[2].Value.Trim();
+                yield return IsSafe(href)
+                    ? new Piece(PieceKind.Link, link.Groups[1].Value, href)
+                    : new Piece(PieceKind.Text, link.Groups[1].Value);
+                position = link.Index + link.Length;
+            }
+            foreach (var piece in Plain(decoded[position..])) yield return piece;
+        }
+    }
+
+    private static readonly System.Text.RegularExpressions.Regex LinkPattern = new(@"\[([^\]]+)\]\(([^)\s]+)\)");
+
+    private static bool IsSafe(string href) =>
+        !href.Contains(':') || href.StartsWith("https://", StringComparison.OrdinalIgnoreCase);
+
+    private static IEnumerable<Piece> Plain(string text)
+    {
+        var parts = text.Split('`');
+        for (var i = 0; i < parts.Length; i++)
+        {
+            if (parts[i].Length > 0) yield return new Piece(i % 2 == 1 ? PieceKind.Code : PieceKind.Text, parts[i]);
+        }
+    }
+}

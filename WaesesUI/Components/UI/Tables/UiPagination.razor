@@ -1,8 +1,9 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
 @if (TotalPages > 1 || AlwaysShow)
 {
-    <nav class="ui-pagination @Class" aria-label="@AriaLabel" @attributes="AdditionalAttributes">
+    <nav class="ui-pagination @Class" aria-label="@AriaLabel" style="@Style" @attributes="AdditionalAttributes">
         @if (ShowInfo)
         {
             <span class="ui-pagination-info">@FromIndex–@ToIndex sur @TotalItems</span>
@@ -41,17 +42,24 @@
 }
 
 @code {
+    /// <summary>Nombre total d'éléments, toutes pages confondues.</summary>
     [Parameter] public int TotalItems { get; set; }
+    /// <summary>Page affichée, à partir de 1.</summary>
     [Parameter] public int CurrentPage { get; set; } = 1;
+    /// <summary>Appelé quand l'utilisateur change de page.</summary>
     [Parameter] public EventCallback<int> CurrentPageChanged { get; set; }
+    /// <summary>Nombre d'éléments par page.</summary>
     [Parameter] public int PageSize { get; set; } = 10;
+    /// <summary>Appelé quand l'utilisateur change la taille de page.</summary>
     [Parameter] public EventCallback<int> PageSizeChanged { get; set; }
+    /// <summary>Tailles de page proposées. Vide : pas de sélecteur.</summary>
     [Parameter] public IReadOnlyList<int> PageSizeOptions { get; set; } = Array.Empty<int>();
+    /// <summary>Affiche « 11–20 sur 134 ».</summary>
     [Parameter] public bool ShowInfo { get; set; }
+    /// <summary>Affiche la pagination même s'il n'y a qu'une seule page.</summary>
     [Parameter] public bool AlwaysShow { get; set; }
+    /// <summary>Nom accessible de la navigation par pages.</summary>
     [Parameter] public string AriaLabel { get; set; } = "Pagination";
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private int TotalPages => Math.Max(1, (int)Math.Ceiling(TotalItems / (double)Math.Max(PageSize, 1)));
     private int SafePage => Math.Clamp(CurrentPage, 1, TotalPages);

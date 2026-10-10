@@ -1,4 +1,5 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
 @if (!string.IsNullOrEmpty(Icon))
 {
@@ -28,17 +29,22 @@
 }
 
 @code {
+    /// <summary>Contenu SVG de l'icône (voir la classe <c>Icons</c>).</summary>
     [Parameter] public string? Icon { get; set; }
+    /// <summary>Taille de l'icône.</summary>
     [Parameter] public UiSize Size { get; set; } = UiSize.Md;
+    /// <summary>Couleur sémantique de l'icône.</summary>
     [Parameter] public UiColor Color { get; set; } = UiColor.Neutral;
+    /// <summary>Couleur CSS libre (remplace <c>Color</c>).</summary>
     [Parameter] public string? CustomColor { get; set; }
+    /// <summary>Attribut <c>viewBox</c> du SVG.</summary>
     [Parameter] public string ViewBox { get; set; } = "0 0 24 24";
+    /// <summary>Remplissage du SVG ; <c>currentColor</c> reprend la couleur du texte.</summary>
     [Parameter] public string Fill { get; set; } = "currentColor";
+    /// <summary>Titre accessible. Sans titre, l'icône est décorative et masquée aux lecteurs d'écran.</summary>
     [Parameter] public string? Title { get; set; }
-    [Parameter] public string? Style { get; set; }
-    [Parameter] public string? Class { get; set; }
+    /// <summary>Appelé au clic sur l'icône.</summary>
     [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private string GetStyle()
     {

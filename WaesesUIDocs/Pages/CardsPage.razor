@@ -1,0 +1,28 @@
+@page "/composants/cartes-et-listes"
+
+<DocPage Href="composants/cartes-et-listes">
+    <DocSection Title="Cartes" Description="`UiCard` regroupe un contenu avec un en-tête, des actions et un pied.">
+        <DocExample Example="typeof(CardExample)" />
+    </DocSection>
+
+    <DocSection Title="Listes et séparateurs" Description="`UiList` répète un gabarit pour chaque élément (ou affiche `EmptyContent`) ; `UiListItem` met en forme une ligne avec un début et une fin. `UiDivider` sépare, avec un libellé facultatif.">
+        <DocExample Example="typeof(ListExample)" />
+    </DocSection>
+
+    <DocSection Title="Chronologie" Description="`UiTimeline` présente des événements datés, chacun avec sa couleur.">
+        <DocExample Example="typeof(TimelineExample)" />
+    </DocSection>
+
+    <DocSection Title="Bloc de code" Description="`UiCodeBlock` affiche du code avec un bouton pour le copier. C'est le composant qui affiche les exemples de cette documentation.">
+        <DocExample Example="typeof(CodeBlockExample)" />
+    </DocSection>
+
+    <DocSection Title="API">
+        <ApiTable Component="typeof(UiCard)" />
+        <ApiTable Component="typeof(UiList<>)" />
+        <ApiTable Component="typeof(UiListItem)" />
+        <ApiTable Component="typeof(UiDivider)" />
+        <ApiTable Component="typeof(UiTimeline)" />
+        <ApiTable Component="typeof(UiCodeBlock)" />
+    </DocSection>
+</DocPage>

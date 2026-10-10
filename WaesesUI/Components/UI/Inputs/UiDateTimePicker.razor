@@ -1,7 +1,7 @@
-@inherits InputBase<DateTime?>
+@inherits UiInputBase<DateTime?>
 @namespace WaesesUI
 
-<div class="ui-form-group @Class">
+<div class="ui-form-group @FieldClass @Class" style="@Style">
     @if (!string.IsNullOrEmpty(Label))
     {
         <label class="ui-label" for="@Id">
@@ -13,7 +13,7 @@
         </label>
     }
 
-    <div id="@Id" class="ui-datetime-picker @(HasError ? "ui-datetime-picker-error" : "")">
+    <div id="@Id" role="group" aria-invalid="@AriaInvalid" aria-describedby="@DescribedBy" class="ui-datetime-picker @(HasError ? "ui-datetime-picker-error" : "")">
         @if (Mode is UiDateTimeMode.Date or UiDateTimeMode.DateTime)
         {
             <select class="ui-select ui-datetime-part" aria-label="Jour" value="@_selectedDay" disabled="@Disabled" @onchange="HandleDayChanged">
@@ -58,20 +58,12 @@
         }
     </div>
 
-    @if (HasError)
-    {
-        <div class="ui-error-text">
-            <span>⚠</span>
-            <span>@GetFirstError()</span>
-        </div>
-    }
-    else if (!string.IsNullOrEmpty(HelperText))
-    {
-        <div class="ui-helper-text">@HelperText</div>
-    }
+    <UiInputMessages Error="@(HasError ? GetFirstError() : null)" HelperText="@HelperText" ErrorId="@ErrorId" HelperId="@HelperId" />
 </div>
 
 @code {
+    protected override string IdPrefix => "datetime";
+
     private int _selectedDay;
     private int _selectedMonth;
     private int _selectedYear;
@@ -80,24 +72,25 @@
     private DateTime? _lastSyncedValue;
     private bool _partsInitialized;
 
-    [Parameter] public string? Id { get; set; } = $"datetime-{Guid.NewGuid():N}";
-    [Parameter] public string? Label { get; set; }
+    /// <summary>Ce que le champ saisit : <c>Date</c>, <c>Time</c> ou <c>DateTime</c>.</summary>
     [Parameter] public UiDateTimeMode Mode { get; set; } = UiDateTimeMode.DateTime;
-    [Parameter] public string? HelperText { get; set; }
-    [Parameter] public string? ErrorMessage { get; set; }
-    [Parameter] public bool Required { get; set; }
-    [Parameter] public bool Disabled { get; set; }
+    /// <summary>Première année proposée.</summary>
     [Parameter] public int YearMin { get; set; } = DateTime.Now.Year - 10;
+    /// <summary>Dernière année proposée.</summary>
     [Parameter] public int YearMax { get; set; } = DateTime.Now.Year + 10;
+    /// <summary>Pas des minutes proposées (par exemple 5 ou 15).</summary>
     [Parameter] public int MinuteStep { get; set; } = 5;
+    /// <summary>Valeur minimale acceptée (date et heure sous forme de texte).</summary>
     [Parameter] public string? Min { get; set; }
+    /// <summary>Valeur maximale acceptée (date et heure sous forme de texte).</summary>
     [Parameter] public string? Max { get; set; }
-    [Parameter] public string? Class { get; set; }
 
     private int DaysInSelectedMonth => DateTime.DaysInMonth(_selectedYear, _selectedMonth);
 
     protected override void OnParametersSet()
     {
+        base.OnParametersSet();
+
         MinuteStep = Math.Clamp(MinuteStep, 1, 60);
         var value = CurrentValue ?? DateTime.Now;
         if (!_partsInitialized || _lastSyncedValue != CurrentValue)
@@ -161,25 +154,6 @@
         return DateTime.TryParse(constraint, CultureInfo.CurrentCulture, DateTimeStyles.None, out value)
             || DateTime.TryParse(constraint, CultureInfo.InvariantCulture, DateTimeStyles.None, out value);
     }
-
-    private IEnumerable<string> GetErrors()
-    {
-        if (!string.IsNullOrEmpty(ErrorMessage))
-        {
-            yield return ErrorMessage;
-        }
-
-        if (EditContext != null && ValueExpression != null)
-        {
-            foreach (var message in EditContext.GetValidationMessages(FieldIdentifier))
-            {
-                yield return message;
-            }
-        }
-    }
-
-    private bool HasError => GetErrors().Any();
-    private string GetFirstError() => GetErrors().FirstOrDefault() ?? string.Empty;
 
     protected override bool TryParseValueFromString(string? value, out DateTime? result, [NotNullWhen(false)] out string? validationErrorMessage)
     {

@@ -1,0 +1,6 @@
+<div class="ui-flex-row" style="flex-wrap: wrap; gap: .5rem;">
+    @foreach (var variant in Enum.GetValues<UiButtonVariant>())
+    {
+        <UiButton Text="@variant.ToString()" Variant="variant" />
+    }
+</div>

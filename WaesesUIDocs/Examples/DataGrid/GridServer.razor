@@ -1,0 +1,57 @@
+<UiDataGrid TItem="Order" ServerData="LoadAsync" ShowSearch="true" ShowFilters="true" PageSize="6" AriaLabel="Commandes">
+    <Columns>
+        <UiColumn TItem="Order" Key="number" Title="N°" Field="o => o.Number" Width="6rem" />
+        <UiColumn TItem="Order" Key="customer" Title="Client" Field="o => o.Customer" />
+        <UiColumn TItem="Order" Key="status" Title="Statut" Field="o => o.Status" />
+        <UiColumn TItem="Order" Key="total" Title="Total" Field="o => o.Total" Format="C2" Align="Alignement.Right" />
+    </Columns>
+</UiDataGrid>
+
+<p class="text-secondary">Les données sont « côté serveur » : la grille envoie page, tri, recherche et filtres, puis affiche ce qu'on lui renvoie (ici 400 ms de latence simulée).</p>
+
+@code {
+    private sealed record Order(int Number, string Customer, string Status, decimal Total);
+
+    private static readonly string[] Customers = { "Atelier Nord", "Boulangerie Rey", "Cabinet Leroy", "Dupont & Fils", "Éditions Lune" };
+    private static readonly string[] Statuses = { "Nouvelle", "Payée", "Expédiée", "Annulée" };
+
+    private static readonly List<Order> Orders = Enumerable.Range(1, 120)
+        .Select(i => new Order(1000 + i, Customers[i % Customers.Length], Statuses[i * 7 % Statuses.Length], 25 + i * 13 % 480))
+        .ToList();
+
+    private static readonly Dictionary<string, Func<Order, object?>> Fields = new()
+    {
+        ["number"] = o => o.Number, ["customer"] = o => o.Customer, ["status"] = o => o.Status, ["total"] = o => o.Total
+    };
+
+    // En production, ceci serait un appel d'API qui applique la même logique côté base de données.
+    private async Task<UiGridData<Order>> LoadAsync(UiGridState state, CancellationToken cancellationToken)
+    {
+        await Task.Delay(400, cancellationToken);
+
+        IEnumerable<Order> query = Orders;
+
+        if (!string.IsNullOrWhiteSpace(state.Search))
+        {
+            query = query.Where(o => o.Customer.Contains(state.Search, StringComparison.OrdinalIgnoreCase));
+        }
+
+        foreach (var filter in state.Filters)
+        {
+            query = query.Where(o => UiFilterEvaluator.Matches(Fields[filter.Key](o), filter.Operator, filter.Value));
+        }
+
+        IOrderedEnumerable<Order>? ordered = null;
+        foreach (var sort in state.Sorts)
+        {
+            var selector = Fields[sort.Key];
+            ordered = ordered is null
+                ? (sort.Descending ? query.OrderByDescending(selector) : query.OrderBy(selector))
+                : (sort.Descending ? ordered.ThenByDescending(selector) : ordered.ThenBy(selector));
+        }
+
+        var filtered = (ordered ?? query).ToList();
+        var page = filtered.Skip((state.Page - 1) * state.PageSize).Take(state.PageSize).ToList();
+        return new UiGridData<Order>(page, filtered.Count);
+    }
+}

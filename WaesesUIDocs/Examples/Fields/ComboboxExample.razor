@@ -1,0 +1,17 @@
+<div class="ui-flex-col" style="gap: 1rem; width: 100%; max-width: 28rem;">
+    <UiCombobox TItem="City" TValue="int" @bind-Value="_cityId" Label="Ville" Placeholder="Rechercher une ville…"
+                Items="_cities" DisplaySelector="c => c.Name" ValueSelector="c => c.Id" EmptyText="Aucune ville ne correspond." />
+
+    <p class="text-secondary">Identifiant choisi : <strong>@_cityId</strong></p>
+</div>
+
+@code {
+    private sealed record City(int Id, string Name);
+
+    private int _cityId;
+
+    private readonly City[] _cities =
+    {
+        new(1, "Paris"), new(2, "Lyon"), new(3, "Marseille"), new(4, "Toulouse"), new(5, "Nice"), new(6, "Nantes"), new(7, "Bordeaux"), new(8, "Lille")
+    };
+}

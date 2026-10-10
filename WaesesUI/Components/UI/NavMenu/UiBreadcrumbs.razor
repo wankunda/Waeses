@@ -1,6 +1,7 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
-<nav class="ui-breadcrumbs @Class" aria-label="@AriaLabel" @attributes="AdditionalAttributes">
+<nav class="ui-breadcrumbs @Class" aria-label="@AriaLabel" style="@Style" @attributes="AdditionalAttributes">
     <ol>
         @foreach (var item in Items.Select((value, index) => (value, index)))
         {
@@ -19,8 +20,8 @@
 </nav>
 
 @code {
+    /// <summary>Étapes du fil d'Ariane ; la dernière est la page courante.</summary>
     [Parameter] public IReadOnlyList<UiBreadcrumbItem> Items { get; set; } = Array.Empty<UiBreadcrumbItem>();
+    /// <summary>Nom accessible de la navigation.</summary>
     [Parameter] public string AriaLabel { get; set; } = "Fil d’Ariane";
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

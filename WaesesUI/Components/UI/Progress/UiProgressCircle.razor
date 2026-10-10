@@ -1,6 +1,7 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
-<div class="ui-progress-circle-wrap @Class" style="width: @(Diameter)px; height: @(Diameter)px;" @attributes="AdditionalAttributes">
+<div class="ui-progress-circle-wrap @Class" style="@WrapStyle" @attributes="AdditionalAttributes">
     <svg width="@Diameter" height="@Diameter" viewBox="0 0 @Diameter @Diameter" style="transform: rotate(-90deg);">
         <!-- Background Track -->
         <circle cx="@(Diameter / 2.0)"
@@ -32,14 +33,19 @@
 </div>
 
 @code {
+    private string? WrapStyle => StyleBuilder.Default($"width: {Diameter}px; height: {Diameter}px;").Add(Style).Build();
+
     [Parameter] public double Value { get; set; }
+    /// <summary>Valeur correspondant à 100 %.</summary>
     [Parameter] public double Max { get; set; } = 100;
+    /// <summary>Diamètre en pixels.</summary>
     [Parameter] public int Diameter { get; set; } = 72;
+    /// <summary>Épaisseur du trait en pixels.</summary>
     [Parameter] public int StrokeWidth { get; set; } = 6;
+    /// <summary>Couleur de l'arc.</summary>
     [Parameter] public UiColor Color { get; set; } = UiColor.Primary;
+    /// <summary>Affiche le pourcentage au centre.</summary>
     [Parameter] public bool ShowValue { get; set; } = true;
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private double Radius => (Diameter - StrokeWidth) / 2.0;
     private double Circumference => 2 * Math.PI * Radius;

@@ -1,0 +1,21 @@
+@* Composant affiché dans un dialogue : il reçoit l'instance du dialogue en cascade et le ferme avec un résultat. *@
+
+<div class="ui-modal-body">
+    <UiInput @bind-Value="_name" Label="Nom du projet" Validation="@(value => string.IsNullOrWhiteSpace(value) ? "Le nom est obligatoire." : null)" />
+</div>
+
+<div class="ui-modal-footer">
+    <UiButton Text="Annuler" Appearance="UiVariant.Text" Color="UiColor.Neutral" OnClick="() => Dialog.Cancel()" />
+    <UiButton Text="Enregistrer" Disabled="@string.IsNullOrWhiteSpace(_name)" OnClick="() => Dialog.Close(_name)" />
+</div>
+
+@code {
+    [CascadingParameter] public UiDialogInstance Dialog { get; set; } = default!;
+
+    /// <summary>Nom initial, passé par UiDialogParameters.</summary>
+    [Parameter] public string Name { get; set; } = string.Empty;
+
+    private string? _name;
+
+    protected override void OnInitialized() => _name = Name;
+}

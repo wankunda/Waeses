@@ -1,7 +1,8 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
 <CascadingValue Value="this" IsFixed="true">
-    <div class="ui-accordion @Class" @attributes="AdditionalAttributes">
+    <div class="ui-accordion @Class" style="@Style" @attributes="AdditionalAttributes">
         @ChildContent
     </div>
 </CascadingValue>
@@ -9,10 +10,10 @@
 @code {
     private readonly List<UiAccordionItem> _items = new();
 
+    /// <summary>Autorise plusieurs éléments ouverts en même temps. Sinon, ouvrir un élément ferme les autres.</summary>
     [Parameter] public bool AllowMultiple { get; set; }
+    /// <summary>Les <c>UiAccordionItem</c> du groupe.</summary>
     [Parameter] public RenderFragment? ChildContent { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     public void RegisterItem(UiAccordionItem item)
     {

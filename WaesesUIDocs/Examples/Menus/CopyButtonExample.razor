@@ -1,0 +1,14 @@
+<div class="ui-flex-col" style="gap: 1rem;">
+    <div class="ui-flex-row" style="align-items: center; gap: .75rem;">
+        <code>dotnet add package WaesesUI</code>
+        <UiCopyButton Text="dotnet add package WaesesUI" Label="Copier la commande" OnCopied="@(() => _copies++)" />
+    </div>
+
+    <UiCopyButton Text="https://github.com/wankunda/Waeses" ShowLabel="true" Label="Copier le lien" CopiedLabel="Lien copié" OnCopied="@(() => _copies++)" />
+
+    <p class="text-secondary">Copies effectuées : <strong>@_copies</strong></p>
+</div>
+
+@code {
+    private int _copies;
+}

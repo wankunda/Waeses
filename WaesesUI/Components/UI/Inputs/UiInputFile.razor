@@ -1,8 +1,8 @@
-﻿@namespace WaesesUI
+@namespace WaesesUI
 
 @using Microsoft.AspNetCore.Components.Forms
 
-<div class="ui-form-group @Class">
+<div class="ui-form-group @Class" style="@Style">
     @if (!string.IsNullOrWhiteSpace(Label))
     {
         <label class="ui-label">
@@ -24,6 +24,7 @@
                        accept="@Accept"
                        multiple="@Multiple"
                        disabled="@Disabled"
+                       aria-label="@AccessibleName"
                        @attributes="AdditionalAttributes" />
 
             <div class="ui-fileupload-button-trigger">
@@ -53,6 +54,7 @@
                        accept="@Accept"
                        multiple="@Multiple"
                        disabled="@Disabled"
+                       aria-label="@AccessibleName"
                        @attributes="AdditionalAttributes" />
 
             <div class="ui-fileupload-dropzone">
@@ -129,23 +131,45 @@
 </div>
 
 @code {
+    /// <summary>Identifiant de l'élément ; généré automatiquement si absent.</summary>
     [Parameter] public string Id { get; set; } = $"file-upload-{Guid.NewGuid():N}";
+    /// <summary>Présentation : zone de dépôt (<c>Dropzone</c>) ou simple bouton (<c>Button</c>).</summary>
     [Parameter] public FileUploadVariant Variant { get; set; } = FileUploadVariant.Dropzone;
+    /// <summary>Texte du bouton d'import.</summary>
     [Parameter] public string? ButtonText { get; set; } = "Importer un fichier";
+    /// <summary>Libellé affiché au-dessus du champ.</summary>
     [Parameter] public string? Label { get; set; }
+    /// <summary>Texte d'aide sous le champ.</summary>
     [Parameter] public string? HelperText { get; set; }
+    /// <summary>Message d'erreur affiché sous le champ.</summary>
     [Parameter] public string? ErrorMessage { get; set; }
+    /// <summary>Marque le champ comme obligatoire.</summary>
     [Parameter] public bool Required { get; set; }
+    /// <summary>Désactive le champ.</summary>
     [Parameter] public bool Disabled { get; set; }
+    /// <summary>Autorise la sélection de plusieurs fichiers.</summary>
     [Parameter] public bool Multiple { get; set; }
+    /// <summary>Types acceptés, comme l'attribut HTML <c>accept</c> (<c>image/*</c>, <c>.pdf</c>…).</summary>
     [Parameter] public string? Accept { get; set; }
+    /// <summary>Nombre maximal de fichiers retenus.</summary>
     [Parameter] public int MaxAllowedFiles { get; set; } = 10;
+    /// <summary>Taille maximale d'un fichier en octets (10 Mo par défaut).</summary>
     [Parameter] public long MaxFileSize { get; set; } = 10 * 1024 * 1024;
+    /// <summary>Affiche la liste des fichiers choisis sous le champ.</summary>
     [Parameter] public bool ShowFileList { get; set; } = true;
+    /// <summary>Classes CSS supplémentaires.</summary>
     [Parameter] public string? Class { get; set; }
+    /// <summary>Style inline supplémentaire.</summary>
+    [Parameter] public string? Style { get; set; }
 
+    // Le <input type="file"> est superposé à la zone visible : il lui faut un nom propre, même quand le libellé est un gabarit.
+    private string AccessibleName => !string.IsNullOrWhiteSpace(Label) ? Label! : !string.IsNullOrWhiteSpace(ButtonText) ? ButtonText! : "Choisir un fichier";
+
+    /// <summary>Contenu personnalisé du bouton d'import.</summary>
     [Parameter] public RenderFragment? ButtonTemplate { get; set; }
+    /// <summary>Gabarit d'affichage des fichiers choisis (remplace la liste par défaut).</summary>
     [Parameter] public RenderFragment<IReadOnlyList<IBrowserFile>>? ChildContent { get; set; }
+    /// <summary>Appelé quand la sélection de fichiers change ; reçoit les fichiers retenus.</summary>
     [Parameter] public EventCallback<IReadOnlyList<IBrowserFile>> FilesChanged { get; set; }
 
     [Parameter(CaptureUnmatchedValues = true)]

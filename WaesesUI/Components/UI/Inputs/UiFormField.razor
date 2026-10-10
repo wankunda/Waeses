@@ -1,4 +1,5 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
 <div class="ui-form-group @Class">
     @if (!string.IsNullOrWhiteSpace(Label))
@@ -8,7 +9,7 @@
     @ChildContent
     @if (!string.IsNullOrWhiteSpace(Error))
     {
-        <div class="ui-error-text" role="alert">@Error</div>
+        <div id="@ErrorId" class="ui-error-text" role="alert">@Error</div>
     }
     else if (!string.IsNullOrWhiteSpace(HelperText))
     {
@@ -17,14 +18,19 @@
 </div>
 
 @code {
+    /// <summary>Identifiant du contrôle étiqueté (attribut <c>for</c> du libellé).</summary>
     [Parameter] public string? For { get; set; }
+    /// <summary>Libellé du champ.</summary>
     [Parameter] public string? Label { get; set; }
+    /// <summary>Texte d'aide sous le champ.</summary>
     [Parameter] public string? HelperText { get; set; }
+    /// <summary>Message d'erreur ; remplace le texte d'aide.</summary>
     [Parameter] public string? Error { get; set; }
+    /// <summary>Affiche l'astérisque d'un champ obligatoire.</summary>
     [Parameter] public bool Required { get; set; }
+    /// <summary>Le contrôle de saisie à habiller.</summary>
     [Parameter] public RenderFragment? ChildContent { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
-    private string HelperId => $"{For ?? "field"}-help";
+    private string HelperId => $"{For ?? "field"}-helper";
+    private string ErrorId => $"{For ?? "field"}-error";
 }

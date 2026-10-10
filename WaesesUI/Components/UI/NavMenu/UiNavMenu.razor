@@ -1,4 +1,4 @@
-﻿@inject IJSRuntime JS
+@inject IJSRuntime JS
 @implements IAsyncDisposable
 @namespace WaesesUI
 
@@ -6,7 +6,7 @@
     <button type="button"
             class="navbar-toggler @(_isOpen ? "navbar-toggler-hidden" : "")"
             aria-label="@(_isOpen ? "Fermer le menu de navigation" : "Ouvrir le menu de navigation")"
-            aria-expanded="@_isOpen"
+            aria-expanded="@(_isOpen ? "true" : "false")"
             aria-controls="@DrawerId"
             @ref="_toggleRef"
             @onclick="ToggleDrawer">
@@ -27,10 +27,21 @@
             </button>
         </div>
 
+        @if (HeaderContent != null)
+        {
+            <div class="nav-header">@HeaderContent</div>
+        }
+
         <div class="nav-scrollable" @onclick="CloseDrawer">
             <nav class="nav flex-column" aria-label="@AriaLabel">
+                @{ string? previousGroup = null; }
                 @foreach (var item in Items)
                 {
+                    @if (!string.IsNullOrEmpty(item.Group) && item.Group != previousGroup)
+                    {
+                        <div class="nav-group-title" role="presentation">@item.Group</div>
+                    }
+                    previousGroup = item.Group;
                     <UiNavMenuItem @key="item.Href"
                                    Text="@item.Text"
                                    Href="@item.Href"
@@ -44,11 +55,19 @@
 </div>
 
 @code {
+    /// <summary>Nom affiché en haut du menu.</summary>
     [Parameter] public string BrandText { get; set; } = "Blazor UI";
+    /// <summary>Adresse du lien du nom (accueil de l'application).</summary>
     [Parameter] public string BrandHref { get; set; } = string.Empty;
+    /// <summary>Identifiant du tiroir (à rendre unique s'il y a plusieurs menus).</summary>
     [Parameter] public string DrawerId { get; set; } = "main-navigation-drawer";
+    /// <summary>Nom accessible de la navigation.</summary>
     [Parameter] public string AriaLabel { get; set; } = "Navigation principale";
+    /// <summary>Liens du menu. Les éléments d'un même <c>Group</c> doivent se suivre.</summary>
     [Parameter] public IEnumerable<NavigationItem>? NavigationItems { get; set; }
+
+    /// <summary>Contenu affiché entre le titre et la liste (champ de recherche, sélecteur de version…).</summary>
+    [Parameter] public RenderFragment? HeaderContent { get; set; }
 
     private IEnumerable<NavigationItem> Items => NavigationItems ?? Array.Empty<NavigationItem>();
     private ElementReference _drawerRef;

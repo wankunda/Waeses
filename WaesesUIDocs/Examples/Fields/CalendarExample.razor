@@ -1,0 +1,9 @@
+<div class="ui-flex-col" style="gap: 1rem; align-items: flex-start;">
+    <UiCalendar @bind-Value="_date" FirstDayOfWeek="DayOfWeek.Monday" IsDateDisabled="@(d => d.Day == 13)" AriaLabel="Calendrier des réservations" />
+
+    <p class="text-secondary">Jour choisi : <strong>@(_date?.ToString("D") ?? "aucun")</strong> (le 13 de chaque mois est indisponible).</p>
+</div>
+
+@code {
+    private DateTime? _date;
+}

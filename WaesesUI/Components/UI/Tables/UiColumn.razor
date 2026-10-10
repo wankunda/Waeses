@@ -1,0 +1,88 @@
+@namespace WaesesUI
+@typeparam TItem
+@implements IDisposable
+
+@* Déclaration d'une colonne de UiDataGrid : ne rend rien, s'enregistre auprès de la grille. *@
+
+@code {
+    private bool? _lastHiddenParameter;
+    private bool _hidden;
+
+    [CascadingParameter] public UiDataGrid<TItem>? Grid { get; set; }
+
+    /// <summary>Texte de l'en-tête.</summary>
+    [Parameter] public string? Title { get; set; }
+
+    /// <summary>Identifiant de la colonne (tri et filtre serveur, mémoire de visibilité). Par défaut le titre.</summary>
+    [Parameter] public string? Key { get; set; }
+
+    /// <summary>Valeur de la cellule ; sert à l'affichage, au tri, au filtre et à la recherche côté client.</summary>
+    [Parameter] public Func<TItem, object?>? Field { get; set; }
+
+    /// <summary>Format .NET des valeurs <see cref="IFormattable"/> (<c>"C2"</c>, <c>"dd/MM/yyyy"</c>…).</summary>
+    [Parameter] public string? Format { get; set; }
+
+    /// <summary>Rendu personnalisé de la cellule.</summary>
+    [Parameter] public RenderFragment<TItem>? CellTemplate { get; set; }
+
+    /// <summary>Rendu de la cellule en mode édition (reçoit la copie modifiable de l'élément).</summary>
+    [Parameter] public RenderFragment<TItem>? EditTemplate { get; set; }
+
+    /// <summary>Contenu personnalisé de l'en-tête (remplace <c>Title</c>).</summary>
+    [Parameter] public RenderFragment? HeaderTemplate { get; set; }
+    /// <summary>Autorise le tri sur cette colonne (nécessite <c>Field</c>, ou une source serveur).</summary>
+    [Parameter] public bool Sortable { get; set; } = true;
+    /// <summary>Affiche un filtre pour cette colonne quand la ligne de filtres est active.</summary>
+    [Parameter] public bool Filterable { get; set; } = true;
+
+    /// <summary>Permet à l'utilisateur de masquer la colonne depuis le menu des colonnes.</summary>
+    [Parameter] public bool Hideable { get; set; } = true;
+
+    /// <summary>Colonne masquée. Le paramètre ne réinitialise le choix de l'utilisateur que lorsque sa valeur change.</summary>
+    [Parameter] public bool Hidden { get; set; }
+    /// <summary>Appelé lorsque l'utilisateur masque ou affiche la colonne depuis le menu des colonnes (fourni par <c>bind-Hidden</c>).</summary>
+    [Parameter] public EventCallback<bool> HiddenChanged { get; set; }
+    /// <summary>Largeur CSS de la colonne (par exemple <c>8rem</c> ou <c>20%</c>).</summary>
+    [Parameter] public string? Width { get; set; }
+    /// <summary>Alignement du contenu et de l'en-tête.</summary>
+    [Parameter] public Alignement Align { get; set; } = Alignement.Left;
+    /// <summary>Classes CSS supplémentaires appliquées aux cellules de la colonne.</summary>
+    [Parameter] public string? Class { get; set; }
+
+    public string EffectiveKey => Key ?? Title ?? "col";
+    public bool IsHidden => _hidden;
+
+    public object? GetValue(TItem item) => Field?.Invoke(item);
+
+    public string GetText(TItem item)
+    {
+        var value = GetValue(item);
+        return value switch
+        {
+            null => string.Empty,
+            IFormattable formattable => formattable.ToString(Format, System.Globalization.CultureInfo.CurrentCulture),
+            _ => value.ToString() ?? string.Empty
+        };
+    }
+
+    internal async Task SetHiddenAsync(bool hidden)
+    {
+        if (_hidden == hidden) return;
+        _hidden = hidden;
+        await HiddenChanged.InvokeAsync(hidden);
+    }
+
+    protected override void OnInitialized() => Grid?.AddColumn(this);
+
+    protected override void OnParametersSet()
+    {
+        if (_lastHiddenParameter != Hidden)
+        {
+            _lastHiddenParameter = Hidden;
+            _hidden = Hidden;
+        }
+        Grid?.NotifyColumnsChanged();
+    }
+
+    public void Dispose() => Grid?.RemoveColumn(this);
+}

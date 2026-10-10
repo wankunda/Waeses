@@ -29,7 +29,7 @@ public class ThemeService : IThemeService
     {
         try
         {
-            var savedTheme = await _jsRuntime.InvokeAsync<string?>("localStorage.getItem", "app_theme");
+            var savedTheme = await _jsRuntime.InvokeAsync<string?>("UiInterop.getStoredTheme");
             if (!string.IsNullOrEmpty(savedTheme))
             {
                 _isDarkMode = savedTheme == "dark";
@@ -37,7 +37,7 @@ public class ThemeService : IThemeService
             else
             {
                 // Default to system preference
-                _isDarkMode = await _jsRuntime.InvokeAsync<bool>("eval", "window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches");
+                _isDarkMode = await _jsRuntime.InvokeAsync<bool>("UiInterop.prefersDark");
             }
             await ApplyThemeAsync();
         }
@@ -70,7 +70,7 @@ public class ThemeService : IThemeService
         try
         {
             var themeName = _isDarkMode ? "dark" : "light";
-            await _jsRuntime.InvokeVoidAsync("eval", $"document.documentElement.setAttribute('data-theme', '{themeName}'); localStorage.setItem('app_theme', '{themeName}');");
+            await _jsRuntime.InvokeVoidAsync("UiInterop.setTheme", themeName);
         }
         catch
         {

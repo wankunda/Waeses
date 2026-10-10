@@ -1,0 +1,12 @@
+<div class="ui-flex-col" style="gap: 1rem; width: 100%; max-width: 28rem;">
+    <UiInput @bind-Value="_search" Label="Recherche différée (500 ms)" DebounceInterval="500" />
+    <p class="text-secondary">Valeur appliquée : <strong>@_search</strong></p>
+
+    <UiInput @bind-Value="_committed" Label="Appliquée à la sortie du champ" Immediate="false" />
+    <p class="text-secondary">Valeur appliquée : <strong>@_committed</strong></p>
+</div>
+
+@code {
+    private string? _search;
+    private string? _committed;
+}

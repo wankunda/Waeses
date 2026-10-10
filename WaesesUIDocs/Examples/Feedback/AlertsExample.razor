@@ -1,0 +1,21 @@
+<div class="ui-flex-col" style="gap: .75rem; width: 100%; max-width: 40rem;">
+    <UiAlert Color="UiColor.Info" Title="Information" Message="La synchronisation démarre à minuit." />
+    <UiAlert Color="UiColor.Success" Title="Enregistré" Message="Vos modifications ont été prises en compte." />
+    <UiAlert Color="UiColor.Warning" Title="Attention" Message="Votre abonnement expire dans 3 jours." Variant="UiVariant.Outlined" />
+    <UiAlert Color="UiColor.Danger" Title="Échec" Message="Le paiement a été refusé." Variant="UiVariant.Filled" />
+
+    @if (_visible)
+    {
+        <UiAlert Color="UiColor.Primary" Title="Astuce" Dismissible="true" OnDismissed="() => _visible = false">
+            Cette alerte se ferme, et son contenu peut contenir du <strong>balisage</strong>.
+        </UiAlert>
+    }
+    else
+    {
+        <UiButton Text="Réafficher l'astuce" Size="UiSize.Sm" Appearance="UiVariant.Outlined" OnClick="() => _visible = true" />
+    }
+</div>
+
+@code {
+    private bool _visible = true;
+}

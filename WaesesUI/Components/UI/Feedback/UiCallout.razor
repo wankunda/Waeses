@@ -1,15 +1,23 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
-<aside class="ui-callout ui-callout-@Color.ToString().ToLower() @Class" role="note" @attributes="AdditionalAttributes">
+<aside class="ui-callout @ToneClass @Class" role="note" style="@Style" @attributes="AdditionalAttributes">
     <UiIcon Icon="@Icon" Size="UiSize.Md" aria-hidden="true" />
     <div><strong>@Title</strong><div>@ChildContent</div></div>
 </aside>
 
 @code {
+    /// <summary>Titre de l'encadré.</summary>
     [Parameter] public string Title { get; set; } = string.Empty;
+    /// <summary>Icône affichée à gauche (SVG de la bibliothèque d'icônes). Mettre <c>null</c> pour n'en afficher aucune.</summary>
     [Parameter] public string? Icon { get; set; } = Icons.Material.Filled.Info;
+    /// <summary>Apparence : <c>Filled</c> (plein), <c>Outlined</c> (contour) ou <c>Text</c> (fond teinté). Sans valeur : rendu historique.</summary>
+    [Parameter] public UiVariant? Variant { get; set; }
+
+    private string ToneClass => UiStyle.ToneClasses("ui-callout", Color, Variant);
+
+    /// <summary>Couleur sémantique de l'encadré.</summary>
     [Parameter] public UiColor Color { get; set; } = UiColor.Info;
+    /// <summary>Contenu de l'encadré.</summary>
     [Parameter] public RenderFragment? ChildContent { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

@@ -1,0 +1,97 @@
+@namespace WaesesUI
+@inject IUiPopoverService PopoverService
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+<div class="ui-popover-provider">
+    @foreach (var entry in PopoverService.Entries)
+    {
+        if (!entry.Open) continue;
+
+        <div @key="entry.Id" id="@entry.LayerId" class="ui-popover-layer">
+            <div class="@CssBuilder.Default("ui-popover-surface").Add(entry.Class).Build()" style="@entry.Style">
+                @entry.Content
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private readonly Dictionary<Guid, DotNetObjectReference<PopoverCallbacks>> _active = new();
+    private bool _disposed;
+
+    private sealed class PopoverCallbacks(UiPopoverEntry entry)
+    {
+        [JSInvokable]
+        public Task RequestClose() => entry.RequestClose?.Invoke() ?? Task.CompletedTask;
+    }
+
+    protected override void OnInitialized()
+    {
+        PopoverService.Changed += OnChanged;
+        PopoverService.AttachProvider();
+    }
+
+    private void OnChanged() => _ = InvokeAsync(() =>
+    {
+        if (!_disposed) StateHasChanged();
+    });
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            var open = PopoverService.Entries.Where(e => e.Open).ToList();
+
+            foreach (var gone in _active.Keys.Where(id => open.All(e => e.Id != id)).ToList())
+            {
+                var layerId = $"ui-popover-{gone:N}";
+                _active[gone].Dispose();
+                _active.Remove(gone);
+                await JS.InvokeVoidAsync("UiInterop.closePopover", layerId);
+            }
+
+            foreach (var entry in open)
+            {
+                var options = new
+                {
+                    placement = entry.Placement.ToString(),
+                    offset = entry.Offset,
+                    matchWidth = entry.MatchAnchorWidth,
+                    closeOnOutsideClick = entry.CloseOnOutsideClick,
+                    closeOnEscape = entry.CloseOnEscape,
+                    anchorSelector = entry.AnchorSelector
+                };
+
+                if (_active.ContainsKey(entry.Id))
+                {
+                    // Le contenu a pu changer de taille : on repositionne.
+                    await JS.InvokeVoidAsync("UiInterop.positionPopover", entry.LayerId, entry.AnchorId, options);
+                    continue;
+                }
+
+                var callbacks = DotNetObjectReference.Create(new PopoverCallbacks(entry));
+                _active[entry.Id] = callbacks;
+                await JS.InvokeVoidAsync("UiInterop.openPopover", entry.LayerId, entry.AnchorId, options, callbacks);
+            }
+        }
+        catch (JSDisconnectedException) { }
+        catch (InvalidOperationException) when (_disposed) { }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        _disposed = true;
+        PopoverService.Changed -= OnChanged;
+        PopoverService.DetachProvider();
+
+        foreach (var (id, callbacks) in _active)
+        {
+            callbacks.Dispose();
+            try { await JS.InvokeVoidAsync("UiInterop.closePopover", $"ui-popover-{id:N}"); }
+            catch (JSDisconnectedException) { }
+            catch (InvalidOperationException) { }
+        }
+        _active.Clear();
+    }
+}

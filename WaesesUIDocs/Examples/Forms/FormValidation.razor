@@ -1,0 +1,45 @@
+@using System.ComponentModel.DataAnnotations
+
+<UiForm Model="_model" Context="form" OnValidSubmit="Save" @bind-IsValid="_valid">
+    <div class="ui-flex-col" style="gap: 1rem; width: 100%; max-width: 28rem;">
+        <UiInput @bind-Value="_model.Name" Label="Nom" />
+        <UiInput @bind-Value="_model.Email" Label="E-mail" Type="email"
+                 Validation="@(email => email?.EndsWith("@example.com") == true ? "Ce domaine est réservé aux tests." : null)" />
+        <UiInput @bind-Value="_model.Age" Label="Âge" Type="number" />
+        <UiCheckbox @bind-Value="_model.Terms" Label="J'accepte les conditions" />
+
+        <div class="ui-flex-row" style="gap: .5rem;">
+            <UiButton Type="submit" Text="Envoyer" Loading="form.IsSubmitting" />
+            <UiButton Text="Effacer les erreurs" Appearance="UiVariant.Text" OnClick="form.ResetValidation" />
+        </div>
+
+        @if (_message is not null)
+        {
+            <UiAlert Color="UiColor.Success" Message="@_message" />
+        }
+        <p class="text-secondary">Formulaire @(_valid ? "valide" : "invalide") — @form.Errors.Count erreur(s).</p>
+    </div>
+</UiForm>
+
+@code {
+    private sealed class Signup
+    {
+        [Required(ErrorMessage = "Le nom est obligatoire.")]
+        public string? Name { get; set; }
+
+        [Required(ErrorMessage = "L'e-mail est obligatoire."), EmailAddress(ErrorMessage = "Adresse e-mail invalide.")]
+        public string? Email { get; set; }
+
+        [Range(18, 120, ErrorMessage = "L'âge doit être compris entre 18 et 120 ans.")]
+        public int Age { get; set; } = 30;
+
+        [Range(typeof(bool), "true", "true", ErrorMessage = "Vous devez accepter les conditions.")]
+        public bool Terms { get; set; }
+    }
+
+    private readonly Signup _model = new();
+    private bool _valid = true;
+    private string? _message;
+
+    private void Save() => _message = $"Merci {_model.Name} : formulaire envoyé.";
+}

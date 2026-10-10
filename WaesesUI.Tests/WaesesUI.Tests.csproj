@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsPackable>false</IsPackable>
+        <RootNamespace>WaesesUI.Tests</RootNamespace>
+        <!-- AngleSharp (dépendance de bUnit) a un avis de sécurité ; il n'analyse ici que le HTML de nos propres composants et n'est pas livré -->
+        <NoWarn>$(NoWarn);NU1902</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Using Include="Xunit" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="bunit" Version="1.40.0" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+        <PackageReference Include="xunit" Version="2.9.3" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="3.1.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\WaesesUI\WaesesUI.csproj" />
+        <ProjectReference Include="..\WaesesUIDocs\WaesesUIDocs.csproj" />
+    </ItemGroup>
+
+</Project>

@@ -1,0 +1,14 @@
+<div class="ui-flex-col" style="gap: 1rem; width: 100%;">
+    <UiTabs AriaLabel="Sections du projet" OnTabChanged="@(index => _active = index)">
+        <UiTabPanel Title="Aperçu" Icon="◈"><p>Vue d'ensemble du projet.</p></UiTabPanel>
+        <UiTabPanel Title="Activité" Badge="3"><p>Trois nouveaux événements depuis hier.</p></UiTabPanel>
+        <UiTabPanel Title="Archives" Disabled="true"><p>Non disponible.</p></UiTabPanel>
+        <UiTabPanel Title="Réglages"><p>Les flèches du clavier passent d'un onglet à l'autre et ignorent les onglets désactivés.</p></UiTabPanel>
+    </UiTabs>
+
+    <p class="text-secondary">Index de l'onglet actif : <strong>@_active</strong></p>
+</div>
+
+@code {
+    private int _active;
+}

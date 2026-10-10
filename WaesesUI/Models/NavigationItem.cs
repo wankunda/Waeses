@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components.Routing;
+using Microsoft.AspNetCore.Components.Routing;
 
 namespace WaesesUI
 {
@@ -9,5 +9,8 @@ namespace WaesesUI
         public string? Icon { get; init; }
         public NavLinkMatch Match { get; init; } = NavLinkMatch.Prefix;
         public bool Disabled { get; init; }
+
+        /// <summary>Titre de section : un en-tête s'affiche à chaque changement de groupe dans la liste (les éléments d'un même groupe doivent se suivre).</summary>
+        public string? Group { get; init; }
     }
 }

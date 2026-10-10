@@ -1,0 +1,18 @@
+<div class="ui-grid ui-grid-cols-2" style="width: 100%;">
+    <div>
+        <p class="text-secondary">Un seul élément ouvert à la fois :</p>
+        <UiAccordion>
+            <UiAccordionItem Title="Livraison" IsOpen="true">Expédition sous 48 heures.</UiAccordionItem>
+            <UiAccordionItem Title="Retours">Retours gratuits pendant 30 jours.</UiAccordionItem>
+            <UiAccordionItem Title="Garantie">Deux ans, pièces et main-d'œuvre.</UiAccordionItem>
+        </UiAccordion>
+    </div>
+
+    <div>
+        <p class="text-secondary">Plusieurs éléments ouverts (<code>AllowMultiple</code>) :</p>
+        <UiAccordion AllowMultiple="true">
+            <UiAccordionItem Title="Matériaux" IsOpen="true">Aluminium recyclé.</UiAccordionItem>
+            <UiAccordionItem Title="Dimensions" IsOpen="true">40 × 25 × 10 cm.</UiAccordionItem>
+        </UiAccordion>
+    </div>
+</div>

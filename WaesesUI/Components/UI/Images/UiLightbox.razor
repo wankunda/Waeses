@@ -10,9 +10,14 @@
 </UiModal>
 
 @code {
+    /// <summary>Indique si l'image est affichée en grand (lié avec <c>bind-IsOpen</c>).</summary>
     [Parameter] public bool IsOpen { get; set; }
+    /// <summary>Appelé lorsque la visionneuse demande sa fermeture.</summary>
     [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
+    /// <summary>Adresse de l'image.</summary>
     [Parameter] public string Src { get; set; } = string.Empty;
+    /// <summary>Texte alternatif, aussi utilisé comme titre de la modale.</summary>
     [Parameter] public string Alt { get; set; } = "Image";
+    /// <summary>Légende affichée sous l'image.</summary>
     [Parameter] public string? Caption { get; set; }
 }

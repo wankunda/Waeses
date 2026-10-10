@@ -1,4 +1,5 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 @inject IJSRuntime JS
 @implements IAsyncDisposable
 
@@ -8,7 +9,7 @@
          @onclick="HandleBackdropClick"
          @ref="_backdropRef">
         <div class="ui-modal-box @SizeClass @Class"
-             style="@GetModalWidthStyle()"
+             style="@StyleBuilder.Default(GetModalWidthStyle()).Add(Style).Build()"
              @onclick:stopPropagation="true"
              @ref="_modalRef"
              tabindex="-1"
@@ -65,21 +66,32 @@
     private readonly string _titleId = $"modal-title-{Guid.NewGuid():N}";
     private bool _isSetUp;
 
+    /// <summary>Indique si la modale est ouverte (lié avec <c>bind-IsOpen</c>).</summary>
     [Parameter] public bool IsOpen { get; set; }
+    /// <summary>Appelé lorsque la modale demande sa fermeture (fond, Échap, bouton de fermeture).</summary>
     [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
+    /// <summary>Titre affiché dans l'en-tête, et nom accessible de la modale.</summary>
     [Parameter] public string? Title { get; set; }
+    /// <summary>En-tête personnalisé (remplace <c>Title</c>).</summary>
     [Parameter] public RenderFragment? Header { get; set; }
+    /// <summary>Contenu de la modale.</summary>
     [Parameter] public RenderFragment? ChildContent { get; set; }
+    /// <summary>Pied de la modale, généralement les boutons d'action.</summary>
     [Parameter] public RenderFragment? Footer { get; set; }
+    /// <summary>Largeur de la modale.</summary>
     [Parameter] public UiSize Size { get; set; } = UiSize.Md;
+    /// <summary>Ferme la modale au clic sur le fond assombri.</summary>
     [Parameter] public bool CloseOnBackdropClick { get; set; } = true;
+    /// <summary>Ferme la modale avec la touche Échap.</summary>
     [Parameter] public bool CloseOnEscape { get; set; } = true;
+    /// <summary>Garde le focus clavier dans la modale et le rend au déclencheur à la fermeture.</summary>
     [Parameter] public bool FocusTrap { get; set; } = true;
+    /// <summary>Bloque le défilement de la page tant que la modale est ouverte.</summary>
     [Parameter] public bool LockScroll { get; set; } = true;
+    /// <summary>Affiche le bouton de fermeture dans l'en-tête.</summary>
     [Parameter] public bool ShowCloseButton { get; set; } = true;
+    /// <summary>Appelé après la fermeture de la modale.</summary>
     [Parameter] public EventCallback OnClosed { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private string SizeClass => Size switch
     {

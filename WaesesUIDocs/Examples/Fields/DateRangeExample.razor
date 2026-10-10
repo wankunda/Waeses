@@ -1,0 +1,19 @@
+<div class="ui-flex-col" style="gap: 1rem; width: 100%; max-width: 32rem;">
+    <UiDateRangePicker Label="Séjour" @bind-Start="_start" @bind-End="_end" />
+
+    <p class="text-secondary">
+        @if (_start is { } start && _end is { } end)
+        {
+            <span>Du <strong>@start.ToString("d")</strong> au <strong>@end.ToString("d")</strong> : @((end - start).Days) nuit(s).</span>
+        }
+        else
+        {
+            <span>Choisissez une arrivée et un départ. Une plage inversée est signalée comme erreur.</span>
+        }
+    </p>
+</div>
+
+@code {
+    private DateTime? _start;
+    private DateTime? _end;
+}

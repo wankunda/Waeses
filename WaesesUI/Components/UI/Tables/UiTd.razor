@@ -1,15 +1,23 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
 <td class="@Class" @attributes="AdditionalAttributes" data-title ="@Label"
-style="text-align: @Align.ToString().ToLower(); @Style">
+    style="text-align: @Align.ToString().ToLower(); @Style"
+    @onclick:stopPropagation="StopPropagation">
   @ChildContent
 </td>
 
 @code{
- [Parameter] public string? Class { get; set; }
+ /// <summary>Libellé de la colonne, affiché devant la valeur dans la présentation mobile (<c>data-title</c>).</summary>
  [Parameter] public string? Label { get; set; }
+ /// <summary>Contenu de la cellule.</summary>
  [Parameter] public RenderFragment? ChildContent { get; set; }
+/// <summary>Alignement du contenu.</summary>
 [Parameter] public Alignement Align { get; set; } = Alignement.Left;
-[Parameter] public string? Style { get; set; }
- [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+ /// <summary>
+ /// Empêche un clic dans cette cellule de déclencher <c>UiTable.OnRowClick</c>.
+ /// À activer sur la cellule qui contient des boutons d'action.
+ /// </summary>
+ [Parameter] public bool StopPropagation { get; set; }
 }

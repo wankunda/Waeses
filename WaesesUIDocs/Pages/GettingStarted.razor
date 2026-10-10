@@ -1,0 +1,38 @@
+@page "/demarrer"
+
+<DocPage Href="demarrer">
+    <DocSection Title="Paquet NuGet" Description="WaesesUI cible .NET 9 et .NET 10. Ajoutez le paquet au projet Blazor (Server, WebAssembly ou Web App) :">
+        <UiCodeBlock Code="@Snippets.InstallPackage" Language="powershell" />
+    </DocSection>
+
+    <DocSection Title="Services" Description="Enregistrez les services dans `Program.cs`. Ils fournissent les notifications, les boîtes de message, les dialogues, le thème et la localisation.">
+        <UiCodeBlock Code="@Snippets.Services" Language="csharp" />
+        <p class="docs-text">Les valeurs par défaut globales (durée des toasts, libellés, thème…) se règlent avec <code>UiOptions</code> :</p>
+        <UiCodeBlock Code="@Snippets.ServicesWithOptions" Language="csharp" />
+    </DocSection>
+
+    <DocSection Title="Ressources statiques" Description="Chargez la feuille de style unique `waeses.min.css` (thème, composants et densités) et le script d'interopérabilité.">
+        <UiCodeBlock Code="@Snippets.StaticAssetsWasm" Language="html" />
+    </DocSection>
+
+    <DocSection Title="Polices" Description="Le thème s'appuie sur les polices du système, ce qui fonctionne hors connexion. Pour retrouver Plus Jakarta Sans et JetBrains Mono, chargez-les vous-même avant la feuille de style ; l'ancien fichier `fonts-google.css` n'existe plus.">
+        <UiCodeBlock Code="@Snippets.StaticFonts" Language="html" />
+    </DocSection>
+
+    <DocSection Title="Migrer depuis 1.1.x" Description="Depuis la 1.2.0, une seule feuille de style est livrée. Remplacez les deux liens `theme.css` et `components-extended.css` par `waeses.min.css`.">
+        <UiCodeBlock Code="@Snippets.StylesMigration" Language="html" />
+    </DocSection>
+
+    <DocSection Title="Imports" Description="Tous les composants publics sont dans l'espace de noms `WaesesUI`. Ajoutez-le à `_Imports.razor` :">
+        <UiCodeBlock Code="@Snippets.Imports" Language="razor" />
+    </DocSection>
+
+    <DocSection Title="Providers" Description="Les notifications, boîtes de message, dialogues et popovers sont affichés par des providers, à placer une seule fois dans le layout principal. N'ajoutez que ceux dont vous vous servez.">
+        <UiCodeBlock Code="@Snippets.Providers" Language="razor" />
+    </DocSection>
+
+    <DocSection Title="Premier composant">
+        <UiCodeBlock Code="@Snippets.FirstComponent" Language="razor" />
+        <p class="docs-text">Poursuivez avec les <a href="composants/boutons">boutons</a>, les <a href="composants/champ-de-saisie">champs de saisie</a> ou le <a href="guides/theme">thème</a>.</p>
+    </DocSection>
+</DocPage>

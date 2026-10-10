@@ -1,23 +1,26 @@
 @typeparam TItem
 @namespace WaesesUI
+@inherits UiComponentBase
+@implements IDisposable
 
 <CascadingValue Value="this" IsFixed="true">
-    <div class="ui-table-container @Class" @attributes="AdditionalAttributes">
+    <div class="ui-table-container @Class" style="@Style" @attributes="AdditionalAttributes">
         @if (ShowSearch || ToolbarContent != null)
         {
             <div class="ui-table-toolbar">
                 @if (ShowSearch)
                 {
                     <div class="ui-table-search-box">
-                        <span class="ui-table-search-icon">
+                        <span class="ui-table-search-icon" aria-hidden="true">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <circle cx="11" cy="11" r="8"></circle>
                                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                             </svg>
                         </span>
-                        <input type="text"
+                        <input type="search"
                                class="ui-input"
                                placeholder="@SearchPlaceholder"
+                               aria-label="@SearchPlaceholder"
                                value="@_searchQuery"
                                @oninput="HandleSearchInput" />
                     </div>
@@ -32,15 +35,22 @@
         }
 
         <div class="ui-table-responsive">
-            <table class="ui-table @(Striped ? "ui-table-striped" : "") @(Hoverable ? "ui-table-hover" : "") @(Bordered ? "ui-table-bordered" : "") @(Compact ? "ui-table-compact" : "")">
-                @if (HeaderContent != null || Selectable)
+            <table class="ui-table @(Striped ? "ui-table-striped" : "") @(Hoverable ? "ui-table-hover" : "") @(Bordered ? "ui-table-bordered" : "") @(Compact ? "ui-table-compact" : "")"
+                   aria-label="@AriaLabel"
+                   aria-busy="@(ShowLoading ? "true" : null)">
+                @if (HeaderContent != null || Selectable || HasDetail)
                 {
                     <thead>
                         <tr>
+                            @if (HasDetail)
+                            {
+                                <th scope="col" class="ui-table-expand-col"><span class="ui-sr-only">@ExpandColumnLabel</span></th>
+                            }
                             @if (Selectable)
                             {
-                                <th style="width: 44px; text-align: center;">
+                                <th scope="col" style="width: 44px; text-align: center;">
                                     <input type="checkbox"
+                                           aria-label="@SelectAllLabel"
                                            checked="@IsAllSelected"
                                            @onchange="ToggleSelectAll"
                                            style="cursor: pointer; width: 16px; height: 16px; accent-color: var(--primary);" />
@@ -51,24 +61,40 @@
                     </thead>
                 }
                 <tbody>
-                    @if (IsLoading)
+                    @if (ShowLoading)
                     {
                         <tr><td colspan="100" class="ui-table-state"><UiSkeleton Variant="UiSkeletonVariant.Rect" Height="8rem" /></td></tr>
                     }
-                    else if (!string.IsNullOrWhiteSpace(ErrorMessage))
+                    else if (!string.IsNullOrWhiteSpace(CurrentError))
                     {
-                        <tr><td colspan="100" class="ui-table-state"><UiErrorState Message="@ErrorMessage" OnRetry="OnRetry" /></td></tr>
+                        <tr><td colspan="100" class="ui-table-state"><UiErrorState Message="@CurrentError" OnRetry="HandleRetry" /></td></tr>
                     }
-                    else if (ProcessedItems.Any())
+                    else if (View.Count > 0)
                     {
                         @foreach (var item in DisplayedItems)
                         {
                             var isSelected = SelectedItems != null && SelectedItems.Contains(item);
-                            <tr class="@(isSelected ? "ui-table-row-selected" : "")" @onclick="() => HandleRowClick(item)">
+                            var isExpanded = HasDetail && _expanded.Contains(item);
+                            <tr class="@CssBuilder.Default().AddIf("ui-table-row-selected", isSelected).AddIf("ui-table-row-clickable", OnRowClick.HasDelegate).Add(RowClass?.Invoke(item)).Build()"
+                                aria-selected="@(Selectable ? (isSelected ? "true" : "false") : null)"
+                                @onclick="() => HandleRowClick(item)">
+                                @if (HasDetail)
+                                {
+                                    <td class="ui-table-expand-col" @onclick:stopPropagation="true">
+                                        <button type="button"
+                                                class="ui-table-expand-btn"
+                                                aria-expanded="@(isExpanded ? "true" : "false")"
+                                                aria-label="@ExpandColumnLabel"
+                                                @onclick="() => ToggleExpand(item)">
+                                            <span aria-hidden="true">@(isExpanded ? "▾" : "▸")</span>
+                                        </button>
+                                    </td>
+                                }
                                 @if (Selectable)
                                 {
                                     <td style="width: 44px; text-align: center;" @onclick:stopPropagation="true">
                                         <input type="checkbox"
+                                               aria-label="@SelectRowLabel"
                                                checked="@isSelected"
                                                @onchange="() => ToggleSelectItem(item)"
                                                style="cursor: pointer; width: 16px; height: 16px; accent-color: var(--primary);" />
@@ -79,6 +105,12 @@
                                     @RowTemplate(item)
                                 }
                             </tr>
+                            @if (isExpanded)
+                            {
+                                <tr class="ui-table-detail-row">
+                                    <td colspan="100">@ChildRowContent!(item)</td>
+                                </tr>
+                            }
                         }
                     }
                     else
@@ -100,10 +132,10 @@
             </table>
         </div>
 
-        @if (Paginated && ProcessedItems.Any())
+        @if (Paginated && View.Count > 0)
         {
             <UiPagination TotalItems="@TotalCount"
-                          CurrentPage="@CurrentPage"
+                          CurrentPage="@EffectivePage"
                           CurrentPageChanged="SetPage"
                           PageSize="@PageSize"
                           PageSizeChanged="HandlePageSizeChanged"
@@ -115,150 +147,315 @@
 </CascadingValue>
 
 @code {
+    private sealed record SortEntry(Func<TItem, object>? Selector, string? Key, bool Descending);
+
+    private readonly List<SortEntry> _sorts = new();
+    private readonly HashSet<TItem> _expanded = new();
     private string _searchQuery = string.Empty;
 
+    private List<TItem>? _view;
+    private List<TItem> _serverItems = new();
+    private int _serverTotal;
+    private bool _serverLoading;
+    private string? _serverError;
+    private CancellationTokenSource? _loadCts;
+    private CancellationTokenSource? _searchCts;
+    private bool _serverStarted;
+
+    /// <summary>Éléments affichés. Ignoré si <c>ServerData</c> est défini.</summary>
     [Parameter] public IEnumerable<TItem>? Items { get; set; }
+
+    /// <summary>
+    /// Source de données serveur : filtrage, tri et pagination sont délégués à l'appelant.
+    /// Les colonnes triables doivent alors fournir une <c>SortKey</c> (<c>Items</c> est ignoré).
+    /// </summary>
+    [Parameter] public Func<UiTableState, CancellationToken, Task<UiTableData<TItem>>>? ServerData { get; set; }
+
+    /// <summary>Délai (ms) avant d'interroger le serveur après une saisie dans la recherche.</summary>
+    [Parameter] public int SearchDebounceMs { get; set; } = 300;
+
+    /// <summary>Autorise le tri sur plusieurs colonnes (Maj + clic sur l'en-tête).</summary>
+    [Parameter] public bool MultiSort { get; set; }
+
+    /// <summary>Force l'affichage de l'état de chargement.</summary>
     [Parameter] public bool IsLoading { get; set; }
+    /// <summary>Message d'erreur affiché à la place des lignes, avec un bouton pour réessayer.</summary>
     [Parameter] public string? ErrorMessage { get; set; }
+    /// <summary>Appelé au clic sur « Réessayer ».</summary>
     [Parameter] public EventCallback OnRetry { get; set; }
+    /// <summary>En-têtes de colonnes : des <c>UiTh</c>.</summary>
     [Parameter] public RenderFragment? HeaderContent { get; set; }
+    /// <summary>Gabarit d'une ligne : des <c>UiTd</c> (un par colonne).</summary>
     [Parameter] public RenderFragment<TItem>? RowTemplate { get; set; }
+
+    /// <summary>Contenu de la ligne dépliable sous chaque élément ; active la colonne d'expansion.</summary>
+    [Parameter] public RenderFragment<TItem>? ChildRowContent { get; set; }
+    /// <summary>Contenu ajouté à la barre d'outils, à côté de la recherche.</summary>
     [Parameter] public RenderFragment? ToolbarContent { get; set; }
+    /// <summary>Contenu affiché quand aucune ligne ne correspond. Remplace <c>EmptyText</c>.</summary>
     [Parameter] public RenderFragment? EmptyContent { get; set; }
+    /// <summary>Message affiché quand aucune ligne ne correspond.</summary>
     [Parameter] public string EmptyText { get; set; } = "Aucune donnée disponible";
+    /// <summary>Nom accessible du tableau.</summary>
+    [Parameter] public string? AriaLabel { get; set; }
+    /// <summary>Nom accessible du bouton de dépliage d'une ligne.</summary>
+    [Parameter] public string ExpandColumnLabel { get; set; } = "Afficher les détails";
+    /// <summary>Nom accessible de la case « tout sélectionner ».</summary>
+    [Parameter] public string SelectAllLabel { get; set; } = "Tout sélectionner";
+    /// <summary>Nom accessible de la case de sélection d'une ligne.</summary>
+    [Parameter] public string SelectRowLabel { get; set; } = "Sélectionner la ligne";
+    /// <summary>Fournit des classes CSS supplémentaires pour une ligne, selon son élément.</summary>
+    [Parameter] public Func<TItem, string?>? RowClass { get; set; }
+    /// <summary>Alterne la couleur de fond des lignes.</summary>
     [Parameter] public bool Striped { get; set; } = true;
+    /// <summary>Met en évidence la ligne survolée.</summary>
     [Parameter] public bool Hoverable { get; set; } = true;
+    /// <summary>Affiche les bordures des cellules.</summary>
     [Parameter] public bool Bordered { get; set; }
+    /// <summary>Réduit l'espacement des cellules.</summary>
     [Parameter] public bool Compact { get; set; }
+    /// <summary>Affiche la zone de recherche.</summary>
     [Parameter] public bool ShowSearch { get; set; }
+    /// <summary>Texte indicatif de la recherche, aussi utilisé comme nom accessible.</summary>
     [Parameter] public string SearchPlaceholder { get; set; } = "Rechercher...";
+    /// <summary>Remplace la recherche par défaut (texte de la ligne contenant la saisie).</summary>
     [Parameter] public Func<TItem, string, bool>? FilterPredicate { get; set; }
+    /// <summary>Affiche la pagination.</summary>
     [Parameter] public bool Paginated { get; set; } = true;
-    [Parameter] public int PageSize { get; set; } = 5;
+    /// <summary>Nombre de lignes par page.</summary>
+    [Parameter] public int PageSize { get; set; } = 10;
+    /// <summary>Tailles de page proposées dans la pagination.</summary>
     [Parameter] public IReadOnlyList<int> PageSizeOptions { get; set; } = new[] { 5, 10, 25, 50 };
+    /// <summary>Page affichée, à partir de 1. Bornée à la dernière page.</summary>
     [Parameter] public int CurrentPage { get; set; } = 1;
+    /// <summary>Appelé quand la page change (changement de page, de tri ou de recherche).</summary>
     [Parameter] public EventCallback<int> CurrentPageChanged { get; set; }
+    /// <summary>Affiche une colonne de cases à cocher.</summary>
     [Parameter] public bool Selectable { get; set; }
+    /// <summary>Éléments sélectionnés. La table modifie cet ensemble ; relisez-le dans <c>SelectedItemsChanged</c>.</summary>
     [Parameter] public HashSet<TItem>? SelectedItems { get; set; }
+    /// <summary>Appelé quand la sélection change.</summary>
     [Parameter] public EventCallback<HashSet<TItem>> SelectedItemsChanged { get; set; }
+    /// <summary>Appelé au clic sur une ligne (hors cases à cocher et boutons de la ligne).</summary>
     [Parameter] public EventCallback<TItem> OnRowClick { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
-    public Func<TItem, object>? CurrentSortSelector { get; private set; }
-    public string? CurrentSortKey { get; private set; }
-    public bool IsSortAscending { get; private set; } = true;
+    // Projection du tri principal (conservée pour compatibilité).
+    public Func<TItem, object>? CurrentSortSelector => _sorts.FirstOrDefault()?.Selector;
+    public string? CurrentSortKey => _sorts.FirstOrDefault()?.Key;
+    public bool IsSortAscending => _sorts.FirstOrDefault()?.Descending != true;
 
-    private IEnumerable<TItem> ProcessedItems
+    public bool IsServerMode => ServerData != null;
+    private bool HasDetail => ChildRowContent != null;
+    private bool ShowLoading => IsLoading || (IsServerMode && _serverLoading && _serverItems.Count == 0);
+    private string? CurrentError => !string.IsNullOrWhiteSpace(ErrorMessage) ? ErrorMessage : _serverError;
+
+    /// <summary>Position (1-based) et sens du tri d'une colonne ; null si elle n'est pas triée.</summary>
+    public (int Position, bool Descending, int Total)? GetSortState(Func<TItem, object>? selector, string? key)
+    {
+        var index = _sorts.FindIndex(s => Matches(s, selector, key));
+        return index < 0 ? null : (index + 1, _sorts[index].Descending, _sorts.Count);
+    }
+
+    private static bool Matches(SortEntry entry, Func<TItem, object>? selector, string? key) =>
+        (!string.IsNullOrEmpty(key) && entry.Key == key) || (selector != null && entry.Selector == selector);
+
+    // Vue filtrée + triée, calculée une seule fois par cycle (invalidée à chaque changement de paramètre ou d'état).
+    private List<TItem> View => _view ??= BuildView();
+
+    private List<TItem> BuildView()
+    {
+        if (IsServerMode) return _serverItems;
+        if (Items == null) return new List<TItem>();
+
+        IEnumerable<TItem> list = Items;
+
+        if (ShowSearch && !string.IsNullOrWhiteSpace(_searchQuery))
+        {
+            list = FilterPredicate != null
+                ? list.Where(item => FilterPredicate(item, _searchQuery))
+                : list.Where(item => item?.ToString()?.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase) ?? false);
+        }
+
+        IOrderedEnumerable<TItem>? ordered = null;
+        foreach (var sort in _sorts.Where(s => s.Selector != null))
+        {
+            ordered = ordered switch
+            {
+                null => sort.Descending ? list.OrderByDescending(sort.Selector!) : list.OrderBy(sort.Selector!),
+                _ => sort.Descending ? ordered.ThenByDescending(sort.Selector!) : ordered.ThenBy(sort.Selector!)
+            };
+        }
+
+        return (ordered ?? list).ToList();
+    }
+
+    private int TotalCount => IsServerMode ? _serverTotal : View.Count;
+
+    private int EffectivePage
     {
         get
         {
-            if (Items == null) return Enumerable.Empty<TItem>();
-
-            var list = Items;
-
-            // 1. Filtrage / Recherche
-            if (ShowSearch && !string.IsNullOrWhiteSpace(_searchQuery))
-            {
-                if (FilterPredicate != null)
-                {
-                    list = list.Where(item => FilterPredicate(item, _searchQuery));
-                }
-                else
-                {
-                    list = list.Where(item => item?.ToString()?.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase) ?? false);
-                }
-            }
-
-            // 2. Tri
-            if (CurrentSortSelector != null)
-            {
-                list = IsSortAscending
-                    ? list.OrderBy(CurrentSortSelector)
-                    : list.OrderByDescending(CurrentSortSelector);
-            }
-
-            return list;
+            var pages = Math.Max(1, (int)Math.Ceiling(TotalCount / (double)Math.Max(PageSize, 1)));
+            return Math.Clamp(CurrentPage, 1, pages);
         }
     }
 
-    private IEnumerable<TItem> DisplayedItems
-    {
-        get
-        {
-            var processed = ProcessedItems;
-            if (!Paginated) return processed;
-
-            return processed.Skip((CurrentPage - 1) * PageSize).Take(PageSize);
-        }
-    }
-
-    private int TotalCount => ProcessedItems.Count();
+    private IEnumerable<TItem> DisplayedItems =>
+        Paginated && !IsServerMode ? View.Skip((EffectivePage - 1) * PageSize).Take(PageSize) : View;
 
     private bool IsAllSelected
     {
         get
         {
             var current = DisplayedItems.ToList();
-            return current.Any() && SelectedItems != null && current.All(item => SelectedItems.Contains(item));
+            return current.Count > 0 && SelectedItems != null && current.All(SelectedItems.Contains);
         }
     }
 
-    public async Task SetSortAsync(Func<TItem, object> selector, string? sortKey)
+    protected override void OnParametersSet() => _view = null;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (CurrentSortSelector == selector)
+        if (IsServerMode && !_serverStarted)
         {
-            IsSortAscending = !IsSortAscending;
+            _serverStarted = true;
+            await ReloadServerDataAsync();
+        }
+    }
+
+    /// <summary>Relit la page courante depuis <c>ServerData</c> (annule une requête en cours).</summary>
+    public async Task ReloadServerDataAsync()
+    {
+        if (ServerData == null) return;
+
+        _loadCts?.Cancel();
+        _loadCts?.Dispose();
+        var cts = _loadCts = new CancellationTokenSource();
+
+        _serverLoading = true;
+        _serverError = null;
+        StateHasChanged();
+
+        var state = new UiTableState(
+            Paginated ? EffectivePage : 1,
+            PageSize,
+            string.IsNullOrWhiteSpace(_searchQuery) ? null : _searchQuery,
+            _sorts.Where(s => s.Key != null).Select(s => new UiSortDefinition(s.Key!, s.Descending)).ToList());
+
+        try
+        {
+            var data = await ServerData(state, cts.Token);
+            if (cts.IsCancellationRequested) return;
+            _serverItems = data.Items.ToList();
+            _serverTotal = data.TotalItems;
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+        catch (Exception ex)
+        {
+            if (cts.IsCancellationRequested) return;
+            _serverError = ex.Message;
+        }
+        finally
+        {
+            if (!cts.IsCancellationRequested)
+            {
+                _serverLoading = false;
+                _view = null;
+                StateHasChanged();
+            }
+        }
+    }
+
+    /// <summary>Tri d'une colonne : alterne croissant/décroissant ; <paramref name="additive"/> (Maj) ajoute un critère.</summary>
+    public async Task ToggleSortAsync(Func<TItem, object>? selector, string? sortKey, bool additive = false)
+    {
+        var index = _sorts.FindIndex(s => Matches(s, selector, sortKey));
+        if (index >= 0)
+        {
+            var existing = _sorts[index];
+            _sorts[index] = existing with { Descending = !existing.Descending };
+            if (!additive || !MultiSort)
+            {
+                var kept = _sorts[index];
+                _sorts.Clear();
+                _sorts.Add(kept);
+            }
         }
         else
         {
-            CurrentSortSelector = selector;
-            CurrentSortKey = sortKey;
-            IsSortAscending = true;
+            if (!additive || !MultiSort) _sorts.Clear();
+            _sorts.Add(new SortEntry(selector, sortKey, false));
         }
-        CurrentPage = 1;
-        await CurrentPageChanged.InvokeAsync(CurrentPage);
-        StateHasChanged();
+
+        _view = null;
+        await ResetToFirstPageAsync();
     }
 
-    private void HandleSearchInput(ChangeEventArgs e)
+    public Task SetSortAsync(Func<TItem, object> selector, string? sortKey) => ToggleSortAsync(selector, sortKey);
+
+    private async Task ResetToFirstPageAsync()
+    {
+        CurrentPage = 1;
+        await CurrentPageChanged.InvokeAsync(CurrentPage);
+        if (IsServerMode) await ReloadServerDataAsync();
+        else StateHasChanged();
+    }
+
+    private async Task HandleSearchInput(ChangeEventArgs e)
     {
         _searchQuery = e.Value?.ToString() ?? string.Empty;
+        _view = null;
         CurrentPage = 1;
+
+        if (!IsServerMode) return;
+
+        _searchCts?.Cancel();
+        _searchCts?.Dispose();
+        var cts = _searchCts = new CancellationTokenSource();
+        try
+        {
+            await Task.Delay(SearchDebounceMs, cts.Token);
+            await ReloadServerDataAsync();
+        }
+        catch (TaskCanceledException) { }
     }
 
     private async Task HandlePageSizeChanged(int newSize)
     {
         PageSize = newSize;
-        CurrentPage = 1;
-        await CurrentPageChanged.InvokeAsync(CurrentPage);
+        _view = null;
+        await ResetToFirstPageAsync();
     }
 
     private async Task SetPage(int page)
     {
-        if (CurrentPage != page)
-        {
-            CurrentPage = page;
-            await CurrentPageChanged.InvokeAsync(CurrentPage);
-        }
+        if (CurrentPage == page) return;
+        CurrentPage = page;
+        await CurrentPageChanged.InvokeAsync(CurrentPage);
+        if (IsServerMode) await ReloadServerDataAsync();
     }
 
-    private async Task HandleRowClick(TItem item)
+    private async Task HandleRetry()
     {
-        await OnRowClick.InvokeAsync(item);
+        _serverError = null;
+        if (IsServerMode) await ReloadServerDataAsync();
+        await OnRetry.InvokeAsync();
+    }
+
+    private Task HandleRowClick(TItem item) => OnRowClick.InvokeAsync(item);
+
+    private void ToggleExpand(TItem item)
+    {
+        if (!_expanded.Remove(item)) _expanded.Add(item);
     }
 
     private async Task ToggleSelectItem(TItem item)
     {
         SelectedItems ??= new HashSet<TItem>();
-        if (SelectedItems.Contains(item))
-        {
-            SelectedItems.Remove(item);
-        }
-        else
-        {
-            SelectedItems.Add(item);
-        }
+        if (!SelectedItems.Remove(item)) SelectedItems.Add(item);
         await SelectedItemsChanged.InvokeAsync(SelectedItems);
     }
 
@@ -266,23 +463,20 @@
     {
         SelectedItems ??= new HashSet<TItem>();
         var isChecked = (bool)(e.Value ?? false);
-        var displayed = DisplayedItems.ToList();
 
-        if (isChecked)
+        foreach (var item in DisplayedItems.ToList())
         {
-            foreach (var item in displayed)
-            {
-                SelectedItems.Add(item);
-            }
-        }
-        else
-        {
-            foreach (var item in displayed)
-            {
-                SelectedItems.Remove(item);
-            }
+            if (isChecked) SelectedItems.Add(item);
+            else SelectedItems.Remove(item);
         }
         await SelectedItemsChanged.InvokeAsync(SelectedItems);
     }
 
+    public void Dispose()
+    {
+        _loadCts?.Cancel();
+        _loadCts?.Dispose();
+        _searchCts?.Cancel();
+        _searchCts?.Dispose();
+    }
 }

@@ -1,4 +1,5 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
 @if (IsOpen)
 {
@@ -8,7 +9,7 @@
                aria-modal="true"
                aria-label="@AriaLabel"
                @onclick:stopPropagation="true"
-               @attributes="AdditionalAttributes">
+               style="@Style" @attributes="AdditionalAttributes">
             <header class="ui-drawer-header">
                 @if (Header != null)
                 {
@@ -33,19 +34,28 @@
 }
 
 @code {
+    /// <summary>Indique si le tiroir est ouvert (lié avec <c>bind-IsOpen</c>).</summary>
     [Parameter] public bool IsOpen { get; set; }
+    /// <summary>Appelé lorsque le tiroir demande sa fermeture.</summary>
     [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
+    /// <summary>Titre affiché dans l'en-tête.</summary>
     [Parameter] public string Title { get; set; } = "Panneau";
+    /// <summary>Nom accessible du tiroir.</summary>
     [Parameter] public string AriaLabel { get; set; } = "Panneau latéral";
+    /// <summary>Bord de l'écran d'où le tiroir apparaît.</summary>
     [Parameter] public UiDrawerPosition Position { get; set; } = UiDrawerPosition.Right;
+    /// <summary>Ferme le tiroir au clic sur le fond assombri.</summary>
     [Parameter] public bool CloseOnBackdropClick { get; set; } = true;
+    /// <summary>Affiche le bouton de fermeture dans l'en-tête.</summary>
     [Parameter] public bool ShowCloseButton { get; set; } = true;
+    /// <summary>En-tête personnalisé (remplace <c>Title</c>).</summary>
     [Parameter] public RenderFragment? Header { get; set; }
+    /// <summary>Contenu du tiroir.</summary>
     [Parameter] public RenderFragment? ChildContent { get; set; }
+    /// <summary>Pied du tiroir.</summary>
     [Parameter] public RenderFragment? Footer { get; set; }
+    /// <summary>Appelé après la fermeture du tiroir.</summary>
     [Parameter] public EventCallback OnClosed { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private async Task HandleBackdropClick()
     {

@@ -1,6 +1,7 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
-<div class="ui-gallery @Class" @attributes="AdditionalAttributes">
+<div class="ui-gallery @Class" style="@Style" @attributes="AdditionalAttributes">
     @foreach (var item in Items)
     {
         <button type="button" class="ui-gallery-item" aria-label="Afficher @item.Alt" @onclick="() => Open(item)">
@@ -12,10 +13,10 @@
 <UiLightbox @bind-IsOpen="_isOpen" Src="@(_selected?.Src ?? string.Empty)" Alt="@(_selected?.Alt ?? "Image")" Caption="@_selected?.Caption" />
 
 @code {
+    /// <summary>Images de la galerie ; un clic ouvre l'image en grand.</summary>
     [Parameter] public IReadOnlyList<UiGalleryItem> Items { get; set; } = Array.Empty<UiGalleryItem>();
+    /// <summary>Rapport largeur/hauteur des vignettes.</summary>
     [Parameter] public ImageRatio Ratio { get; set; } = ImageRatio.Widescreen;
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private UiGalleryItem? _selected;
     private bool _isOpen;

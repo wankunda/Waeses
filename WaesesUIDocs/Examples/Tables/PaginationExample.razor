@@ -1,0 +1,10 @@
+<div class="ui-flex-col" style="gap: 1rem; width: 100%;">
+    <UiPagination TotalItems="134" @bind-CurrentPage="_page" @bind-PageSize="_size" PageSizeOptions="new[] { 10, 25, 50 }" ShowInfo="true" AriaLabel="Pages des résultats" />
+
+    <p class="text-secondary">Page <strong>@_page</strong>, <strong>@_size</strong> éléments par page.</p>
+</div>
+
+@code {
+    private int _page = 1;
+    private int _size = 10;
+}

@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-test-pack:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            9.0.x
+            10.0.x
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Feuille de style à jour
+        run: python tools/build-css.py --check
+
+      - name: Restore
+        run: dotnet restore Waeses.slnx
+
+      - name: Build
+        run: dotnet build Waeses.slnx --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test WaesesUI.Tests --configuration Release --no-build
+
+      - name: Pack
+        run: dotnet pack WaesesUI/WaesesUI.csproj --configuration Release --no-build --output ./artifacts
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nuget-packages
+          path: artifacts/*
+
+  # Site de documentation dans un vrai navigateur (publication Release trimmée, Chromium, axe-core).
+  docs-e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            9.0.x
+            10.0.x
+
+      - name: Compiler les tests de bout en bout
+        run: dotnet build WaesesUIDocs.E2E --configuration Release
+
+      - name: Installer Chromium pour Playwright
+        run: pwsh WaesesUIDocs.E2E/bin/Release/net10.0/playwright.ps1 install --with-deps chromium
+
+      - name: Tests de bout en bout (la fixture publie le site elle-même)
+        run: dotnet test WaesesUIDocs.E2E --configuration Release --no-build
+
+  # Publication : uniquement sur un tag vX.Y.Z, avec le secret NUGET_API_KEY configuré dans le dépôt.
+  publish:
+    needs: build-test-pack
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: nuget-packages
+          path: artifacts
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Push
+        run: dotnet nuget push "artifacts/*.nupkg" --api-key "${{ secrets.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate

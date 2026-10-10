@@ -1,22 +1,30 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 @implements IDisposable
 
 @if (ParentTabs?.IsActive(this) == true)
 {
-    <div class="ui-tab-pane @Class" @attributes="AdditionalAttributes">
+    <div id="@PanelId" role="tabpanel" aria-labelledby="@TabId" tabindex="0" class="ui-tab-pane @Class" style="@Style" @attributes="AdditionalAttributes">
         @ChildContent
     </div>
 }
 
 @code {
     [CascadingParameter] public UiTabs? ParentTabs { get; set; }
+    /// <summary>Libellé de l'onglet.</summary>
     [Parameter] public string Title { get; set; } = string.Empty;
+    /// <summary>Icône (ou texte court) affichée avant le libellé.</summary>
     [Parameter] public string? Icon { get; set; }
+    /// <summary>Petit texte affiché dans un badge à côté du libellé (par exemple un compteur).</summary>
     [Parameter] public string? Badge { get; set; }
+    /// <summary>Onglet visible mais non sélectionnable.</summary>
     [Parameter] public bool Disabled { get; set; }
+    /// <summary>Contenu du panneau, affiché quand l'onglet est actif.</summary>
     [Parameter] public RenderFragment? ChildContent { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private readonly string _uid = Guid.NewGuid().ToString("N");
+    public string TabId => $"ui-tab-{_uid}";
+    public string PanelId => $"ui-tabpanel-{_uid}";
 
     protected override void OnInitialized()
     {

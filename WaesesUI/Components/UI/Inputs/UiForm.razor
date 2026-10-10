@@ -1,0 +1,161 @@
+@namespace WaesesUI
+@inherits UiComponentBase
+@implements IDisposable
+
+@* Formulaire avec validation globale (équivalent de MudForm) : IsValid, Errors, Validate(), ResetValidation(), état de soumission.
+   Les champs Ui* y participent par EditContext, y compris leur paramètre Validation. *@
+<CascadingValue Value="this" IsFixed="true">
+    <EditForm @key="_generation"
+              EditContext="_editContext"
+              OnValidSubmit="HandleValidSubmitAsync"
+              OnInvalidSubmit="HandleInvalidSubmitAsync"
+              class="@CssBuilder.Default("ui-form").Add(Class).Build()"
+              style="@Style"
+              novalidate
+              @attributes="AdditionalAttributes">
+        @if (DataAnnotations)
+        {
+            <DataAnnotationsValidator />
+        }
+        @ChildContent?.Invoke(this)
+    </EditForm>
+</CascadingValue>
+
+@code {
+    private EditContext _editContext = default!;
+    private object? _contextModel;
+    private int _generation;
+    private bool _isValid = true;
+    private bool _isSubmitting;
+    private IReadOnlyList<string> _errors = Array.Empty<string>();
+
+    /// <summary>Objet édité (les champs y sont liés par <c>bind-Value</c>). Ignoré si <see cref="EditContext"/> est fourni.</summary>
+    [Parameter] public object? Model { get; set; }
+
+    /// <summary>Contexte d'édition fourni par l'appelant, à la place de <see cref="Model"/>.</summary>
+    [Parameter] public EditContext? EditContext { get; set; }
+
+    /// <summary>Contenu du formulaire ; le paramètre est le formulaire lui-même (<c>Context="form"</c>).</summary>
+    [Parameter] public RenderFragment<UiForm>? ChildContent { get; set; }
+
+    /// <summary>Valide aussi les attributs <c>[Required]</c>, <c>[StringLength]</c>… du modèle.</summary>
+    [Parameter] public bool DataAnnotations { get; set; } = true;
+
+    /// <summary>Appelé à la soumission lorsque tous les champs sont valides. Pendant son exécution, <c>IsSubmitting</c> est vrai.</summary>
+    [Parameter] public EventCallback<EditContext> OnValidSubmit { get; set; }
+    /// <summary>Appelé à la soumission lorsqu'au moins un champ est invalide.</summary>
+    [Parameter] public EventCallback<EditContext> OnInvalidSubmit { get; set; }
+
+    /// <summary>Lié (<c>bind-IsValid</c>) : faux tant qu'au moins un champ porte une erreur.</summary>
+    [Parameter] public bool IsValid { get; set; } = true;
+    /// <summary>Appelé lorsque la validité globale change (fourni par <c>bind-IsValid</c>).</summary>
+    [Parameter] public EventCallback<bool> IsValidChanged { get; set; }
+
+    /// <summary>Contexte d'édition courant.</summary>
+    public EditContext Context => _editContext;
+
+    /// <summary>Vrai pendant l'exécution de <see cref="OnValidSubmit"/> (pour désactiver le bouton d'envoi).</summary>
+    public bool IsSubmitting => _isSubmitting;
+
+    /// <summary>Messages de validation de tous les champs.</summary>
+    public IReadOnlyList<string> Errors => _errors;
+
+    /// <summary>Vrai si un champ a été modifié depuis l'ouverture ou la dernière réinitialisation.</summary>
+    public bool IsTouched => _editContext.IsModified();
+
+    protected override void OnParametersSet()
+    {
+        var source = (object?)EditContext ?? Model;
+        if (_editContext != null && ReferenceEquals(source, _contextModel)) return;
+
+        _contextModel = source;
+        AttachContext(EditContext ?? new EditContext(Model ?? new object()));
+    }
+
+    private void AttachContext(EditContext context)
+    {
+        if (_editContext != null)
+        {
+            _editContext.OnValidationStateChanged -= HandleValidationStateChanged;
+        }
+
+        _editContext = context;
+        _editContext.OnValidationStateChanged += HandleValidationStateChanged;
+        _generation++;
+        RefreshState(notify: false);
+    }
+
+    private void HandleValidationStateChanged(object? sender, ValidationStateChangedEventArgs e)
+    {
+        RefreshState(notify: true);
+    }
+
+    private void RefreshState(bool notify)
+    {
+        _errors = _editContext.GetValidationMessages().ToList();
+        var valid = _errors.Count == 0;
+        if (valid == _isValid) return;
+
+        _isValid = valid;
+        IsValid = valid;
+        if (notify)
+        {
+            _ = InvokeAsync(async () =>
+            {
+                await IsValidChanged.InvokeAsync(valid);
+                StateHasChanged();
+            });
+        }
+    }
+
+    /// <summary>Valide tous les champs et renvoie le résultat.</summary>
+    public bool Validate()
+    {
+        var valid = _editContext.Validate();
+        RefreshState(notify: true);
+        return valid;
+    }
+
+    /// <summary>Efface les erreurs et l'état « modifié » ; les valeurs du modèle ne sont pas touchées.</summary>
+    public void ResetValidation()
+    {
+        // Les validateurs ne supportent pas le changement de contexte : on repart d'un contexte neuf sur le même modèle.
+        var model = _editContext.Model;
+        AttachContext(new EditContext(model));
+        _ = InvokeAsync(async () =>
+        {
+            await IsValidChanged.InvokeAsync(true);
+            StateHasChanged();
+        });
+    }
+
+    /// <summary>Valide puis déclenche <see cref="OnValidSubmit"/> ou <see cref="OnInvalidSubmit"/> (équivaut à un clic sur le bouton d'envoi).</summary>
+    public Task SubmitAsync() => Validate() ? HandleValidSubmitAsync(_editContext) : HandleInvalidSubmitAsync(_editContext);
+
+    private async Task HandleValidSubmitAsync(EditContext context)
+    {
+        if (_isSubmitting) return;
+
+        _isSubmitting = true;
+        StateHasChanged();
+        try
+        {
+            await OnValidSubmit.InvokeAsync(context);
+        }
+        finally
+        {
+            _isSubmitting = false;
+            StateHasChanged();
+        }
+    }
+
+    private Task HandleInvalidSubmitAsync(EditContext context) => OnInvalidSubmit.InvokeAsync(context);
+
+    public void Dispose()
+    {
+        if (_editContext != null)
+        {
+            _editContext.OnValidationStateChanged -= HandleValidationStateChanged;
+        }
+    }
+}

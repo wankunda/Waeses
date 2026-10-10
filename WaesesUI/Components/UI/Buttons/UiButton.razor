@@ -1,82 +1,122 @@
 @namespace WaesesUI
+@inherits UiComponentBase
+
+@{
+    RenderFragment content = @<text>
+        @if (Loading)
+        {
+            <span class="ui-spinner ui-spinner-sm" style="margin-right: 0.25rem;" aria-hidden="true"></span>
+        }
+        else if (!string.IsNullOrEmpty(Icon))
+        {
+            @if (Icon.TrimStart().StartsWith('<'))
+            {
+                <UiIcon Icon="@Icon" Size="@(Size is UiSize.Sm or UiSize.Lg ? Size : UiSize.Md)" />
+            }
+            else
+            {
+                <span class="ui-btn-icon">@Icon</span>
+            }
+        }
+        @if (ChildContent != null)
+        {
+            @ChildContent
+        }
+        else if (!string.IsNullOrEmpty(Text))
+        {
+            <span>@Text</span>
+        }
+        @if (!string.IsNullOrEmpty(EndIcon))
+        {
+            @if (EndIcon.TrimStart().StartsWith('<'))
+            {
+                <UiIcon Icon="@EndIcon" Size="@(Size is UiSize.Sm or UiSize.Lg ? Size : UiSize.Md)" />
+            }
+            else
+            {
+                <span class="ui-btn-icon ui-btn-end-icon">@EndIcon</span>
+            }
+        }
+    </text>;
+}
 
 @if (string.IsNullOrEmpty(Href))
 {
     <button type="@Type"
-            class="ui-btn ui-btn-@Variant.ToString().ToLower() ui-btn-@Size.ToString().ToLower() @Class"
-            disabled="@(Disabled || Loading)"
+            class="@CssClass"
+            style="@Style"
+            disabled="@IsDisabled"
+            aria-busy="@(Loading ? "true" : null)"
             @onclick="OnClick"
             @attributes="AdditionalAttributes">
-        @if (Loading)
-        {
-            <span class="ui-spinner ui-spinner-sm" style="margin-right: 0.25rem;"></span>
-        }
-        @if (!string.IsNullOrEmpty(Icon) && !Loading)
-        {
-            @if (Icon.TrimStart().StartsWith("<"))
-            {
-                <UiIcon Icon="@Icon" Size="@(Size)" />
-            }
-            else
-            {
-                <span class="ui-btn-icon">@Icon</span>
-            }
-        }
-        @if (ChildContent != null)
-        {
-            @ChildContent
-        }
-        else if (!string.IsNullOrEmpty(Text))
-        {
-            <span>@Text</span>
-        }
+        @content
     </button>
 }
 else
 {
-    <a href="@Href"
+    @* Un <a> n'a pas d'attribut disabled : on retire href et on expose l'état via ARIA. *@
+    <a href="@(IsDisabled ? null : Href)"
        target="@Target"
-       class="ui-btn ui-btn-@Variant.ToString().ToLower() ui-btn-@Size.ToString().ToLower() @Class"
-       disabled="@(Disabled || Loading)"
+       rel="@(Target == "_blank" ? "noopener noreferrer" : null)"
+       class="@CssClass"
+       style="@Style"
+       role="@(IsDisabled ? "link" : null)"
+       aria-disabled="@(IsDisabled ? "true" : null)"
+       aria-busy="@(Loading ? "true" : null)"
+       tabindex="@(IsDisabled ? -1 : null)"
+       @onclick="OnClick"
        @attributes="AdditionalAttributes">
-        @if (Loading)
-        {
-            <span class="ui-spinner ui-spinner-sm" style="margin-right: 0.25rem;"></span>
-        }
-        @if (!string.IsNullOrEmpty(Icon) && !Loading)
-        {
-            @if (Icon.TrimStart().StartsWith("<"))
-            {
-                <UiIcon Icon="@Icon" Size="@(Size == UiSize.Sm ? UiSize.Sm : (Size == UiSize.Lg ? UiSize.Lg : UiSize.Md))" />
-            }
-            else
-            {
-                <span class="ui-btn-icon">@Icon</span>
-            }
-        }
-        @if (ChildContent != null)
-        {
-            @ChildContent
-        }
-        else if (!string.IsNullOrEmpty(Text))
-        {
-            <span>@Text</span>
-        }
+        @content
     </a>
 }
 
 @code {
+    /// <summary>Texte du bouton. Ignoré si <c>ChildContent</c> est fourni.</summary>
     [Parameter] public string? Text { get; set; }
+    /// <summary>Contenu libre du bouton (remplace <c>Text</c>).</summary>
     [Parameter] public RenderFragment? ChildContent { get; set; }
+    /// <summary>Style historique du bouton (<c>Primary</c>, <c>Outline</c>, <c>Danger</c>…). Remplacé par <c>Color</c> et <c>Appearance</c> dès que l'un des deux est défini.</summary>
     [Parameter] public UiButtonVariant Variant { get; set; } = UiButtonVariant.Primary;
+    /// <summary>Taille du bouton.</summary>
     [Parameter] public UiSize Size { get; set; } = UiSize.Md;
+    /// <summary>Attribut HTML <c>type</c> : <c>button</c> (défaut), <c>submit</c> ou <c>reset</c>. Utilisez <c>submit</c> pour valider un formulaire.</summary>
     [Parameter] public string Type { get; set; } = "button";
+    /// <summary>Désactive le bouton. Un lien désactivé perd son <c>href</c> et expose <c>aria-disabled</c>.</summary>
     [Parameter] public bool Disabled { get; set; }
+    /// <summary>Affiche un indicateur de chargement et désactive le bouton le temps d'une opération.</summary>
     [Parameter] public bool Loading { get; set; }
+    /// <summary>Icône affichée avant le texte : un SVG de la bibliothèque d'icônes, ou un texte court.</summary>
     [Parameter] public string? Icon { get; set; }
+
+    /// <summary>Icône affichée après le texte (<see cref="Icon"/> reste l'icône de début).</summary>
+    [Parameter] public string? EndIcon { get; set; }
+
+    /// <summary>Couleur du bouton. Avec <see cref="Appearance"/>, remplace <see cref="Variant"/>.</summary>
+    [Parameter] public UiColor? Color { get; set; }
+
+    /// <summary>Apparence (plein, contour, texte) indépendante de la couleur. Avec <see cref="Color"/>, remplace <see cref="Variant"/>.</summary>
+    [Parameter] public UiVariant? Appearance { get; set; }
+
+    /// <summary>Occupe toute la largeur disponible.</summary>
+    [Parameter] public bool FullWidth { get; set; }
+    /// <summary>Adresse de destination : le bouton devient alors un lien <c>a</c>.</summary>
     [Parameter] public string? Href { get; set; }
+    /// <summary>Cible du lien (par exemple <c>_blank</c>). Avec <c>_blank</c>, <c>rel="noopener noreferrer"</c> est ajouté.</summary>
     [Parameter] public string? Target { get; set; }
-    [Parameter] public string? Class { get; set; }
+    /// <summary>Appelé au clic (ou à l'activation au clavier).</summary>
     [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private bool IsDisabled => Disabled || Loading;
+
+    private bool UsesColorAppearance => Color.HasValue || Appearance.HasValue;
+
+    private string CssClass => CssBuilder
+        .Default("ui-btn")
+        .AddIf($"ui-btn-{Variant.ToString().ToLowerInvariant()}", !UsesColorAppearance)
+        .AddIf($"{(Color ?? UiColor.Primary).ToCssClass()} ui-btn-{(Appearance ?? UiVariant.Filled).ToString().ToLowerInvariant()}", UsesColorAppearance)
+        .Add($"ui-btn-{Size.ToString().ToLowerInvariant()}")
+        .AddIf("ui-btn-block", FullWidth)
+        .AddIf("ui-btn-disabled", IsDisabled && !string.IsNullOrEmpty(Href))
+        .Add(Class)
+        .Build();
 }

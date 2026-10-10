@@ -1,0 +1,24 @@
+@page "/composants/dialogues"
+
+<DocPage Href="composants/dialogues">
+    <DocSection Title="Providers" Description="Dialogues, boîtes de message et notifications sont affichés par des composants à placer une seule fois dans le layout (voir l'installation) : `UiDialogProvider`, `UiMessageBoxProvider` et `UiToastContainer`.">
+    </DocSection>
+
+    <DocSection Title="Dialogue avec un composant" Description="`IUiDialogService.ShowAsync&lt;T&gt;` affiche n'importe quel composant dans une modale. Le composant reçoit `UiDialogInstance` en cascade et se ferme avec `Close(donnée)` ou `Cancel()` ; l'appelant attend `reference.Result`. Plusieurs dialogues peuvent être empilés.">
+        <DocExample Example="typeof(DialogServiceExample)" Companions="new[] { typeof(EditNameDialog) }" />
+    </DocSection>
+
+    <DocSection Title="Confirmations et alertes" Description="`IMessageBoxService.ShowAsync` renvoie `true` si l'utilisateur confirme et `false` s'il annule ou ferme la boîte.">
+        <DocExample Example="typeof(MessageBoxExample)" />
+    </DocSection>
+
+    <DocSection Title="Notifications" Description="`IToastService.ShowToast` affiche une notification éphémère. Durée, position et nombre maximal par défaut se règlent avec `UiOptions`.">
+        <DocExample Example="typeof(ToastExample)" />
+    </DocSection>
+
+    <DocSection Title="API">
+        <ApiTable Component="typeof(UiDialogProvider)" Note="Il ne se configure pas : les options de chaque dialogue se passent à `ShowAsync` avec `UiDialogOptions`." />
+        <ApiTable Component="typeof(UiToastContainer)" Note="Durée, position et nombre maximal de toasts se règlent avec `UiOptions` (voir l'installation)." />
+        <ApiTable Component="typeof(UiMessageBoxProvider)" Note="Les libellés par défaut (Confirmer, Annuler, OK) se règlent avec `UiOptions`." />
+    </DocSection>
+</DocPage>

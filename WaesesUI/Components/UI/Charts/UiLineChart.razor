@@ -1,6 +1,7 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
-<div class="ui-chart @Class" @attributes="AdditionalAttributes">
+<div class="ui-chart @Class" style="@Style" @attributes="AdditionalAttributes">
     <svg class="ui-chart-svg" viewBox="0 0 @Width @Height" role="img" aria-label="@AriaLabel" preserveAspectRatio="none">
         @if (ShowGrid)
         {
@@ -27,16 +28,30 @@
 </div>
 
 @code {
+    /// <summary>Points de la courbe (libellé et valeur).</summary>
     [Parameter] public IReadOnlyList<UiChartData> Data { get; set; } = Array.Empty<UiChartData>();
+    /// <summary>Largeur du dessin en pixels (le graphique s'adapte à son conteneur).</summary>
     [Parameter] public int Width { get; set; } = 640;
+    /// <summary>Hauteur du dessin en pixels.</summary>
     [Parameter] public int Height { get; set; } = 320;
+    /// <summary>Couleur CSS de la courbe (par exemple <c>var(--success)</c>).</summary>
     [Parameter] public string Color { get; set; } = "var(--primary)";
+    /// <summary>Affiche les lignes de repère horizontales.</summary>
     [Parameter] public bool ShowGrid { get; set; } = true;
+    /// <summary>Nom accessible du graphique.</summary>
     [Parameter] public string AriaLabel { get; set; } = "Graphique linéaire";
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+    /// <summary>
+    /// Format .NET des valeurs (axe, étiquettes, info-bulles), par exemple <c>"N0"</c> pour « 50 000 » selon la culture.
+    /// Null : <c>"0.##"</c> en culture invariante (comportement historique).
+    /// </summary>
+    [Parameter] public string? ValueFormat { get; set; }
 
-    private const double ChartLeft = 48;
+    /// <summary>Met en forme une valeur à la place de <see cref="ValueFormat"/> (devise, unité, abréviation...).</summary>
+    [Parameter] public Func<double, string>? ValueFormatter { get; set; }
+
+
+    // La marge gauche s'adapte à la largeur des étiquettes de l'axe (« 1 000 000 » ne doit pas être coupé)
+    private double ChartLeft => Math.Max(48, FormatValue(Maximum).Length * 7.5 + 14);
     private const double ChartRight = 16;
     private const double ChartTop = 24;
     private const double ChartBottom = 38;
@@ -57,7 +72,10 @@
         return (x, y);
     }
 
-    private static string FormatValue(double value) => value.ToString("0.##", CultureInfo.InvariantCulture);
+    private string FormatValue(double value) =>
+        ValueFormatter is not null ? ValueFormatter(value)
+        : ValueFormat is not null ? value.ToString(ValueFormat, CultureInfo.CurrentCulture)
+        : value.ToString("0.##", CultureInfo.InvariantCulture);
 
     private static string SvgText(double x, double y, string anchor, string cssClass, string value) =>
         $"<text x=\"{x.ToString("0.##", CultureInfo.InvariantCulture)}\" y=\"{y.ToString("0.##", CultureInfo.InvariantCulture)}\" text-anchor=\"{anchor}\" class=\"{cssClass}\">{System.Net.WebUtility.HtmlEncode(value)}</text>";

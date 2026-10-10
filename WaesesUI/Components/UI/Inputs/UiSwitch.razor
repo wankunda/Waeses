@@ -1,12 +1,14 @@
-@inherits InputBase<bool>
+@inherits UiInputBase<bool>
 @namespace WaesesUI
 
-<div class="ui-choice-item @(CurrentValue ? "ui-switch-active" : "") @(Disabled ? "disabled" : "") @CssClass @Class"
+<div class="ui-choice-item @(CurrentValue ? "ui-switch-active" : "") @(Disabled ? "disabled" : "") @CssClass @ColorClass @Class"
      @onclick="Toggle"
      role="switch"
-     aria-checked="@CurrentValue"
+     aria-checked="@(CurrentValue ? "true" : "false")"
+     aria-disabled="@(Disabled ? "true" : null)"
      tabindex="@(Disabled ? -1 : 0)"
      @onkeydown="HandleKeyDown"
+     style="@Style"
      @attributes="AdditionalAttributes">
     <div class="ui-switch-track">
         <div class="ui-switch-thumb"></div>
@@ -30,30 +32,10 @@
 }
 
 @code {
-    [Parameter] public string? Label { get; set; }
+    protected override string IdPrefix => "switch";
+
+    /// <summary>Libellé libre de l'interrupteur (remplace <c>Label</c>).</summary>
     [Parameter] public RenderFragment? ChildContent { get; set; }
-    [Parameter] public bool Disabled { get; set; }
-    [Parameter] public string? ErrorMessage { get; set; }
-    [Parameter] public string? Class { get; set; }
-
-    private IEnumerable<string> GetErrors()
-    {
-        if (!string.IsNullOrEmpty(ErrorMessage))
-        {
-            yield return ErrorMessage;
-        }
-
-        if (EditContext != null && ValueExpression != null)
-        {
-            foreach (var msg in EditContext.GetValidationMessages(FieldIdentifier))
-            {
-                yield return msg;
-            }
-        }
-    }
-
-    private bool HasError => GetErrors().Any();
-    private string GetFirstError() => GetErrors().FirstOrDefault() ?? string.Empty;
 
     protected override bool TryParseValueFromString(string? value, out bool result, [NotNullWhen(false)] out string? validationErrorMessage)
     {

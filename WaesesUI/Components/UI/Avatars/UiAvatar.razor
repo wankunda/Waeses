@@ -1,7 +1,8 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
 <div class="ui-avatar ui-avatar-@Size.ToString().ToLower() ui-avatar-@Shape.ToString().ToLower() @Class"
-     style="@GetCustomStyle()"
+     style="@StyleBuilder.Default(GetCustomStyle()).Add(Style).Build()"
      @attributes="AdditionalAttributes">
     @if (!string.IsNullOrEmpty(Src) && !_imageFailed)
     {
@@ -27,16 +28,22 @@
 </div>
 
 @code {
+    /// <summary>Adresse de l'image. Sans image, les initiales sont affichées.</summary>
     [Parameter] public string? Src { get; set; }
+    /// <summary>Texte alternatif de l'image.</summary>
     [Parameter] public string? Alt { get; set; } = "Avatar";
+    /// <summary>Initiales affichées en l'absence d'image.</summary>
     [Parameter] public string? Initials { get; set; }
+    /// <summary>Taille de l'avatar.</summary>
     [Parameter] public UiSize Size { get; set; } = UiSize.Md;
+    /// <summary>Forme : cercle ou carré.</summary>
     [Parameter] public AvatarShape Shape { get; set; } = AvatarShape.Circle;
+    /// <summary>Pastille de présence (en ligne, occupé, absent, hors ligne).</summary>
     [Parameter] public AvatarStatus Status { get; set; } = AvatarStatus.None;
+    /// <summary>Couleur de fond CSS des initiales.</summary>
     [Parameter] public string? BackgroundColor { get; set; }
+    /// <summary>Contenu libre à la place de l'image et des initiales.</summary>
     [Parameter] public RenderFragment? ChildContent { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private string? _lastSrc;
     private bool _imageFailed;

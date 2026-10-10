@@ -1,0 +1,28 @@
+@page "/composants/champ-de-saisie"
+
+<DocPage Href="composants/champ-de-saisie">
+    <DocSection Title="Utilisation de base" Description="`UiInput` est générique : le type de la propriété liée (texte, nombre, date…) détermine la conversion. Une valeur illisible produit une erreur de validation plutôt qu'une exception.">
+        <DocExample Example="typeof(InputBasic)" />
+    </DocSection>
+
+    <DocSection Title="Apparences" Description="`Variant` (contour, fond teinté, soulignement) et `Color` (couleur du focus) s'appliquent à tous les champs : `UiInput`, `UiSelect`, `UiTextArea`, `UiCombobox`, `UiAutocomplete`, `UiDatePicker`…">
+        <DocExample Example="typeof(InputVariants)" />
+    </DocSection>
+
+    <DocSection Title="Validation" Description="Le paramètre `Validation` renvoie le message d'erreur, ou `null` si la valeur est valide.">
+        <DocExample Example="typeof(InputValidation)" />
+    </DocSection>
+
+    <DocSection Title="Saisie différée" Description="`DebounceInterval` attend la fin de la frappe avant de mettre la valeur à jour ; `Immediate=&quot;false&quot;` attend la sortie du champ.">
+        <DocExample Example="typeof(InputDebounce)" />
+    </DocSection>
+
+    <DocSection Title="Zone de texte" Description="`UiTextArea` partage les paramètres communs des champs.">
+        <DocExample Example="typeof(TextAreaCounter)" />
+    </DocSection>
+
+    <DocSection Title="API">
+        <ApiTable Component="typeof(UiInput<>)" />
+        <ApiTable Component="typeof(UiTextArea<>)" />
+    </DocSection>
+</DocPage>

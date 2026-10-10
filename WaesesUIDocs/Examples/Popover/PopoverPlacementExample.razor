@@ -1,0 +1,16 @@
+<div class="ui-flex-col" style="gap: 1rem; align-items: flex-start;">
+    <UiSelect @bind-Value="_placement" Label="Position" Items="Enum.GetValues<UiPopoverPlacement>()" />
+
+    @* L'ancre est l'élément parent du panneau : ici, ce div qui contient le bouton. *@
+    <div>
+        <UiButton Text="@(_open ? "Fermer" : "Ouvrir le panneau")" OnClick="() => _open = !_open" />
+        <UiPopoverPanel @bind-Open="_open" Placement="_placement" Class="p-sm">
+            Panneau placé en <strong>@_placement</strong>. Il se retourne s'il manque de la place et se ferme avec Échap ou un clic à l'extérieur.
+        </UiPopoverPanel>
+    </div>
+</div>
+
+@code {
+    private bool _open;
+    private UiPopoverPlacement _placement = UiPopoverPlacement.BottomStart;
+}

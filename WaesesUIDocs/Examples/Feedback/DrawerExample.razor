@@ -1,0 +1,29 @@
+<div class="ui-flex-row" style="gap: .5rem;">
+    <UiButton Text="Panneau à droite" Appearance="UiVariant.Outlined" OnClick="() => Open(UiDrawerPosition.Right)" />
+    <UiButton Text="Panneau à gauche" Appearance="UiVariant.Outlined" OnClick="() => Open(UiDrawerPosition.Left)" />
+</div>
+
+<UiDrawer @bind-IsOpen="_open" Title="Filtres" AriaLabel="Filtres de recherche" Position="_position">
+    <ChildContent>
+        <div class="ui-flex-col" style="gap: 1rem;">
+            <UiCheckbox @bind-Value="_inStock" Label="En stock uniquement" />
+            <UiSwitch @bind-Value="_promo" Label="Promotions" />
+        </div>
+    </ChildContent>
+    <Footer>
+        <UiButton Text="Appliquer" OnClick="() => _open = false" />
+    </Footer>
+</UiDrawer>
+
+@code {
+    private bool _open;
+    private bool _inStock = true;
+    private bool _promo;
+    private UiDrawerPosition _position = UiDrawerPosition.Right;
+
+    private void Open(UiDrawerPosition position)
+    {
+        _position = position;
+        _open = true;
+    }
+}

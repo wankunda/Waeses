@@ -1,0 +1,7 @@
+<div style="width: 100%; max-width: 28rem;">
+    <UiTextArea @bind-Value="_bio" Label="Biographie" Rows="4" MaxLength="120" ShowCharacterCount="true" Placeholder="Parlez-nous de vous…" />
+</div>
+
+@code {
+    private string? _bio;
+}

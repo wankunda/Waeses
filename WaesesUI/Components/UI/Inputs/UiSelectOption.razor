@@ -1,0 +1,31 @@
+@namespace WaesesUI
+@typeparam TValue
+@inherits UiComponentBase
+
+<option value="@FormattedValue" disabled="@Disabled" class="@Class" style="@Style" @attributes="AdditionalAttributes">@ChildContent@(ChildContent is null ? (Text ?? FormattedValue) : null)</option>
+
+@code {
+    [CascadingParameter] public UiSelect<TValue>? Select { get; set; }
+
+    /// <summary>Valeur de l'option, du même type que la valeur liée au <see cref="UiSelect{TValue}"/>.</summary>
+    [Parameter] public TValue? Value { get; set; }
+
+    /// <summary>Libellé affiché. À défaut, le contenu de l'option, puis la valeur elle-même.</summary>
+    [Parameter] public string? Text { get; set; }
+
+    /// <summary>Libellé en texte brut (une option native n'accepte pas de balisage).</summary>
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>Option visible mais non sélectionnable.</summary>
+    [Parameter] public bool Disabled { get; set; }
+
+    // Même conversion que celle du select parent, pour que valeur affichée, valeur envoyée et valeur relue concordent.
+    private string FormattedValue => Select is not null
+        ? Select.FormatOption(Value)
+        : Value switch
+        {
+            null => string.Empty,
+            IFormattable formattable => formattable.ToString(null, System.Globalization.CultureInfo.InvariantCulture),
+            _ => Value.ToString() ?? string.Empty
+        };
+}

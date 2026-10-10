@@ -1,0 +1,72 @@
+@namespace WaesesUI
+@inherits UiComponentBase
+@inject IUiPopoverService PopoverService
+@implements IDisposable
+
+@* Le contenu est rendu par UiPopoverProvider à la racine de la page (jamais rogné par overflow).
+   L'ancre est l'élément parent de ce composant, ou AnchorSelector. Sans provider : rendu en place. *@
+<span id="@_entry.AnchorId" class="ui-popover-anchor" hidden aria-hidden="true"></span>
+@if (!PopoverService.HasProvider && Open)
+{
+    <div class="@CssBuilder.Default("ui-popover-inline").Add(Class).Build()" style="@Style" @attributes="AdditionalAttributes">
+        @ChildContent
+    </div>
+}
+
+@code {
+    private readonly UiPopoverEntry _entry = new();
+
+    /// <summary>Indique si le panneau est ouvert (lié avec <c>bind-Open</c>).</summary>
+    [Parameter] public bool Open { get; set; }
+    /// <summary>Appelé lorsque le panneau demande sa fermeture (clic extérieur, Échap).</summary>
+    [Parameter] public EventCallback<bool> OpenChanged { get; set; }
+    /// <summary>Contenu du panneau.</summary>
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    /// <summary>Position préférée par rapport à l'ancre ; inversée automatiquement s'il manque de la place.</summary>
+    [Parameter] public UiPopoverPlacement Placement { get; set; } = UiPopoverPlacement.BottomStart;
+    /// <summary>Distance en pixels entre l'ancre et le panneau.</summary>
+    [Parameter] public int Offset { get; set; } = 8;
+
+    /// <summary>Donne au popover au moins la largeur de l'ancre (listes déroulantes).</summary>
+    [Parameter] public bool MatchAnchorWidth { get; set; }
+    /// <summary>Ferme le panneau au clic en dehors de l'ancre et du panneau.</summary>
+    [Parameter] public bool CloseOnOutsideClick { get; set; } = true;
+    /// <summary>Ferme le panneau avec la touche Échap.</summary>
+    [Parameter] public bool CloseOnEscape { get; set; } = true;
+
+    /// <summary>Sélecteur CSS de l'ancre, relatif au document. Par défaut : l'élément parent.</summary>
+    [Parameter] public string? AnchorSelector { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _entry.RequestClose = async () =>
+        {
+            await InvokeAsync(async () =>
+            {
+                Open = false;
+                _entry.Open = false;
+                PopoverService.Update();
+                await OpenChanged.InvokeAsync(false);
+                StateHasChanged();
+            });
+        };
+        PopoverService.Register(_entry);
+    }
+
+    protected override void OnParametersSet()
+    {
+        _entry.Open = Open;
+        _entry.Content = ChildContent;
+        _entry.Placement = Placement;
+        _entry.Offset = Offset;
+        _entry.MatchAnchorWidth = MatchAnchorWidth;
+        _entry.CloseOnOutsideClick = CloseOnOutsideClick;
+        _entry.CloseOnEscape = CloseOnEscape;
+        _entry.AnchorSelector = AnchorSelector;
+        _entry.Class = Class;
+        _entry.Style = Style;
+        PopoverService.Update();
+    }
+
+    public void Dispose() => PopoverService.Remove(_entry);
+}

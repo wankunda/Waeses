@@ -1,4 +1,5 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
 <div class="ui-image-wrapper @GetRatioClass() @(Circle ? "ui-image-circle" : (Rounded ? "ui-image-rounded" : "")) @(HoverZoom ? "ui-image-hover-zoom" : "") @Class"
      style="@Style"
@@ -9,11 +10,10 @@
         <div class="ui-image-skeleton"></div>
     }
 
-    <img class="ui-image"
+    <img class="ui-image @(_isLoading ? "ui-image-loading" : "")"
          src="@(_hasError ? FallbackSrc : Src)"
          alt="@Alt"
          loading="@(Lazy ? "lazy" : "eager")"
-         style="@(_isLoading ? "display: none;" : "")"
          @onload="HandleLoaded"
          @onerror="HandleError" />
 
@@ -29,18 +29,36 @@
     private bool _isLoading = true;
     private bool _hasError;
 
+    /// <summary>Adresse de l'image.</summary>
     [Parameter] public string? Src { get; set; }
+    /// <summary>Texte alternatif de l'image.</summary>
     [Parameter] public string? Alt { get; set; } = "Image";
+    /// <summary>Légende affichée sous l'image.</summary>
     [Parameter] public string? Caption { get; set; }
+    /// <summary>Rapport largeur/hauteur imposé au cadre (évite le décalage de mise en page au chargement).</summary>
     [Parameter] public ImageRatio Ratio { get; set; } = ImageRatio.Auto;
+    /// <summary>Arrondit les angles.</summary>
     [Parameter] public bool Rounded { get; set; } = true;
+    /// <summary>Découpe l'image en cercle.</summary>
     [Parameter] public bool Circle { get; set; }
+    /// <summary>Agrandit légèrement l'image au survol.</summary>
     [Parameter] public bool HoverZoom { get; set; } = true;
+    /// <summary>Charge l'image seulement quand elle approche de l'écran.</summary>
     [Parameter] public bool Lazy { get; set; } = true;
+    /// <summary>Image de remplacement affichée si <c>Src</c> ne se charge pas.</summary>
     [Parameter] public string? FallbackSrc { get; set; }
-    [Parameter] public string? Style { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string? _lastSrc;
+
+    protected override void OnParametersSet()
+    {
+        if (_lastSrc != Src)
+        {
+            _lastSrc = Src;
+            _isLoading = true;
+            _hasError = false;
+        }
+    }
 
     private void HandleLoaded()
     {

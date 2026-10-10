@@ -1,6 +1,7 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
-<ol class="ui-stepper @Class" aria-label="@AriaLabel" @attributes="AdditionalAttributes">
+<ol class="ui-stepper @Class" aria-label="@AriaLabel" style="@Style" @attributes="AdditionalAttributes">
     @foreach (var step in Steps.Select((value, index) => (value, index)))
     {
         var state = step.index < ActiveIndex || step.value.Completed ? "complete" : step.index == ActiveIndex ? "active" : "upcoming";
@@ -14,12 +15,14 @@
 </ol>
 
 @code {
+    /// <summary>Étapes du parcours.</summary>
     [Parameter] public IReadOnlyList<UiStepItem> Steps { get; set; } = Array.Empty<UiStepItem>();
+    /// <summary>Index de l'étape active (lié avec <c>bind-ActiveIndex</c>).</summary>
     [Parameter] public int ActiveIndex { get; set; }
+    /// <summary>Appelé quand l'utilisateur choisit une autre étape.</summary>
     [Parameter] public EventCallback<int> ActiveIndexChanged { get; set; }
+    /// <summary>Nom accessible de la liste d'étapes.</summary>
     [Parameter] public string AriaLabel { get; set; } = "Étapes";
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private Task SelectStep(int index) => ActiveIndexChanged.InvokeAsync(index);
 }

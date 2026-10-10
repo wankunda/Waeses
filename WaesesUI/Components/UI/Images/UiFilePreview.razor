@@ -1,6 +1,7 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
-<article class="ui-file-preview @Class" @attributes="AdditionalAttributes">
+<article class="ui-file-preview @Class" style="@Style" @attributes="AdditionalAttributes">
     <UiIcon Icon="@GetIcon()" Size="UiSize.Lg" Color="UiColor.Primary" aria-hidden="true" />
     <div class="ui-file-preview-info">
         <strong>@FileName</strong>
@@ -13,12 +14,14 @@
 </article>
 
 @code {
+    /// <summary>Nom du fichier affiché.</summary>
     [Parameter] public string FileName { get; set; } = "Fichier";
+    /// <summary>Type MIME : détermine l'icône et l'aperçu.</summary>
     [Parameter] public string? ContentType { get; set; }
+    /// <summary>Taille en octets, affichée en unité lisible.</summary>
     [Parameter] public long? SizeBytes { get; set; }
+    /// <summary>Adresse du fichier, pour l'aperçu et le téléchargement.</summary>
     [Parameter] public string? Url { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private string FormatSize() => !SizeBytes.HasValue ? string.Empty : SizeBytes.Value switch
     {

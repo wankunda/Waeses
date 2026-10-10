@@ -1,9 +1,17 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 @typeparam TValue
+@implements IDisposable
 
-<div class="ui-choice-item @(IsChecked ? "ui-radio-checked" : "") @(Disabled ? "disabled" : "") @Class"
+<div class="ui-choice-item @(IsChecked ? "ui-radio-checked" : "") @(Disabled ? "disabled" : "") @ColorClass @Class"
+     id="@ElementId"
+     role="radio"
+     aria-checked="@(IsChecked ? "true" : "false")"
+     aria-disabled="@(Disabled ? "true" : null)"
+     tabindex="@(Disabled ? -1 : (ParentGroup?.IsTabStop(this) == true ? 0 : -1))"
      @onclick="HandleSelect"
-     @attributes="AdditionalAttributes">
+     @onkeydown="HandleKeyDown"
+     style="@Style" @attributes="AdditionalAttributes">
     <div class="ui-radio-outer">
         <div class="ui-radio-inner"></div>
     </div>
@@ -20,13 +28,48 @@
 @code {
     [CascadingParameter] public UiRadioGroup<TValue>? ParentGroup { get; set; }
     [Parameter] public TValue? Value { get; set; }
+    /// <summary>Libellé de l'option. Ignoré si <c>ChildContent</c> est fourni.</summary>
     [Parameter] public string? Label { get; set; }
+    /// <summary>Libellé libre de l'option.</summary>
     [Parameter] public RenderFragment? ChildContent { get; set; }
+    /// <summary>Option visible mais non sélectionnable.</summary>
     [Parameter] public bool Disabled { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
-    private bool IsChecked => ParentGroup != null && EqualityComparer<TValue>.Default.Equals(ParentGroup.Value, Value);
+    private readonly string _uid = Guid.NewGuid().ToString("N");
+    /// <summary>Couleur de l'option ; par défaut celle du groupe.</summary>
+    [Parameter] public UiColor? Color { get; set; }
+
+    private string ColorClass => (Color ?? ParentGroup?.Color)?.ToCssClass() ?? string.Empty;
+
+    internal string ElementId => $"ui-radio-{_uid}";
+
+    protected override void OnInitialized() => ParentGroup?.Register(this);
+
+    public void Dispose() => ParentGroup?.Unregister(this);
+
+    internal void Refresh() => _ = InvokeAsync(StateHasChanged);
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (Disabled || ParentGroup == null) return;
+        switch (e.Key)
+        {
+            case " ":
+            case "Enter":
+                await ParentGroup.SelectValueAsync(Value);
+                break;
+            case "ArrowRight":
+            case "ArrowDown":
+                await ParentGroup.MoveAsync(this, 1);
+                break;
+            case "ArrowLeft":
+            case "ArrowUp":
+                await ParentGroup.MoveAsync(this, -1);
+                break;
+        }
+    }
+
+    internal bool IsChecked => ParentGroup != null && EqualityComparer<TValue>.Default.Equals(ParentGroup.Value, Value);
 
     private async Task HandleSelect()
     {

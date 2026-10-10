@@ -1,0 +1,27 @@
+<div class="ui-flex-col" style="gap: 1rem; width: 100%; max-width: 32rem;">
+    <UiList TItem="Contact" Items="_contacts">
+        <ItemTemplate Context="contact">
+            <UiListItem>
+                <Leading><UiAvatar Initials="@contact.Initials" BackgroundColor="@contact.Color" Alt="@contact.Name" /></Leading>
+                <ChildContent><strong>@contact.Name</strong></ChildContent>
+                <Trailing><UiBadge Text="@contact.Role" Color="UiColor.Secondary" /></Trailing>
+            </UiListItem>
+        </ItemTemplate>
+        <EmptyContent><span class="text-secondary">Aucun contact.</span></EmptyContent>
+    </UiList>
+
+    <UiDivider Label="ou" />
+
+    <UiList TItem="string" Items="Array.Empty<string>()">
+        <EmptyContent><span class="text-secondary">Liste vide : le contenu <code>EmptyContent</code> s'affiche.</span></EmptyContent>
+    </UiList>
+</div>
+
+@code {
+    private sealed record Contact(string Name, string Initials, string Role, string Color);
+
+    private readonly Contact[] _contacts =
+    {
+        new("Alice Martin", "AM", "Produit", "#173f5f"), new("Benoît Roy", "BR", "Design", "#a33b1f"), new("Chloé Petit", "CP", "Ingénierie", "#20639b")
+    };
+}

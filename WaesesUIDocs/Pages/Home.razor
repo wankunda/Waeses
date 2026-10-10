@@ -1,0 +1,35 @@
+@page "/"
+
+<PageTitle>WaesesUI · Documentation</PageTitle>
+
+<article class="docs-content">
+    <header class="docs-header">
+        <span class="docs-eyebrow">Bibliothèque de composants Blazor</span>
+        <h1>WaesesUI</h1>
+        <p class="docs-lead">
+            Des composants Razor pensés pour le clavier et les lecteurs d'écran, un thème clair et sombre pilotable en C#,
+            et une validation de formulaire de bout en bout. Compatible Blazor Server, WebAssembly et Web App (.NET 9 et 10).
+        </p>
+        <div class="ui-flex-row" style="flex-wrap: wrap; gap: .5rem; margin-top: 1.25rem;">
+            <UiButton Text="Installer WaesesUI" Href="demarrer" EndIcon="@Icons.Material.Filled.ArrowForward" />
+            <UiButton Text="Grille de données" Href="composants/grille-de-donnees" Appearance="UiVariant.Outlined" />
+        </div>
+    </header>
+
+    @foreach (var group in DocsCatalog.Entries.Where(e => e.Href.Length > 0).GroupBy(e => e.Group))
+    {
+        <DocSection Title="@group.Key">
+            <div class="docs-cards">
+                @foreach (var entry in group)
+                {
+                    <a class="docs-card" href="@entry.Href">
+                        <strong>@entry.Title</strong>
+                        <span>@entry.Description</span>
+                    </a>
+                }
+            </div>
+        </DocSection>
+    }
+
+    <DocSection Title="Cette documentation" Description="Chaque exemple est un vrai composant qui s'exécute ici, et le code affiché dessous est le fichier source lui-même. Les tableaux d'API sont générés à partir du code de la bibliothèque : ils ne peuvent pas être périmés. Chaque composant public est documenté, ou explicitement exclu avec sa raison : un test échoue sinon." />
+</article>

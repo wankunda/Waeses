@@ -1,0 +1,20 @@
+<div class="ui-flex-col" style="gap: 1rem; width: 100%; max-width: 28rem;">
+    <UiSelect @bind-Value="_team" Label="Équipe" Placeholder="Choisir une équipe">
+        <UiSelectOption Value="@("produit")" Text="Produit" />
+        <UiSelectOption Value="@("design")" Text="Design" />
+        <UiSelectOption Value="@("ingenierie")" Text="Ingénierie" />
+        <UiSelectOption Value="@("support")" Text="Support (complet)" Disabled="true" />
+    </UiSelect>
+
+    <UiSelect @bind-Value="_rate" Label="Taux (decimal)">
+        <UiSelectOption Value="1.5m" Text="Un et demi" />
+        <UiSelectOption Value="2.25m" Text="Deux et quart" />
+    </UiSelect>
+
+    <p class="text-secondary">Équipe : <strong>@(_team ?? "—")</strong> — taux : <strong>@_rate</strong></p>
+</div>
+
+@code {
+    private string? _team;
+    private decimal _rate = 1.5m;
+}

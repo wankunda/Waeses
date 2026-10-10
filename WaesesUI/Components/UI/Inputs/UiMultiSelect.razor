@@ -1,8 +1,31 @@
 @typeparam TItem
 @typeparam TValue
 @namespace WaesesUI
+@inherits UiComponentBase
+@inject IUiPopoverService PopoverService
 
-<div class="ui-form-group ui-multiselect @Class">
+@{
+    RenderFragment Menu = @<div id="@MenuId" class="ui-multiselect-menu" role="listbox" aria-multiselectable="true" aria-labelledby="@LabelId">
+        @foreach (var item in Items)
+        {
+            var value = ValueSelector(item);
+            var selected = Contains(value);
+            <button type="button" class="ui-multiselect-option @(selected ? "selected" : "")" role="option" aria-selected="@(selected ? "true" : "false")" @onclick="() => ToggleItem(value)">
+                <span class="ui-multiselect-check" aria-hidden="true">@(selected ? "✓" : "")</span>
+                @if (ItemTemplate != null)
+                {
+                    @ItemTemplate(item)
+                }
+                else
+                {
+                    @DisplaySelector(item)
+                }
+            </button>
+        }
+    </div>;
+}
+
+<div class="ui-form-group ui-multiselect @FieldClass @Class">
     @if (!string.IsNullOrEmpty(Label))
     {
         <label class="ui-label" id="@LabelId">
@@ -13,49 +36,46 @@
             }
         </label>
     }
-    <button type="button"
-            id="@Id"
-            class="ui-multiselect-trigger @(HasError ? "ui-input-error" : "")"
-            disabled="@Disabled"
-            aria-haspopup="listbox"
-            aria-expanded="@_isOpen"
-            aria-labelledby="@LabelId"
-            @onclick="Toggle">
-        @if (SelectedItems.Count == 0)
-        {
-            <span class="ui-multiselect-placeholder">@Placeholder</span>
-        }
-        else
+    @* La zone est un conteneur (et non un bouton) : les boutons « retirer » des puces ne peuvent pas être imbriqués dans un bouton. *@
+    <div id="@Id"
+         class="ui-multiselect-trigger @(HasError ? "ui-input-error" : "") @(Disabled ? "ui-multiselect-disabled" : "")"
+         @onclick="Toggle">
+        @if (SelectedItems.Count > 0)
         {
             <span class="ui-multiselect-values">
                 @foreach (var item in SelectedItems)
                 {
-                    <span class="ui-multiselect-chip">@DisplaySelector(item)<button type="button" aria-label="Retirer @DisplaySelector(item)" @onclick="() => Remove(item)" @onclick:stopPropagation="true">×</button></span>
+                    <span class="ui-multiselect-chip">@DisplaySelector(item)<button type="button" aria-label="Retirer @DisplaySelector(item)" disabled="@Disabled" @onclick="() => Remove(item)" @onclick:stopPropagation="true">×</button></span>
                 }
             </span>
         }
-        <span class="ui-multiselect-chevron" aria-hidden="true">⌄</span>
-    </button>
-    @if (_isOpen && !Disabled)
-    {
-        <div class="ui-multiselect-menu" role="listbox" aria-multiselectable="true" aria-labelledby="@LabelId">
-            @foreach (var item in Items)
+        <button type="button"
+                id="@ToggleId"
+                class="ui-multiselect-toggle"
+                disabled="@Disabled"
+                aria-haspopup="listbox"
+                aria-expanded="@(_isOpen ? "true" : "false")"
+                aria-controls="@MenuId"
+                aria-labelledby="@LabelId"
+                aria-describedby="@SummaryId">
+            @if (SelectedItems.Count == 0)
             {
-                var value = ValueSelector(item);
-                var selected = Contains(value);
-                <button type="button" class="ui-multiselect-option @(selected ? "selected" : "")" role="option" aria-selected="@selected" @onclick="() => ToggleItem(value)">
-                    <span class="ui-multiselect-check" aria-hidden="true">@(selected ? "✓" : "")</span>
-                    @if (ItemTemplate != null)
-                    {
-                        @ItemTemplate(item)
-                    }
-                    else
-                    {
-                        @DisplaySelector(item)
-                    }
-                </button>
+                <span class="ui-multiselect-placeholder">@Placeholder</span>
             }
-        </div>
+            <span class="ui-multiselect-chevron" aria-hidden="true">⌄</span>
+        </button>
+        <span id="@SummaryId" class="ui-sr-only">@(SelectedItems.Count == 0 ? Placeholder : string.Join(", ", SelectedItems.Select(DisplaySelector)))</span>
+    </div>
+    @if (PopoverService.HasProvider)
+    {
+        @* Menu rendu à la racine de la page : jamais rognée, ferme au clic extérieur et sur Échap. *@
+        <UiPopoverPanel Open="_isOpen && !Disabled" OpenChanged="HandlePanelOpenChanged" AnchorSelector="@TriggerSelector" MatchAnchorWidth="true" Offset="4" Class="ui-listbox-surface">
+            @Menu
+        </UiPopoverPanel>
+    }
+    else if (_isOpen && !Disabled)
+    {
+        @Menu
     }
     @if (HasError)
     {
@@ -68,24 +88,47 @@
 </div>
 
 @code {
+    /// <summary>Apparence du champ : contour (défaut), fond teinté ou soulignement seul.</summary>
+    [Parameter] public UiVariant? Variant { get; set; }
+
+    /// <summary>Couleur de mise en avant (focus).</summary>
+    [Parameter] public UiColor? Color { get; set; }
+
+    private string FieldClass => UiStyle.FieldClasses(Variant, Color);
+
+    /// <summary>Identifiant de l'élément ; généré automatiquement si absent.</summary>
     [Parameter] public string? Id { get; set; } = $"multiselect-{Guid.NewGuid():N}";
+    /// <summary>Libellé affiché au-dessus du champ.</summary>
     [Parameter] public string? Label { get; set; }
+    /// <summary>Texte affiché tant qu'aucune valeur n'est choisie.</summary>
     [Parameter] public string Placeholder { get; set; } = "Sélectionner...";
+    /// <summary>Texte d'aide sous le champ, remplacé par l'erreur quand il y en a une.</summary>
     [Parameter] public string? HelperText { get; set; }
+    /// <summary>Message d'erreur imposé par l'appelant.</summary>
     [Parameter] public string? ErrorMessage { get; set; }
+    /// <summary>Marque le champ comme obligatoire ; sans sélection, il est en erreur.</summary>
     [Parameter] public bool Required { get; set; }
+    /// <summary>Désactive le champ.</summary>
     [Parameter] public bool Disabled { get; set; }
+    /// <summary>Éléments proposés dans la liste.</summary>
     [Parameter] public IEnumerable<TItem> Items { get; set; } = Array.Empty<TItem>();
+    /// <summary>Texte affiché pour un élément (obligatoire).</summary>
     [Parameter, EditorRequired] public Func<TItem, string> DisplaySelector { get; set; } = default!;
+    /// <summary>Valeur correspondant à un élément (obligatoire).</summary>
     [Parameter, EditorRequired] public Func<TItem, TValue> ValueSelector { get; set; } = default!;
+    /// <summary>Valeurs sélectionnées (lié avec <c>bind-SelectedValues</c>).</summary>
     [Parameter] public IReadOnlyList<TValue> SelectedValues { get; set; } = Array.Empty<TValue>();
+    /// <summary>Appelé quand la sélection change ; reçoit la nouvelle liste.</summary>
     [Parameter] public EventCallback<IReadOnlyList<TValue>> SelectedValuesChanged { get; set; }
+    /// <summary>Gabarit d'une option de la liste.</summary>
     [Parameter] public RenderFragment<TItem>? ItemTemplate { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private bool _isOpen;
     private string LabelId => $"{Id}-label";
+    private string MenuId => $"{Id}-menu";
+    private string ToggleId => $"{Id}-toggle";
+    private string SummaryId => $"{Id}-summary";
+    private string TriggerSelector => $"[id='{Id}']";
     private IReadOnlyList<TItem> SelectedItems => Items.Where(item => Contains(ValueSelector(item))).ToList();
     private bool HasError => Required && SelectedValues.Count == 0 || !string.IsNullOrWhiteSpace(ErrorMessage);
 
@@ -101,5 +144,9 @@
     }
 
     private Task Remove(TItem item) => ToggleItem(ValueSelector(item));
-    private void Toggle() => _isOpen = !_isOpen;
+    private void Toggle()
+    {
+        if (!Disabled) _isOpen = !_isOpen;
+    }
+    private void HandlePanelOpenChanged(bool open) => _isOpen = open;
 }

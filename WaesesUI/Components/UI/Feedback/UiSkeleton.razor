@@ -1,18 +1,21 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
 <div class="ui-skeleton ui-skeleton-@Variant.ToString().ToLower() @Class"
-     style="@GetStyle()"
+     style="@StyleBuilder.Default(GetStyle()).Add(Style).Build()"
      role="status"
      aria-label="@AriaLabel"
      @attributes="AdditionalAttributes"></div>
 
 @code {
+    /// <summary>Forme du squelette : <c>Text</c> (ligne), <c>Rect</c> (rectangle) ou <c>Circle</c>.</summary>
     [Parameter] public UiSkeletonVariant Variant { get; set; } = UiSkeletonVariant.Text;
+    /// <summary>Largeur CSS (par exemple <c>12rem</c> ou <c>60%</c>).</summary>
     [Parameter] public string? Width { get; set; }
+    /// <summary>Hauteur CSS.</summary>
     [Parameter] public string? Height { get; set; }
+    /// <summary>Nom accessible annoncé aux lecteurs d'écran.</summary>
     [Parameter] public string AriaLabel { get; set; } = "Chargement";
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private string GetStyle()
     {

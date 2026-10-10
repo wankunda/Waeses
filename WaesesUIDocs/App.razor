@@ -1,0 +1,14 @@
+<Router AppAssembly="typeof(App).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="routeData" DefaultLayout="typeof(DocsLayout)" />
+        <FocusOnNavigate RouteData="routeData" Selector="input" />
+    </Found>
+    <NotFound>
+        <LayoutView Layout="typeof(DocsLayout)">
+            <div class="ui-container docs-content">
+                <h1>Page introuvable</h1>
+                <p class="text-secondary">Cette page n'existe pas (ou plus). <a href="">Retour à l'accueil</a>.</p>
+            </div>
+        </LayoutView>
+    </NotFound>
+</Router>

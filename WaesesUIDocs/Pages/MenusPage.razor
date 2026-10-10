@@ -1,0 +1,26 @@
+@page "/composants/menus"
+
+<DocPage Href="composants/menus">
+    <DocSection Title="Menu d'actions" Description="`UiMenu` ouvre une liste d'actions sous son bouton. Le contenu est affiché par le navigateur dans la couche supérieure de la page (API Popover) : aucun conteneur ne le rogne. Les éléments sont des boutons, des liens ou des éléments `role=&quot;menuitem&quot;`. Au clavier, la flèche bas ou haut sur le bouton ouvre le menu, les flèches parcourent les éléments et Échap ferme le menu en rendant le focus au bouton.">
+        <DocExample Example="typeof(MenuExample)" />
+    </DocSection>
+
+    <DocSection Title="Menu déroulant" Description="`UiDropdownMenu` est un `UiMenu` à l'apparence de menu déroulant : mêmes paramètres, sans les options d'alignement.">
+        <DocExample Example="typeof(DropdownMenuExample)" />
+    </DocSection>
+
+    <DocSection Title="Menu d'avatar" Description="`UiAvatarMenu` combine un avatar et un `UiMenu` : l'avatar est le bouton qui ouvre le menu. Il reprend les paramètres de `UiAvatar` et ceux du menu.">
+        <DocExample Example="typeof(AvatarMenuExample)" />
+    </DocSection>
+
+    <DocSection Title="Copier dans le presse-papiers" Description="`UiCopyButton` copie `Text` avec l'API du presse-papiers du navigateur, qui exige un contexte sécurisé (HTTPS ou localhost). Sans libellé visible, l'icône est nommée par `Label`.">
+        <DocExample Example="typeof(CopyButtonExample)" />
+    </DocSection>
+
+    <DocSection Title="API">
+        <ApiTable Component="typeof(UiMenu)" />
+        <ApiTable Component="typeof(UiDropdownMenu)" />
+        <ApiTable Component="typeof(UiAvatarMenu)" />
+        <ApiTable Component="typeof(UiCopyButton)" />
+    </DocSection>
+</DocPage>

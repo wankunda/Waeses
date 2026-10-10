@@ -1,0 +1,14 @@
+<UiPopover AriaLabel="Détails du compte" @bind-IsOpen="_open">
+    <Trigger><span>Mon compte ▾</span></Trigger>
+    <ChildContent>
+        <div class="ui-flex-col" style="gap: .5rem; min-width: 12rem;">
+            <strong>Alice Martin</strong>
+            <span class="text-secondary">alice@exemple.fr</span>
+            <UiButton Text="Se déconnecter" Size="UiSize.Sm" Appearance="UiVariant.Outlined" OnClick="() => _open = false" />
+        </div>
+    </ChildContent>
+</UiPopover>
+
+@code {
+    private bool _open;
+}
