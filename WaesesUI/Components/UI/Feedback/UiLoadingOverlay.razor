@@ -1,6 +1,7 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
-<div class="ui-loading-overlay-host @Class" @attributes="AdditionalAttributes">
+<div class="ui-loading-overlay-host @Class" style="@Style" @attributes="AdditionalAttributes">
     @ChildContent
     @if (IsLoading)
     {
@@ -19,6 +20,4 @@
     [Parameter] public string? Text { get; set; } = "Chargement...";
     [Parameter] public UiSize Size { get; set; } = UiSize.Md;
     [Parameter] public RenderFragment? ChildContent { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

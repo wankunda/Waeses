@@ -48,6 +48,20 @@
 </EditForm>
 
 <section class="ui-grid ui-grid-cols-2 mt-sm">
+    <UiCard Title="Calendrier" Subtitle="UiCalendar : le mois sous forme de grille, avec navigation au clavier">
+        <UiCalendar @bind-Value="_calendarDate" Min="DateTime.Today.AddMonths(-6)" Max="DateTime.Today.AddYears(1)" />
+        <p class="mt-sm">Date choisie : <strong>@(_calendarDate?.ToString("D") ?? "aucune")</strong></p>
+    </UiCard>
+    <UiCard Title="Sélecteur de date" Subtitle="UiDatePicker : un champ qui ouvre le calendrier">
+        <div class="ui-grid ui-grid-cols-1">
+            <UiDatePicker Label="Date de paiement" @bind-Value="_paymentDate" Format="dd MMMM yyyy" HelperText="Cliquez pour ouvrir le calendrier." />
+            <UiDatePicker Label="Échéance (lundi à vendredi)" @bind-Value="_dueDate" IsDateDisabled="d => d.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday" Min="DateTime.Today" />
+        </div>
+        <p class="mt-sm">Paiement : <strong>@(_paymentDate?.ToString("d") ?? "aucune")</strong> · Échéance : <strong>@(_dueDate?.ToString("d") ?? "aucune")</strong></p>
+    </UiCard>
+</section>
+
+<section class="ui-grid ui-grid-cols-2 mt-sm">
     <UiCard Title="Recherche assistée" Subtitle="Autocomplete typé">
         <UiAutocomplete TItem="DemoCity" TValue="string" Label="Ville" Items="_cities" @bind-Value="_model.City" DisplaySelector="city => city.Name" ValueSelector="city => city.Code" Placeholder="Rechercher une ville" />
         <UiCombobox TItem="DemoCity" TValue="string" Label="Ville (combobox)" Items="_cities" @bind-Value="_model.City" DisplaySelector="city => city.Name" ValueSelector="city => city.Code" Placeholder="Filtrer et sélectionner" />
@@ -63,6 +77,9 @@
 </section>
 
 @code {
+    private DateTime? _calendarDate = DateTime.Today;
+    private DateTime? _paymentDate = DateTime.Today.AddDays(3);
+    private DateTime? _dueDate;
     private readonly DemoFormModel _model = new() { AvailableOn = DateTime.Today.AddDays(7), AvailableAt = TimeSpan.FromHours(9), PeriodStart = DateTime.Today, PeriodEnd = DateTime.Today.AddDays(7), ProjectColor = "#4f46e5", Team = "Produit", Channel = "Email", City = "PAR", Tags = new[] { "Blazor" } };
     private readonly IReadOnlyList<DemoCity> _cities = new[]
     {

@@ -1,6 +1,7 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
-<section class="ui-empty-state @Class" role="status" @attributes="AdditionalAttributes">
+<section class="ui-empty-state @Class" role="status" style="@Style" @attributes="AdditionalAttributes">
     @if (!string.IsNullOrWhiteSpace(Icon))
     {
         <UiIcon Icon="@Icon" Size="UiSize.Xl" Color="@IconColor" aria-hidden="true" />
@@ -28,8 +29,6 @@
     [Parameter] public string? ActionText { get; set; }
     [Parameter] public EventCallback OnAction { get; set; }
     [Parameter] public RenderFragment? ChildContent { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private Task OnActionClick() => OnAction.InvokeAsync();
 }

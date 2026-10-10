@@ -1,4 +1,5 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
 <div class="ui-form-group @Class">
     @if (!string.IsNullOrWhiteSpace(Label))
@@ -23,8 +24,6 @@
     [Parameter] public string? Error { get; set; }
     [Parameter] public bool Required { get; set; }
     [Parameter] public RenderFragment? ChildContent { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private string HelperId => $"{For ?? "field"}-help";
 }

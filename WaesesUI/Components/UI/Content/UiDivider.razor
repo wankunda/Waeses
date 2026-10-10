@@ -1,12 +1,11 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
-<div class="ui-divider @(Vertical ? "ui-divider-vertical" : "") @Class" role="separator" aria-orientation="@(Vertical ? "vertical" : "horizontal")" @attributes="AdditionalAttributes">
+<div class="ui-divider @(Vertical ? "ui-divider-vertical" : "") @Class" role="separator" aria-orientation="@(Vertical ? "vertical" : "horizontal")" style="@Style" @attributes="AdditionalAttributes">
     @if (!string.IsNullOrWhiteSpace(Label)) { <span>@Label</span> }
 </div>
 
 @code {
     [Parameter] public string? Label { get; set; }
     [Parameter] public bool Vertical { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

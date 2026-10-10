@@ -1,7 +1,8 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
 <div class="ui-avatar ui-avatar-@Size.ToString().ToLower() ui-avatar-@Shape.ToString().ToLower() @Class"
-     style="@GetCustomStyle()"
+     style="@StyleBuilder.Default(GetCustomStyle()).Add(Style).Build()"
      @attributes="AdditionalAttributes">
     @if (!string.IsNullOrEmpty(Src) && !_imageFailed)
     {
@@ -35,8 +36,6 @@
     [Parameter] public AvatarStatus Status { get; set; } = AvatarStatus.None;
     [Parameter] public string? BackgroundColor { get; set; }
     [Parameter] public RenderFragment? ChildContent { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private string? _lastSrc;
     private bool _imageFailed;

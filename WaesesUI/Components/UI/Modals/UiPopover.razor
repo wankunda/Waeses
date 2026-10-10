@@ -1,8 +1,10 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 @implements IAsyncDisposable
 @inject IJSRuntime JS
+@inject IUiPopoverService PopoverService
 
-<div class="ui-popover @Class" @ref="_rootRef" @attributes="AdditionalAttributes">
+<div class="ui-popover @Class" @ref="_rootRef" style="@Style" @attributes="AdditionalAttributes">
     <button type="button"
             class="ui-popover-trigger"
             aria-expanded="@_isOpen"
@@ -10,9 +12,15 @@
             @onclick="Toggle">
         @Trigger
     </button>
-    @if (_isOpen)
+    @if (PopoverService.HasProvider)
     {
-        <div class="ui-popover-content" role="dialog" @onclick:stopPropagation="true">
+        <UiPopoverPanel Open="_isOpen" OpenChanged="HandlePanelOpenChanged" Placement="Placement" Offset="Offset" MatchAnchorWidth="MatchAnchorWidth">
+            <div role="dialog" aria-label="@AriaLabel">@ChildContent</div>
+        </UiPopoverPanel>
+    }
+    else if (_isOpen)
+    {
+        <div class="ui-popover-content" role="dialog" aria-label="@AriaLabel" @onclick:stopPropagation="true">
             @ChildContent
         </div>
     }
@@ -23,8 +31,12 @@
     [Parameter] public RenderFragment? ChildContent { get; set; }
     [Parameter] public bool IsOpen { get; set; }
     [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>Position du contenu quand un <see cref="UiPopoverProvider"/> est présent.</summary>
+    [Parameter] public UiPopoverPlacement Placement { get; set; } = UiPopoverPlacement.BottomEnd;
+    [Parameter] public int Offset { get; set; } = 8;
+    [Parameter] public bool MatchAnchorWidth { get; set; }
+    [Parameter] public string? AriaLabel { get; set; }
 
     private bool _isOpen;
     private bool _initialized;
@@ -42,7 +54,7 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (firstRender && !PopoverService.HasProvider)
         {
             _dotNetRef = DotNetObjectReference.Create(this);
             await JS.InvokeVoidAsync("UiInterop.setupOverlay", _rootRef, _dotNetRef);
@@ -56,6 +68,12 @@
     {
         _isOpen = false;
         await IsOpenChanged.InvokeAsync(false);
+    }
+
+    private async Task HandlePanelOpenChanged(bool open)
+    {
+        _isOpen = open;
+        await IsOpenChanged.InvokeAsync(open);
     }
 
     private async Task Toggle()

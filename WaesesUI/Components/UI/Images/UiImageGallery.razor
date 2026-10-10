@@ -1,6 +1,7 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
-<div class="ui-gallery @Class" @attributes="AdditionalAttributes">
+<div class="ui-gallery @Class" style="@Style" @attributes="AdditionalAttributes">
     @foreach (var item in Items)
     {
         <button type="button" class="ui-gallery-item" aria-label="Afficher @item.Alt" @onclick="() => Open(item)">
@@ -14,8 +15,6 @@
 @code {
     [Parameter] public IReadOnlyList<UiGalleryItem> Items { get; set; } = Array.Empty<UiGalleryItem>();
     [Parameter] public ImageRatio Ratio { get; set; } = ImageRatio.Widescreen;
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private UiGalleryItem? _selected;
     private bool _isOpen;

@@ -3,7 +3,7 @@
 
 <main class="auth-layout">
     <header class="d-flex justify-space-between align-center position-sticky"
-            style="background: var(--bg-surface); border-bottom: 1px solid var(--border-default); padding: 0.85rem 1.5rem; top: 0; z-index: 100; backdrop-filter: blur(10px);">
+            style="background: var(--bg-surface); border-bottom: 1px solid var(--border-default); padding: calc(0.85rem + env(safe-area-inset-top, 0px)) calc(1.5rem + env(safe-area-inset-right, 0px)) 0.85rem calc(1.5rem + env(safe-area-inset-left, 0px)); top: 0; z-index: 100; backdrop-filter: blur(10px);">
         <div class="d-flex align-center justify-center gap-sm">
             @if (!string.IsNullOrWhiteSpace(BrandIcon))
             {
@@ -31,13 +31,19 @@
     @MainBody
 </main>
 
-<footer class="d-flex justify-center align-center p-md"
-        style="background: var(--bg-surface); border-top: 1px solid var(--border-default);">
-    <span style="font-size: 0.85rem; color: var(--text-secondary);">
-        &copy; @DateTime.Now.Year Waeses. All rights reserved.
-    </span>
-    @Footer
-</footer>
+@if (ShowFooter)
+{
+    <footer class="d-flex justify-center align-center p-md"
+            style="background: var(--bg-surface); border-top: 1px solid var(--border-default);">
+        @if (FooterText != string.Empty)
+        {
+            <span style="font-size: 0.85rem; color: var(--text-secondary);">
+                @(FooterText ?? $"© {DateTime.Now.Year} Waeses. All rights reserved.")
+            </span>
+        }
+        @Footer
+    </footer>
+}
 
 
 @code {
@@ -45,6 +51,12 @@
     [Parameter] public EventCallback<bool> IsDarkModeChanged { get; set; }
     [Parameter] public RenderFragment? MainBody { get; set; }
     [Parameter] public RenderFragment? Footer { get; set; }
+
+    /// <summary>Affiche le pied de page (texte et fragment <see cref="Footer"/>). Vrai par défaut.</summary>
+    [Parameter] public bool ShowFooter { get; set; } = true;
+
+    /// <summary>Texte du pied de page. Null : « © année Waeses. All rights reserved. » ; chaîne vide : aucun texte.</summary>
+    [Parameter] public string? FooterText { get; set; }
     [Parameter] public bool ShowThemeToggle { get; set; } = true;
     [Parameter] public string BrandText { get; set; } = "Waeses UI";
     [Parameter] public string? BrandIcon { get; set; } = "⚡";

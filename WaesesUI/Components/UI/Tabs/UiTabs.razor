@@ -1,7 +1,8 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
 <CascadingValue Value="this" IsFixed="true">
-    <div class="ui-tabs @Class" @attributes="AdditionalAttributes">
+    <div class="ui-tabs @Class" style="@Style" @attributes="AdditionalAttributes">
         <div class="ui-tab-nav">
             @foreach (var panel in _panels)
             {
@@ -32,9 +33,7 @@
     private UiTabPanel? _activePanel;
 
     [Parameter] public RenderFragment? ChildContent { get; set; }
-    [Parameter] public string? Class { get; set; }
     [Parameter] public EventCallback<int> OnTabChanged { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     public void AddPanel(UiTabPanel panel)
     {

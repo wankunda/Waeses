@@ -129,7 +129,22 @@
 .ui-combobox-option { padding: .55rem .7rem; border-radius: var(--radius-sm); cursor: pointer; }
 .ui-combobox-option:hover, .ui-combobox-option.active { background: var(--primary-light); }
 .ui-combobox-empty { padding: .7rem; color: var(--text-muted); text-align: center; }
-.ui-carousel { width: 100%; }
+/* Carrousel : piste flex déplacée par translateX (slide) ou diapositives superposées (fade). */
+.ui-carousel { width: 100%; border-radius: var(--radius-md); }
+.ui-carousel:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
+.ui-carousel-track { display: flex; width: 100%; transition: transform .45s var(--trans-smooth, ease); }
+.ui-carousel-slide { position: relative; flex: 0 0 100%; min-width: 0; touch-action: pan-y; user-select: none; }
+.ui-carousel-slide:not(.active) { visibility: hidden; pointer-events: none; transition: visibility 0s linear .45s; }
+.ui-carousel-caption { pointer-events: none; }
+.ui-carousel-transition-fade .ui-carousel-track { display: grid; transition: none; }
+.ui-carousel-transition-fade .ui-carousel-slide { grid-area: 1 / 1; opacity: 0; transition: opacity .45s ease, visibility 0s linear .45s; }
+.ui-carousel-transition-fade .ui-carousel-slide.active { opacity: 1; transition-delay: 0s; }
+.ui-carousel-transition-none .ui-carousel-track, .ui-carousel-transition-none .ui-carousel-slide { transition: none; }
+.ui-carousel-control:disabled { opacity: .45; cursor: not-allowed; }
+.ui-carousel-control:focus-visible, .ui-carousel-dots button:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+    .ui-carousel-track, .ui-carousel-slide { transition: none !important; }
+}
 .ui-carousel-stage { position: relative; overflow: hidden; border-radius: var(--radius-md); background: var(--bg-surface-secondary); }
 .ui-carousel-stage .ui-image-wrapper { display: block; width: 100%; }
 .ui-carousel-caption { position: absolute; right: 0; bottom: 0; left: 0; padding: .8rem 1rem; color: #fff; background: linear-gradient(transparent, rgba(0,0,0,.72)); }
@@ -197,3 +212,56 @@
 .ui-btn-fab-max {
     padding: 2.5rem;
 }
+
+/* ==========================================================================
+   Calendrier (UiCalendar) et sélecteur de date (UiDatePicker)
+   ========================================================================== */
+.ui-cal { width: 18.5rem; max-width: 100%; padding: .6rem; box-sizing: border-box; color: var(--text-main); background: var(--bg-surface-elevated, var(--bg-surface)); border: 1px solid var(--border-default); border-radius: var(--radius-md); user-select: none; }
+.ui-cal-header { display: flex; align-items: center; justify-content: space-between; gap: .25rem; margin-bottom: .4rem; }
+.ui-cal-nav { display: inline-flex; align-items: center; justify-content: center; width: 2.25rem; height: 2.25rem; padding: 0; color: var(--text-secondary); background: transparent; border: 0; border-radius: var(--radius-full); cursor: pointer; }
+.ui-cal-nav:hover:not(:disabled) { color: var(--text-main); background: var(--bg-surface-secondary); }
+.ui-cal-nav:disabled { opacity: .35; cursor: not-allowed; }
+.ui-cal-title { flex: 1; padding: .4rem .5rem; color: var(--text-main); background: transparent; border: 0; border-radius: var(--radius-sm); font: inherit; font-weight: 600; cursor: pointer; }
+.ui-cal-title:hover { background: var(--bg-surface-secondary); }
+.ui-cal :is(button):focus-visible { outline: 2px solid var(--border-focus); outline-offset: 1px; }
+
+.ui-cal-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.ui-cal-weekdays { margin-bottom: 2px; }
+.ui-cal-weekday { padding: .3rem 0; color: var(--text-muted); font-size: .72rem; font-weight: 600; text-align: center; text-transform: uppercase; letter-spacing: .03em; }
+.ui-cal-day { aspect-ratio: 1; min-height: 2.1rem; padding: 0; color: var(--text-main); background: transparent; border: 1px solid transparent; border-radius: var(--radius-full); font: inherit; font-size: .875rem; cursor: pointer; transition: background-color var(--trans-fast), color var(--trans-fast); }
+.ui-cal-day:hover:not(.ui-cal-day-disabled):not(.ui-cal-day-selected) { background: var(--bg-surface-secondary); }
+.ui-cal-day-outside { color: var(--text-muted); }
+.ui-cal-day-today { border-color: var(--primary); font-weight: 700; }
+.ui-cal-day-selected { color: var(--primary-contrast); background: var(--primary); border-color: var(--primary); font-weight: 700; }
+.ui-cal-day-disabled { opacity: .35; text-decoration: line-through; cursor: not-allowed; }
+
+.ui-cal-pick { display: grid; grid-template-columns: repeat(3, 1fr); gap: .35rem; padding: .25rem 0; }
+.ui-cal-pick-item { padding: .7rem .25rem; color: var(--text-main); background: transparent; border: 1px solid transparent; border-radius: var(--radius-md); font: inherit; font-size: .9rem; cursor: pointer; }
+.ui-cal-pick-item:hover:not(:disabled) { background: var(--bg-surface-secondary); }
+.ui-cal-pick-item:disabled { opacity: .35; cursor: not-allowed; }
+.ui-cal-pick-current { border-color: var(--primary); }
+.ui-cal-pick-selected { color: var(--primary-contrast); background: var(--primary); border-color: var(--primary); }
+.ui-cal-pick-selected:hover:not(:disabled) { background: var(--primary-hover); }
+
+.ui-cal-footer { display: flex; justify-content: center; margin-top: .4rem; padding-top: .4rem; border-top: 1px solid var(--border-subtle); }
+.ui-cal-today { padding: .35rem .9rem; color: var(--primary); background: transparent; border: 0; border-radius: var(--radius-full); font: inherit; font-size: .85rem; font-weight: 600; cursor: pointer; }
+.ui-cal-today:hover:not(:disabled) { background: var(--primary-light); }
+.ui-cal-today:disabled { opacity: .35; cursor: not-allowed; }
+
+.ui-datepicker { position: relative; width: 100%; }
+.ui-datepicker .ui-input-wrapper { position: relative; }
+.ui-datepicker-trigger { display: flex; align-items: center; justify-content: space-between; gap: .5rem; text-align: left; cursor: pointer; }
+.ui-datepicker-trigger:disabled { cursor: not-allowed; }
+.ui-datepicker-empty .ui-datepicker-text { color: var(--text-muted); }
+.ui-datepicker-clear { position: absolute; top: 50%; right: 2.6rem; display: inline-flex; align-items: center; justify-content: center; width: 1.6rem; height: 1.6rem; padding: 0; color: var(--text-muted); background: transparent; border: 0; border-radius: var(--radius-full); transform: translateY(-50%); cursor: pointer; }
+.ui-datepicker-clear:hover { color: var(--text-main); background: var(--bg-surface-secondary); }
+.ui-datepicker-clear:focus-visible { outline: 2px solid var(--border-focus); }
+.ui-datepicker-popup { position: fixed; inset: auto; top: 0; left: 0; z-index: 1100; margin: 0; padding: 0; background: transparent; border: 0; box-shadow: var(--shadow-lg); border-radius: var(--radius-md); overflow: visible; max-width: calc(100vw - 1rem); }
+.ui-datepicker-popup:popover-open { display: block; }
+
+/* Popover rendu par UiPopoverProvider : position fixe, placée par JS (transform), jamais rognée. */
+.ui-popover-provider { display: contents; }
+.ui-popover-layer { position: fixed; top: 0; left: 0; z-index: 10000; max-width: calc(100vw - 1rem); visibility: hidden; }
+.ui-popover-layer[data-positioned] { visibility: visible; }
+.ui-popover-surface { min-width: 10rem; max-height: calc(100vh - 1rem); overflow: auto; padding: .75rem; color: var(--text-main); background: var(--bg-surface-elevated); border: 1px solid var(--border-default); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); }
+.ui-popover-inline { position: absolute; z-index: 1100; top: calc(100% + .5rem); right: 0; min-width: 14rem; padding: .75rem; color: var(--text-main); background: var(--bg-surface-elevated); border: 1px solid var(--border-default); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); }

@@ -1,8 +1,9 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
 @if (TotalPages > 1 || AlwaysShow)
 {
-    <nav class="ui-pagination @Class" aria-label="@AriaLabel" @attributes="AdditionalAttributes">
+    <nav class="ui-pagination @Class" aria-label="@AriaLabel" style="@Style" @attributes="AdditionalAttributes">
         @if (ShowInfo)
         {
             <span class="ui-pagination-info">@FromIndex–@ToIndex sur @TotalItems</span>
@@ -50,8 +51,6 @@
     [Parameter] public bool ShowInfo { get; set; }
     [Parameter] public bool AlwaysShow { get; set; }
     [Parameter] public string AriaLabel { get; set; } = "Pagination";
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private int TotalPages => Math.Max(1, (int)Math.Ceiling(TotalItems / (double)Math.Max(PageSize, 1)));
     private int SafePage => Math.Clamp(CurrentPage, 1, TotalPages);

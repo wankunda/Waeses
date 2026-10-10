@@ -1,0 +1,352 @@
+@namespace WaesesUI
+@inherits UiComponentBase
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+<div class="ui-cal @Class" @ref="_rootRef" role="group" aria-label="@AriaLabel" style="@Style" @attributes="AdditionalAttributes">
+    <div class="ui-cal-header">
+        <button type="button" class="ui-cal-nav" aria-label="@PreviousLabel" disabled="@(!CanGoPrevious)" @onclick="PreviousAsync">
+            <UiIcon Icon="@Icons.Material.Filled.ChevronLeft" Size="UiSize.Sm" />
+        </button>
+        <button type="button" class="ui-cal-title" aria-live="polite" @onclick="ToggleView">@Title</button>
+        <button type="button" class="ui-cal-nav" aria-label="@NextLabel" disabled="@(!CanGoNext)" @onclick="NextAsync">
+            <UiIcon Icon="@Icons.Material.Filled.ChevronRight" Size="UiSize.Sm" />
+        </button>
+    </div>
+
+    @if (_view == CalendarView.Days)
+    {
+        <div class="ui-cal-grid" role="grid" aria-label="@Title" @onkeydown="HandleKeyDownAsync">
+            <div class="ui-cal-row ui-cal-weekdays" role="row">
+                @for (var i = 0; i < 7; i++)
+                {
+                    <span class="ui-cal-weekday" role="columnheader" aria-label="@DayName(i)">@WeekdayLabel(i)</span>
+                }
+            </div>
+            @for (var week = 0; week < 6; week++)
+            {
+                <div class="ui-cal-row" role="row">
+                    @for (var day = 0; day < 7; day++)
+                    {
+                        var date = GridStart.AddDays(week * 7 + day);
+                        var disabled = IsDisabled(date);
+                        var selected = _lastValue == date;
+                        <button type="button"
+                                role="gridcell"
+                                class="@DayClass(date, disabled, selected)"
+                                data-date="@date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)"
+                                tabindex="@(date == _focus ? 0 : -1)"
+                                aria-label="@date.ToString("D", Culture)"
+                                aria-selected="@(selected ? "true" : "false")"
+                                aria-current="@(date == Today ? "date" : null)"
+                                aria-disabled="@(disabled ? "true" : null)"
+                                @onclick="() => SelectAsync(date)">@date.Day</button>
+                    }
+                </div>
+            }
+        </div>
+    }
+    else if (_view == CalendarView.Months)
+    {
+        <div class="ui-cal-pick">
+            @for (var month = 1; month <= 12; month++)
+            {
+                var m = month;
+                var disabled = IsMonthDisabled(_month.Year, m);
+                <button type="button"
+                        class="ui-cal-pick-item @(IsCurrentMonth(m) ? "ui-cal-pick-current" : null) @(_month.Month == m ? "ui-cal-pick-selected" : null)"
+                        disabled="@disabled"
+                        @onclick="() => PickMonth(m)">@MonthLabel(m)</button>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="ui-cal-pick">
+            @for (var i = 0; i < 12; i++)
+            {
+                var year = _yearPageStart + i;
+                var disabled = IsYearDisabled(year);
+                <button type="button"
+                        class="ui-cal-pick-item @(year == Today.Year ? "ui-cal-pick-current" : null) @(year == _month.Year ? "ui-cal-pick-selected" : null)"
+                        disabled="@disabled"
+                        @onclick="() => PickYear(year)">@year</button>
+            }
+        </div>
+    }
+
+    @if (ShowToday)
+    {
+        <div class="ui-cal-footer">
+            <button type="button" class="ui-cal-today" disabled="@IsDisabled(Today)" @onclick="() => SelectAsync(Today)">@TodayText</button>
+        </div>
+    }
+</div>
+
+@code {
+    private enum CalendarView { Days, Months, Years }
+
+    /// <summary>Date choisie (la partie heure est ignorée).</summary>
+    [Parameter] public DateTime? Value { get; set; }
+    [Parameter] public EventCallback<DateTime?> ValueChanged { get; set; }
+
+    /// <summary>Première date sélectionnable.</summary>
+    [Parameter] public DateTime? Min { get; set; }
+
+    /// <summary>Dernière date sélectionnable.</summary>
+    [Parameter] public DateTime? Max { get; set; }
+
+    /// <summary>Rend certaines dates non sélectionnables (jours fériés, dates déjà prises...).</summary>
+    [Parameter] public Func<DateTime, bool>? IsDateDisabled { get; set; }
+
+    /// <summary>Premier jour de la semaine. Null : celui de la culture courante (lundi en français).</summary>
+    [Parameter] public DayOfWeek? FirstDayOfWeek { get; set; }
+
+    /// <summary>Affiche le bouton qui sélectionne la date du jour.</summary>
+    [Parameter] public bool ShowToday { get; set; } = true;
+
+    [Parameter] public string TodayText { get; set; } = "Aujourd'hui";
+    [Parameter] public string PreviousLabel { get; set; } = "Précédent";
+    [Parameter] public string NextLabel { get; set; } = "Suivant";
+    [Parameter] public string AriaLabel { get; set; } = "Calendrier";
+
+    private ElementReference _rootRef;
+    private CalendarView _view = CalendarView.Days;
+    private DateTime _month;          // premier jour du mois affiché
+    private DateTime _focus;          // jour qui porte le focus clavier (toujours dans le mois affiché)
+    private DateTime? _lastValue;
+    private int _yearPageStart;
+    private bool _initialized;
+    private bool _focusPending;
+    private bool _jsReady;
+
+    private static CultureInfo Culture => CultureInfo.CurrentCulture;
+    private static DateTime Today => DateTime.Today;
+    private DayOfWeek Fdw => FirstDayOfWeek ?? Culture.DateTimeFormat.FirstDayOfWeek;
+    private DateTime GridStart => _month.AddDays(-(((int)_month.DayOfWeek - (int)Fdw + 7) % 7));
+
+    // ---------- Cycle de vie ----------
+    protected override void OnParametersSet()
+    {
+        var value = Value?.Date;
+
+        if (!_initialized)
+        {
+            _initialized = true;
+            _lastValue = value;
+            _focus = Clamp(value ?? Today);
+            _month = FirstOfMonth(_focus);
+            return;
+        }
+
+        if (value != _lastValue)
+        {
+            _lastValue = value;
+            if (value is { } v)
+            {
+                _focus = v;
+                _month = FirstOfMonth(v);
+            }
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("UiInterop.setupCalendar", _rootRef);
+            _jsReady = true;
+        }
+
+        if (_focusPending)
+        {
+            _focusPending = false;
+            var selector = $".ui-cal-grid [data-date='{_focus.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}']";
+            await JS.InvokeVoidAsync("UiInterop.focusInside", _rootRef, selector);
+        }
+    }
+
+    // ---------- Affichage ----------
+    private string Title => _view switch
+    {
+        CalendarView.Days => $"{Capitalize(Culture.DateTimeFormat.GetMonthName(_month.Month))} {_month.Year}",
+        CalendarView.Months => _month.Year.ToString(Culture),
+        _ => $"{_yearPageStart} – {_yearPageStart + 11}"
+    };
+
+    // Deux lettres (« Lu », « Ma »...) : les noms les plus courts de .NET n'ont parfois qu'une lettre (« M » pour mardi et mercredi)
+    private string WeekdayLabel(int index)
+    {
+        var name = Culture.DateTimeFormat.AbbreviatedDayNames[((int)Fdw + index) % 7].TrimEnd('.');
+        return Capitalize(name.Length > 2 ? name[..2] : name);
+    }
+    private string DayName(int index) => Culture.DateTimeFormat.DayNames[((int)Fdw + index) % 7];
+    private string MonthLabel(int month) => Capitalize(Culture.DateTimeFormat.GetAbbreviatedMonthName(month).TrimEnd('.'));
+    private bool IsCurrentMonth(int month) => Today.Year == _month.Year && Today.Month == month;
+
+    private string DayClass(DateTime date, bool disabled, bool selected)
+    {
+        var css = "ui-cal-day";
+        if (date.Month != _month.Month) css += " ui-cal-day-outside";
+        if (date == Today) css += " ui-cal-day-today";
+        if (selected) css += " ui-cal-day-selected";
+        if (disabled) css += " ui-cal-day-disabled";
+        return css;
+    }
+
+    private static string Capitalize(string text) =>
+        string.IsNullOrEmpty(text) ? text : char.ToUpper(text[0], Culture) + text[1..];
+
+    // ---------- Bornes ----------
+    private static DateTime FirstOfMonth(DateTime date) => new(date.Year, date.Month, 1);
+
+    private DateTime Clamp(DateTime date)
+    {
+        date = date.Date;
+        if (Min is { } min && date < min.Date) return min.Date;
+        if (Max is { } max && date > max.Date) return max.Date;
+        return date;
+    }
+
+    private bool IsDisabled(DateTime date) =>
+        (Min is { } min && date < min.Date)
+        || (Max is { } max && date > max.Date)
+        || IsDateDisabled?.Invoke(date) == true;
+
+    private bool IsMonthDisabled(int year, int month)
+    {
+        var first = new DateTime(year, month, 1);
+        var last = first.AddMonths(1).AddDays(-1);
+        return (Min is { } min && last < min.Date) || (Max is { } max && first > max.Date);
+    }
+
+    private bool IsYearDisabled(int year) =>
+        year < 1 || year > 9999
+        || (Min is { } min && year < min.Year)
+        || (Max is { } max && year > max.Year);
+
+    private bool CanGoPrevious => _view switch
+    {
+        CalendarView.Days => Min is not { } min || _month > FirstOfMonth(min),
+        CalendarView.Months => Min is not { } min || _month.Year > min.Year,
+        _ => _yearPageStart > 1 && (Min is not { } min || _yearPageStart > min.Year)
+    };
+
+    private bool CanGoNext => _view switch
+    {
+        CalendarView.Days => Max is not { } max ? _month.Year < 9999 || _month.Month < 12 : _month < FirstOfMonth(max),
+        CalendarView.Months => Max is not { } max ? _month.Year < 9999 : _month.Year < max.Year,
+        _ => _yearPageStart + 12 <= 9999 && (Max is not { } max || _yearPageStart + 11 < max.Year)
+    };
+
+    // ---------- Navigation ----------
+    private void ToggleView()
+    {
+        _view = _view switch
+        {
+            CalendarView.Days => CalendarView.Months,
+            CalendarView.Months => CalendarView.Years,
+            _ => CalendarView.Days
+        };
+
+        if (_view == CalendarView.Years) _yearPageStart = _month.Year - (_month.Year - 1) % 12;
+    }
+
+    private Task PreviousAsync() => MoveAsync(-1);
+    private Task NextAsync() => MoveAsync(1);
+
+    private Task MoveAsync(int direction)
+    {
+        switch (_view)
+        {
+            case CalendarView.Days: ShowMonth(_month.AddMonths(direction)); break;
+            case CalendarView.Months: ShowMonth(_month.AddYears(direction)); break;
+            default: _yearPageStart += 12 * direction; break;
+        }
+        return Task.CompletedTask;
+    }
+
+    /// <summary>Affiche un mois et garde le focus clavier sur le même jour (ou le dernier jour du mois).</summary>
+    private void ShowMonth(DateTime anyDayOfMonth)
+    {
+        _month = FirstOfMonth(anyDayOfMonth);
+        _focus = new DateTime(_month.Year, _month.Month, Math.Min(_focus.Day, DateTime.DaysInMonth(_month.Year, _month.Month)));
+    }
+
+    private void PickMonth(int month)
+    {
+        ShowMonth(new DateTime(_month.Year, month, 1));
+        _view = CalendarView.Days;
+    }
+
+    private void PickYear(int year)
+    {
+        ShowMonth(new DateTime(year, _month.Month, 1));
+        _view = CalendarView.Months;
+    }
+
+    // ---------- Sélection ----------
+    private async Task SelectAsync(DateTime date)
+    {
+        if (IsDisabled(date)) return;
+
+        _focus = date;
+        _month = FirstOfMonth(date);
+        _lastValue = date;
+        Value = date;
+        await ValueChanged.InvokeAsync(date);
+    }
+
+    // ---------- Clavier ----------
+    private Task HandleKeyDownAsync(KeyboardEventArgs e)
+    {
+        try
+        {
+            var weekStart = _focus.AddDays(-(((int)_focus.DayOfWeek - (int)Fdw + 7) % 7));
+            DateTime? target = e.Key switch
+            {
+                "ArrowLeft" => _focus.AddDays(-1),
+                "ArrowRight" => _focus.AddDays(1),
+                "ArrowUp" => _focus.AddDays(-7),
+                "ArrowDown" => _focus.AddDays(7),
+                "Home" => weekStart,
+                "End" => weekStart.AddDays(6),
+                "PageUp" => e.ShiftKey ? _focus.AddYears(-1) : _focus.AddMonths(-1),
+                "PageDown" => e.ShiftKey ? _focus.AddYears(1) : _focus.AddMonths(1),
+                _ => null
+            };
+
+            if (target is null) return Task.CompletedTask;
+
+            _focus = Clamp(target.Value);
+            _month = FirstOfMonth(_focus);
+            _focusPending = true;
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            // bornes du type DateTime : on reste sur la date courante
+        }
+
+        return Task.CompletedTask;
+    }
+
+    /// <summary>Place le focus clavier sur le jour sélectionné (ou sur celui du jour), par exemple à l'ouverture d'une fenêtre.</summary>
+    public Task FocusAsync()
+    {
+        _view = CalendarView.Days;
+        _focusPending = true;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (!_jsReady) return;
+
+        try
+        {
+            await JS.InvokeVoidAsync("UiInterop.teardownCalendar", _rootRef);
+        }
+        catch (JSDisconnectedException) { }
+    }
+}

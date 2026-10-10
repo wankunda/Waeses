@@ -1,8 +1,9 @@
 @typeparam TItem
 @namespace WaesesUI
+@inherits UiComponentBase
 
 <CascadingValue Value="this" IsFixed="true">
-    <div class="ui-table-container @Class" @attributes="AdditionalAttributes">
+    <div class="ui-table-container @Class" style="@Style" @attributes="AdditionalAttributes">
         @if (ShowSearch || ToolbarContent != null)
         {
             <div class="ui-table-toolbar">
@@ -134,7 +135,7 @@
     [Parameter] public string SearchPlaceholder { get; set; } = "Rechercher...";
     [Parameter] public Func<TItem, string, bool>? FilterPredicate { get; set; }
     [Parameter] public bool Paginated { get; set; } = true;
-    [Parameter] public int PageSize { get; set; } = 5;
+    [Parameter] public int PageSize { get; set; } = 10;
     [Parameter] public IReadOnlyList<int> PageSizeOptions { get; set; } = new[] { 5, 10, 25, 50 };
     [Parameter] public int CurrentPage { get; set; } = 1;
     [Parameter] public EventCallback<int> CurrentPageChanged { get; set; }
@@ -142,8 +143,6 @@
     [Parameter] public HashSet<TItem>? SelectedItems { get; set; }
     [Parameter] public EventCallback<HashSet<TItem>> SelectedItemsChanged { get; set; }
     [Parameter] public EventCallback<TItem> OnRowClick { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     public Func<TItem, object>? CurrentSortSelector { get; private set; }
     public string? CurrentSortKey { get; private set; }

@@ -1,6 +1,7 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
-<ol class="ui-timeline @Class" aria-label="@AriaLabel" @attributes="AdditionalAttributes">
+<ol class="ui-timeline @Class" aria-label="@AriaLabel" style="@Style" @attributes="AdditionalAttributes">
     @foreach (var item in Items)
     {
         <li class="ui-timeline-item">
@@ -17,6 +18,4 @@
 @code {
     [Parameter] public IReadOnlyList<UiTimelineItem> Items { get; set; } = Array.Empty<UiTimelineItem>();
     [Parameter] public string AriaLabel { get; set; } = "Chronologie";
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

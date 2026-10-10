@@ -1,6 +1,7 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
-<div class="ui-accordion-item @(IsOpen ? "active" : "") @Class" @attributes="AdditionalAttributes">
+<div class="ui-accordion-item @(IsOpen ? "active" : "") @Class" style="@Style" @attributes="AdditionalAttributes">
     <div class="ui-accordion-header" @onclick="Toggle">
         <span>@Title</span>
         <svg class="ui-accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -20,8 +21,6 @@
     [Parameter] public string Title { get; set; } = string.Empty;
     [Parameter] public bool IsOpen { get; set; }
     [Parameter] public RenderFragment? ChildContent { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     protected override void OnInitialized()
     {

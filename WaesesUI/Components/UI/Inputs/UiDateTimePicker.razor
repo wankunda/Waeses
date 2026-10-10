@@ -1,7 +1,7 @@
 @inherits InputBase<DateTime?>
 @namespace WaesesUI
 
-<div class="ui-form-group @Class">
+<div class="ui-form-group @Class" style="@Style">
     @if (!string.IsNullOrEmpty(Label))
     {
         <label class="ui-label" for="@Id">
@@ -93,6 +93,7 @@
     [Parameter] public string? Min { get; set; }
     [Parameter] public string? Max { get; set; }
     [Parameter] public string? Class { get; set; }
+    [Parameter] public string? Style { get; set; }
 
     private int DaysInSelectedMonth => DateTime.DaysInMonth(_selectedYear, _selectedMonth);
 

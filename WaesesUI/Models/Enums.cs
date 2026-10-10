@@ -173,3 +173,10 @@ public static class EnumExtensions
         }
     }
 }
+/// <summary>Animation de passage d'une diapositive à l'autre dans <see cref="UiCarousel"/>.</summary>
+public enum UiCarouselTransition
+{
+    Slide,
+    Fade,
+    None
+}

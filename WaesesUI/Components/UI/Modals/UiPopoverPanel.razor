@@ -1,0 +1,65 @@
+@namespace WaesesUI
+@inherits UiComponentBase
+@inject IUiPopoverService PopoverService
+@implements IDisposable
+
+@* Le contenu est rendu par UiPopoverProvider à la racine de la page (jamais rogné par overflow).
+   L'ancre est l'élément parent de ce composant, ou AnchorSelector. Sans provider : rendu en place. *@
+<span id="@_entry.AnchorId" class="ui-popover-anchor" hidden aria-hidden="true"></span>
+@if (!PopoverService.HasProvider && Open)
+{
+    <div class="@CssBuilder.Default("ui-popover-inline").Add(Class).Build()" style="@Style" @attributes="AdditionalAttributes">
+        @ChildContent
+    </div>
+}
+
+@code {
+    private readonly UiPopoverEntry _entry = new();
+
+    [Parameter] public bool Open { get; set; }
+    [Parameter] public EventCallback<bool> OpenChanged { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public UiPopoverPlacement Placement { get; set; } = UiPopoverPlacement.BottomStart;
+    [Parameter] public int Offset { get; set; } = 8;
+
+    /// <summary>Donne au popover au moins la largeur de l'ancre (listes déroulantes).</summary>
+    [Parameter] public bool MatchAnchorWidth { get; set; }
+    [Parameter] public bool CloseOnOutsideClick { get; set; } = true;
+    [Parameter] public bool CloseOnEscape { get; set; } = true;
+
+    /// <summary>Sélecteur CSS de l'ancre, relatif au document. Par défaut : l'élément parent.</summary>
+    [Parameter] public string? AnchorSelector { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _entry.RequestClose = async () =>
+        {
+            await InvokeAsync(async () =>
+            {
+                Open = false;
+                _entry.Open = false;
+                PopoverService.Update();
+                await OpenChanged.InvokeAsync(false);
+                StateHasChanged();
+            });
+        };
+        PopoverService.Register(_entry);
+    }
+
+    protected override void OnParametersSet()
+    {
+        _entry.Open = Open;
+        _entry.Content = ChildContent;
+        _entry.Placement = Placement;
+        _entry.Offset = Offset;
+        _entry.MatchAnchorWidth = MatchAnchorWidth;
+        _entry.CloseOnOutsideClick = CloseOnOutsideClick;
+        _entry.CloseOnEscape = CloseOnEscape;
+        _entry.AnchorSelector = AnchorSelector;
+        _entry.Class = Class;
+        _entry.Style = Style;
+        PopoverService.Update();
+    }
+
+    public void Dispose() => PopoverService.Remove(_entry);
+}

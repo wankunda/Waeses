@@ -1,8 +1,9 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 @implements IAsyncDisposable
 @inject IJSRuntime JS
 
-<div class="ui-menu @AlignmentClass @(Dense ? "ui-menu-dense" : null) @Class" @ref="_rootRef" @attributes="AdditionalAttributes">
+<div class="ui-menu @AlignmentClass @(Dense ? "ui-menu-dense" : null) @Class" @ref="_rootRef" style="@Style" @attributes="AdditionalAttributes">
     <button @ref="_triggerRef"
             type="button"
             class="ui-menu-trigger"
@@ -39,8 +40,6 @@
     [Parameter] public bool CloseOnItemClick { get; set; } = true;
     [Parameter] public UiMenuAlignment Alignment { get; set; } = UiMenuAlignment.End;
     [Parameter] public string? MaxHeight { get; set; } = "20rem";
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private readonly string _menuId = $"ui-menu-{Guid.NewGuid():N}";
     private bool _isOpen;

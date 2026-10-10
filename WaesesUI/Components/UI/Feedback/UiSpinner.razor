@@ -1,8 +1,9 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
 @if (Variant == UiSpinnerVariant.Pulse)
 {
-    <div class="ui-pulse-loader @Class" style="color: @GetColorCss();" @attributes="AdditionalAttributes">
+    <div class="ui-pulse-loader @Class" style="@ColorStyle" @attributes="AdditionalAttributes">
         <div class="ui-pulse-dot"></div>
         <div class="ui-pulse-dot"></div>
         <div class="ui-pulse-dot"></div>
@@ -16,11 +17,11 @@ else
 }
 
 @code {
+    private string? ColorStyle => StyleBuilder.Default($"color: {GetColorCss()};").Add(Style).Build();
+
     [Parameter] public UiSize Size { get; set; } = UiSize.Md;
     [Parameter] public UiColor Color { get; set; } = UiColor.Primary;
     [Parameter] public UiSpinnerVariant Variant { get; set; } = UiSpinnerVariant.Spin; // "spin" or "pulse"
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private string GetColorCss() => Color switch
     {

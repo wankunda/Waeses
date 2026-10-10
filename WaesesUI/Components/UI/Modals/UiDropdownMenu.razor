@@ -1,4 +1,5 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
 <UiMenu Trigger="@Trigger"
         ChildContent="@ChildContent"
@@ -6,7 +7,7 @@
         IsOpen="@IsOpen"
         IsOpenChanged="@IsOpenChanged"
         Class="@($"ui-dropdown {Class}")"
-        @attributes="AdditionalAttributes" />
+        style="@Style" @attributes="AdditionalAttributes" />
 
 @code {
     [Parameter] public RenderFragment? Trigger { get; set; }
@@ -14,6 +15,4 @@
     [Parameter] public string AriaLabel { get; set; } = "Menu d'actions";
     [Parameter] public bool IsOpen { get; set; }
     [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

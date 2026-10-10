@@ -269,6 +269,48 @@ window.UiInterop = {
         if (items.length > 0) items[first ? 0 : items.length - 1].focus();
     },
 
+    // ---- Thème (sans eval : compatible avec une politique CSP stricte) ----
+    getStoredTheme: function () {
+        try { return window.localStorage.getItem('app_theme'); } catch (e) { return null; }
+    },
+
+    prefersDark: function () {
+        return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    },
+
+    setTheme: function (name) {
+        const root = document.documentElement;
+        root.setAttribute('data-theme', name);
+        root.style.colorScheme = name;
+        try { window.localStorage.setItem('app_theme', name); } catch (e) { /* stockage indisponible */ }
+    },
+
+    // ---- Calendrier ----
+    focusInside: function (container, selector) {
+        if (!container) return;
+        const element = container.querySelector(selector);
+        if (element && typeof element.focus === 'function') element.focus();
+    },
+
+    // Les flèches, Début, Fin et Page précédente/suivante déplacent la sélection de jour :
+    // sans cela, le navigateur ferait aussi défiler la page.
+    setupCalendar: function (rootEl) {
+        if (!rootEl || rootEl._uiCalendarKeydown) return;
+        const keys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Home', 'End', 'PageUp', 'PageDown'];
+        rootEl._uiCalendarKeydown = function (event) {
+            if (keys.indexOf(event.key) >= 0 && event.target.closest && event.target.closest('.ui-cal-grid')) {
+                event.preventDefault();
+            }
+        };
+        rootEl.addEventListener('keydown', rootEl._uiCalendarKeydown);
+    },
+
+    teardownCalendar: function (rootEl) {
+        if (!rootEl || !rootEl._uiCalendarKeydown) return;
+        rootEl.removeEventListener('keydown', rootEl._uiCalendarKeydown);
+        delete rootEl._uiCalendarKeydown;
+    },
+
     focusElement: function (element) {
         if (element && typeof element.focus === 'function') element.focus();
     },
@@ -326,6 +368,7 @@ window.UiInterop = {
         };
 
         modalEl.addEventListener('keydown', modalEl._uiHandleKeyDown);
+        modalEl._uiPreviousFocus = document.activeElement;
 
         // Focus the first focusable element (or the modal box itself)
         requestAnimationFrame(function () {
@@ -343,15 +386,138 @@ window.UiInterop = {
         if (!modalEl || !modalEl._uiHandleKeyDown) return;
         modalEl.removeEventListener('keydown', modalEl._uiHandleKeyDown);
         delete modalEl._uiHandleKeyDown;
+
+        // Rend le focus à l'élément qui a ouvert la modale
+        const previous = modalEl._uiPreviousFocus;
+        delete modalEl._uiPreviousFocus;
+        if (previous && previous.isConnected && typeof previous.focus === 'function') {
+            previous.focus();
+        }
     },
 
     // Lock body scroll when modal is open
+    // Compteur : plusieurs modales empilées ne déverrouillent la page qu'à la dernière fermeture
+    _scrollLocks: 0,
+
     lockBodyScroll: function () {
+        window.UiInterop._scrollLocks++;
         document.body.style.overflow = 'hidden';
     },
 
     unlockBodyScroll: function () {
-        document.body.style.overflow = '';
+        window.UiInterop._scrollLocks = Math.max(0, window.UiInterop._scrollLocks - 1);
+        if (window.UiInterop._scrollLocks === 0) {
+            document.body.style.overflow = '';
+        }
+    },
+
+    // ---------- Popovers (rendus par UiPopoverProvider) ----------
+    _popovers: new Map(),
+
+    _resolvePopoverAnchor: function (anchorId, options) {
+        if (options && options.anchorSelector) {
+            const found = document.querySelector(options.anchorSelector);
+            if (found) return found;
+        }
+        const placeholder = document.getElementById(anchorId);
+        return placeholder ? placeholder.parentElement : null;
+    },
+
+    openPopover: function (layerId, anchorId, options, dotNetRef) {
+        const layer = document.getElementById(layerId);
+        const anchor = window.UiInterop._resolvePopoverAnchor(anchorId, options);
+        if (!layer || !anchor) return;
+
+        window.UiInterop.closePopover(layerId);
+
+        const state = { layer, anchorId, anchor, options, dotNetRef };
+        const close = function () { dotNetRef.invokeMethodAsync('RequestClose'); };
+
+        state.onPointerDown = function (event) {
+            if (!state.options.closeOnOutsideClick) return;
+            if (layer.contains(event.target) || state.anchor.contains(event.target)) return;
+            close();
+        };
+        state.onKeyDown = function (event) {
+            if (event.key === 'Escape' && state.options.closeOnEscape) {
+                event.stopPropagation();
+                close();
+            }
+        };
+        state.onReposition = function () { window.UiInterop._placePopover(state); };
+
+        document.addEventListener('mousedown', state.onPointerDown);
+        document.addEventListener('keydown', state.onKeyDown);
+        window.addEventListener('resize', state.onReposition);
+        window.addEventListener('scroll', state.onReposition, true);
+
+        window.UiInterop._popovers.set(layerId, state);
+        window.UiInterop._placePopover(state);
+    },
+
+    positionPopover: function (layerId, anchorId, options) {
+        const state = window.UiInterop._popovers.get(layerId);
+        if (!state) return;
+        state.options = options;
+        state.anchor = window.UiInterop._resolvePopoverAnchor(anchorId, options) || state.anchor;
+        window.UiInterop._placePopover(state);
+    },
+
+    closePopover: function (layerId) {
+        const state = window.UiInterop._popovers.get(layerId);
+        if (!state) return;
+        document.removeEventListener('mousedown', state.onPointerDown);
+        document.removeEventListener('keydown', state.onKeyDown);
+        window.removeEventListener('resize', state.onReposition);
+        window.removeEventListener('scroll', state.onReposition, true);
+        window.UiInterop._popovers.delete(layerId);
+    },
+
+    _placePopover: function (state) {
+        const { layer, anchor, options } = state;
+        if (!layer.isConnected || !anchor.isConnected) return;
+
+        const margin = 8;
+        const gap = options.offset || 0;
+        const a = anchor.getBoundingClientRect();
+
+        layer.style.minWidth = options.matchWidth ? a.width + 'px' : '';
+        const p = layer.getBoundingClientRect();
+        const vw = document.documentElement.clientWidth;
+        const vh = document.documentElement.clientHeight;
+
+        let side = 'bottom', align = 'start';
+        switch (options.placement) {
+            case 'Bottom': side = 'bottom'; align = 'center'; break;
+            case 'BottomEnd': side = 'bottom'; align = 'end'; break;
+            case 'TopStart': side = 'top'; align = 'start'; break;
+            case 'Top': side = 'top'; align = 'center'; break;
+            case 'TopEnd': side = 'top'; align = 'end'; break;
+            case 'Left': side = 'left'; align = 'center'; break;
+            case 'Right': side = 'right'; align = 'center'; break;
+        }
+
+        // Retourne le côté s'il manque de place d'un côté et qu'il y en a plus de l'autre.
+        if (side === 'bottom' && a.bottom + gap + p.height > vh - margin && a.top - gap - p.height >= margin) side = 'top';
+        else if (side === 'top' && a.top - gap - p.height < margin && a.bottom + gap + p.height <= vh - margin) side = 'bottom';
+        else if (side === 'right' && a.right + gap + p.width > vw - margin && a.left - gap - p.width >= margin) side = 'left';
+        else if (side === 'left' && a.left - gap - p.width < margin && a.right + gap + p.width <= vw - margin) side = 'right';
+
+        let top, left;
+        if (side === 'bottom' || side === 'top') {
+            top = side === 'bottom' ? a.bottom + gap : a.top - gap - p.height;
+            left = align === 'start' ? a.left : align === 'end' ? a.right - p.width : a.left + (a.width - p.width) / 2;
+        } else {
+            left = side === 'right' ? a.right + gap : a.left - gap - p.width;
+            top = a.top + (a.height - p.height) / 2;
+        }
+
+        left = Math.min(Math.max(left, margin), Math.max(margin, vw - p.width - margin));
+        top = Math.min(Math.max(top, margin), Math.max(margin, vh - p.height - margin));
+
+        layer.style.transform = 'translate(' + Math.round(left) + 'px,' + Math.round(top) + 'px)';
+        layer.dataset.side = side;
+        layer.dataset.positioned = 'true';
     },
 
     copyText: async function (text) {

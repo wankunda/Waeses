@@ -1,6 +1,7 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
-<div class="ui-card @(Hoverable ? "ui-card-hoverable" : "") @(Glass ? "ui-card-glass" : "") @Class" @attributes="AdditionalAttributes">
+<div class="ui-card @(Hoverable ? "ui-card-hoverable" : "") @(Glass ? "ui-card-glass" : "") @Class" style="@Style" @attributes="AdditionalAttributes">
     @if (Header != null || !string.IsNullOrEmpty(Title) || !string.IsNullOrEmpty(Subtitle))
     {
         <div class="ui-card-header">
@@ -54,6 +55,4 @@
     [Parameter] public RenderFragment? Footer { get; set; }
     [Parameter] public bool Hoverable { get; set; }
     [Parameter] public bool Glass { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

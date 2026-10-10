@@ -1,6 +1,7 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
-<span class="ui-badge ui-badge-@Color.ToString().ToLower() @Class" @attributes="AdditionalAttributes">
+<span class="ui-badge ui-badge-@Color.ToString().ToLower() @Class" style="@Style" @attributes="AdditionalAttributes">
     @if (Dot)
     {
         <span class="ui-badge-dot"></span>
@@ -20,6 +21,4 @@
     [Parameter] public RenderFragment? ChildContent { get; set; }
     [Parameter] public UiColor Color { get; set; } = UiColor.Primary;
     [Parameter] public bool Dot { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

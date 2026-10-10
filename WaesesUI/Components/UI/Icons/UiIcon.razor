@@ -1,4 +1,5 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
 @if (!string.IsNullOrEmpty(Icon))
 {
@@ -35,10 +36,7 @@
     [Parameter] public string ViewBox { get; set; } = "0 0 24 24";
     [Parameter] public string Fill { get; set; } = "currentColor";
     [Parameter] public string? Title { get; set; }
-    [Parameter] public string? Style { get; set; }
-    [Parameter] public string? Class { get; set; }
     [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private string GetStyle()
     {

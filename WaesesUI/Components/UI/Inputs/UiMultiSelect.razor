@@ -1,6 +1,7 @@
 @typeparam TItem
 @typeparam TValue
 @namespace WaesesUI
+@inherits UiComponentBase
 
 <div class="ui-form-group ui-multiselect @Class">
     @if (!string.IsNullOrEmpty(Label))
@@ -81,8 +82,6 @@
     [Parameter] public IReadOnlyList<TValue> SelectedValues { get; set; } = Array.Empty<TValue>();
     [Parameter] public EventCallback<IReadOnlyList<TValue>> SelectedValuesChanged { get; set; }
     [Parameter] public RenderFragment<TItem>? ItemTemplate { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private bool _isOpen;
     private string LabelId => $"{Id}-label";

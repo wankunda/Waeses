@@ -1,6 +1,7 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
-<section class="ui-error-state @Class" role="alert" @attributes="AdditionalAttributes">
+<section class="ui-error-state @Class" role="alert" style="@Style" @attributes="AdditionalAttributes">
     <UiIcon Icon="@Icons.Material.Filled.Error" Size="UiSize.Lg" Color="UiColor.Danger" aria-hidden="true" />
     <div>
         <h3>@Title</h3>
@@ -17,6 +18,4 @@
     [Parameter] public string Message { get; set; } = "Impossible de charger les données.";
     [Parameter] public string RetryText { get; set; } = "Réessayer";
     [Parameter] public EventCallback OnRetry { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

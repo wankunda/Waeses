@@ -1,8 +1,9 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
 <UiFormField For="@Id" Label="@Label" HelperText="@HelperText" Error="@CurrentError" Required="@Required" Class="@Class">
     <div class="ui-date-range">
-        <input id="@Id" type="date" class="ui-input" value="@Format(Range.Start)" min="@Min" max="@Range.End?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)" disabled="@Disabled" aria-label="Date de début" @onchange="SetStart" @attributes="AdditionalAttributes" />
+        <input id="@Id" type="date" class="ui-input" value="@Format(Range.Start)" min="@Min" max="@Range.End?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)" disabled="@Disabled" aria-label="Date de début" @onchange="SetStart" style="@Style" @attributes="AdditionalAttributes" />
         <span aria-hidden="true">–</span>
         <input type="date" class="ui-input" value="@Format(Range.End)" min="@Range.Start?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)" max="@Max" disabled="@Disabled" aria-label="Date de fin" @onchange="SetEnd" />
     </div>
@@ -20,8 +21,6 @@
     [Parameter] public EventCallback<DateTime?> EndChanged { get; set; }
     [Parameter] public string? Min { get; set; }
     [Parameter] public string? Max { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private UiDateRange Range => new(Start, End);
     private string? CurrentError => Start.HasValue && End.HasValue && Start > End ? "La date de début doit précéder la date de fin." : null;

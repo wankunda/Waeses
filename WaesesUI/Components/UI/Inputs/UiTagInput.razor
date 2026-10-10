@@ -1,4 +1,5 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
 <UiFormField For="@Id" Label="@Label" HelperText="@HelperText" Error="@ErrorMessage" Required="@Required" Class="@Class">
     <div class="ui-tag-input" @onclick="FocusInput">
@@ -6,7 +7,7 @@
         {
             <UiChip Text="@tag" Dismissible="true" OnDismiss="() => RemoveAsync(tag)" />
         }
-        <input @ref="_inputRef" id="@Id" value="@_draft" placeholder="@Placeholder" disabled="@Disabled" aria-label="@Label" @oninput="UpdateDraft" @onkeydown="HandleKeyDown" @onblur="HandleBlur" @attributes="AdditionalAttributes" />
+        <input @ref="_inputRef" id="@Id" value="@_draft" placeholder="@Placeholder" disabled="@Disabled" aria-label="@Label" @oninput="UpdateDraft" @onkeydown="HandleKeyDown" @onblur="HandleBlur" style="@Style" @attributes="AdditionalAttributes" />
     </div>
 </UiFormField>
 
@@ -25,8 +26,6 @@
     [Parameter] public EventCallback<IReadOnlyList<string>> ValuesChanged { get; set; }
     [Parameter] public char Separator { get; set; } = ',';
     [Parameter] public int MaxTags { get; set; } = 0;
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private void UpdateDraft(ChangeEventArgs args) => _draft = args.Value?.ToString() ?? string.Empty;
 

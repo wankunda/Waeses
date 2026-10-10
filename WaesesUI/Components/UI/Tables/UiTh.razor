@@ -1,4 +1,5 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 @typeparam TItem
 
 <th class="@(IsSortable ? "ui-th-sortable" : "") @(IsSorted ? "ui-th-sorted" : "") @Class"
@@ -39,9 +40,6 @@
     [Parameter] public bool Sortable { get; set; } = true;
     [Parameter] public Alignement Align { get; set; } = Alignement.Left;
     [Parameter] public RenderFragment? ChildContent { get; set; }
-    [Parameter] public string? Style { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private bool IsSortable => Sortable && (SortBy != null || !string.IsNullOrEmpty(SortKey));
     private bool IsSorted => Table != null && ((SortBy != null && Table.CurrentSortSelector == SortBy) || (!string.IsNullOrEmpty(SortKey) && Table.CurrentSortKey == SortKey));

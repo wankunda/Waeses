@@ -1,6 +1,7 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
-<div class="ui-code-block @Class" @attributes="AdditionalAttributes">
+<div class="ui-code-block @Class" style="@Style" @attributes="AdditionalAttributes">
     <div class="ui-code-header">
         <span>@(string.IsNullOrWhiteSpace(Language) ? "Code" : Language)</span>
         <UiCopyButton Text="@Code" />
@@ -11,6 +12,4 @@
 @code {
     [Parameter] public string Code { get; set; } = string.Empty;
     [Parameter] public string? Language { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

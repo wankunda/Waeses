@@ -3,7 +3,7 @@
 @inherits InputBase<TValue>
 @namespace WaesesUI
 
-<UiFormField For="@Id" Label="@Label" HelperText="@HelperText" Error="@GetFirstError()" Required="@Required" Class="@Class">
+<UiFormField For="@Id" Label="@Label" HelperText="@HelperText" Error="@GetFirstError()" Required="@Required" Class="@Class" Style="@Style">
     <div class="ui-combobox">
         <input id="@Id" class="ui-input @CssClass" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-expanded="@_isOpen" aria-controls="@ListId" aria-activedescendant="@ActiveOptionId" value="@_query" placeholder="@Placeholder" disabled="@Disabled" readonly="@ReadOnly" @onfocus="Open" @oninput="HandleInput" @onkeydown="HandleKeyDown" @attributes="AdditionalAttributes" />
         @if (_isOpen)
@@ -37,6 +37,7 @@
     [Parameter] public RenderFragment<TItem>? ItemTemplate { get; set; }
     [Parameter] public Func<TItem, string, bool>? FilterPredicate { get; set; }
     [Parameter] public string? Class { get; set; }
+    [Parameter] public string? Style { get; set; }
 
     private bool _isOpen;
     private int _activeIndex = -1;

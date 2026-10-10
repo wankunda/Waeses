@@ -37,7 +37,7 @@
     </UiCard>
     <UiCard Title="Média et actions" Subtitle="Image avec fallback, puis confirmation">
         <UiImage Src="https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=900&q=80" Alt="Espace de travail lumineux" Caption="Un média avec ratio et légende." Ratio="ImageRatio.Widescreen" FallbackSrc="https://placehold.co/900x500/e8eef2/173f5f?text=WaesesUI" />
-        <UiCarousel Items="_gallery" Class="mt-sm" />
+        <UiCarousel Items="_gallery" AutoCycle="true" AutoCycleInterval="6000" Class="mt-sm" />
         <div class="ui-flex-row mt-md"><UiButton Text="Archiver le projet" Variant="UiButtonVariant.Danger" OnClick="ArchiveProject" /><span class="text-secondary">OnRowClick ouvre aussi une boîte de dialogue.</span></div>
     </UiCard>
 </section>

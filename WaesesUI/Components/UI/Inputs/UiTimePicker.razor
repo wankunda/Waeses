@@ -1,7 +1,7 @@
 @inherits InputBase<TimeSpan?>
 @namespace WaesesUI
 
-<UiFormField For="@Id" Label="@Label" HelperText="@HelperText" Error="@GetFirstError()" Required="@Required" Class="@Class">
+<UiFormField For="@Id" Label="@Label" HelperText="@HelperText" Error="@GetFirstError()" Required="@Required" Class="@Class" Style="@Style">
     <input id="@Id" type="time" class="ui-input @CssClass" value="@CurrentValueAsString" min="@Min" max="@Max" step="@Step" disabled="@Disabled" @onchange="HandleChange" @attributes="AdditionalAttributes" />
 </UiFormField>
 
@@ -15,6 +15,7 @@
     [Parameter] public string? Max { get; set; }
     [Parameter] public int Step { get; set; } = 60;
     [Parameter] public string? Class { get; set; }
+    [Parameter] public string? Style { get; set; }
 
     private void HandleChange(ChangeEventArgs args) => CurrentValueAsString = args.Value?.ToString();
 

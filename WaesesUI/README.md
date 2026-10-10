@@ -33,7 +33,7 @@ Install-Package WaesesUI
 ### Via une référence de package
 
 ```xml
-<PackageReference Include="WaesesUI" Version="1.1.3" />
+<PackageReference Include="WaesesUI" Version="1.2.0" />
 ```
 
 ### Mise à jour en production
@@ -60,7 +60,18 @@ using WaesesUI;
 builder.Services.AddWaesesUIServices();
 ```
 
-Cette extension enregistre `IToastService`, `IMessageBoxService` et `IThemeService` avec leurs implementations respectives.
+Cette extension enregistre `IToastService`, `IMessageBoxService`, `IUiDialogService` et `IThemeService` avec leurs implementations respectives.
+
+Les valeurs par defaut globales se configurent via `UiOptions` :
+
+```csharp
+builder.Services.AddWaesesUIServices(o =>
+{
+    o.ToastDurationMs = 6000;
+    o.MaxToasts = 3;
+    o.ConfirmText = "Valider";
+});
+```
 
 ### Assets statiques
 
@@ -72,6 +83,14 @@ Dans `Components/App.razor`, ajoutez le theme et le script d'interoperabilite :
 ```
 
 Le script doit etre charge apres le rendu Blazor, generalement juste avant `</body>`.
+
+### Polices
+
+Le theme n'impose plus de telecharger des polices : il s'appuie sur les polices du systeme, ce qui fonctionne hors connexion (application mobile, intranet). Pour retrouver Plus Jakarta Sans et JetBrains Mono, ajoutez en plus du theme (necessite une connexion) :
+
+```razor
+<link rel="stylesheet" href="_content/WaesesUI/css/fonts-google.css" />
+```
 
 ## Imports Razor
 
@@ -87,7 +106,7 @@ Les composants sont organises par familles :
 | --- | --- |
 | Actions | `UiButton`, `UiBadge` |
 | Layout et navigation | `UiLayout`, `UiSimpleLayout`, `UiNavMenu`, `UiNavMenuItem`, `UiBreadcrumbs`, `UiStepper` |
-| Formulaires | `UiFormField`, `UiInput`, `UiTextArea`, `UiSelect`, `UiMultiSelect`, `UiCombobox`, `UiColorPicker`, `UiTimePicker`, `UiDateRangePicker`, `UiTagInput`, `UiLocaleSwitcher`, `UiAutocomplete`, `UiDateTimePicker`, `UiCheckbox`, `UiSwitch`, `UiSlider`, `UiRadioGroup`, `UiRadioOption`, `UiInputFile` |
+| Formulaires | `UiFormField`, `UiInput`, `UiTextArea`, `UiSelect`, `UiMultiSelect`, `UiCombobox`, `UiColorPicker`, `UiTimePicker`, `UiDateRangePicker`, `UiTagInput`, `UiLocaleSwitcher`, `UiAutocomplete`, `UiDateTimePicker`, `UiDatePicker`, `UiCalendar`, `UiCheckbox`, `UiSwitch`, `UiSlider`, `UiRadioGroup`, `UiRadioOption`, `UiInputFile` |
 | Contenu | `UiCard`, `UiList`, `UiListItem`, `UiChip`, `UiDivider`, `UiCodeBlock`, `UiCopyButton`, `UiImage`, `UiImageGallery`, `UiLightbox`, `UiCarousel`, `UiFilePreview`, `UiAvatar`, `UiAvatarGroup`, `UiAvatarMenu` |
 | Feedback | `UiAlert`, `UiCallout`, `UiTimeline`, `UiLocalizedText`, `UiSpinner`, `UiSkeleton`, `UiEmptyState`, `UiErrorState`, `UiLoadingOverlay`, `UiTooltip`, `UiAccordion`, `UiAccordionItem`, `UiToastContainer`, `UiMessageBoxProvider` |
 | Overlays | `UiModal`, `UiPopover`, `UiMenu`, `UiDropdownMenu`, `UiDrawer` |
@@ -140,6 +159,8 @@ Les boutons utilisent `Size`. Les champs natifs peuvent recevoir les classes `ui
 ```
 
 Pour un ecran autonome, comme une page de connexion, utilisez `UiSimpleLayout` avec le fragment `MainBody`.
+
+Le pied de page de `UiLayout` et de `UiSimpleLayout` se configure : `ShowFooter="false"` le masque, `FooterText="Mon texte"` remplace le texte par defaut (`FooterText=""` n'affiche que le fragment `Footer`). Les en-tetes et le pied de page tiennent compte des zones systeme (`env(safe-area-inset-*)`), utile avec `viewport-fit=cover` sur mobile.
 
 ## Menus
 
@@ -208,6 +229,10 @@ Pour un texte long, utilisez `UiTextArea` avec `@bind-Value`, `Rows`, `MaxLength
                ValueSelector="team => team.Id" />
 ```
 
+`UiSelect<TValue>` accepte les `string`, nombres, enumerations, `Guid`, `DateOnly` et leurs versions nullables.
+
+`UiTable` pagine par defaut par 10 lignes (`PageSize`). Pour mettre des boutons d'action dans une ligne cliquable (`OnRowClick`), marquez leur cellule avec `<UiTd StopPropagation="true">` : le clic sur le bouton ne declenche plus le clic de ligne.
+
 `UiTable` expose aussi `IsLoading`, `ErrorMessage` et `OnRetry` pour afficher les états de chargement et d'erreur sans dupliquer le rendu dans chaque page. `UiPagination` peut être utilisé seul pour les collections chargées côté serveur.
 
 Sur mobile, `UiTable` affiche chaque ligne sous forme de fiche et masque l'en-tête du tableau. Renseignez `Label` sur chaque `UiTd` pour afficher le nom de la colonne à côté de sa valeur dans cette présentation.
@@ -225,6 +250,36 @@ Sur mobile, `UiTable` affiche chaque ligne sous forme de fiche et masque l'en-t�
 
 `UiTimePicker` lie un `TimeSpan?`, `UiDateRangePicker` lie séparément les bornes `Start` et `End`, et `UiTagInput` expose une collection de chaînes via `@bind-Values`. `UiCombobox` fournit un contrôle de sélection unique avec filtrage clavier ; `UiColorPicker` lie une couleur hexadécimale. `UiFormField` enveloppe un contrôle personnalisé avec un libellé, une aide et une erreur cohérents.
 
+## Dates : calendrier et selecteur
+
+`UiCalendar` affiche un mois sous forme de grille (6 semaines, premier jour de la semaine selon la culture, lundi en francais). Le titre ouvre la vue des mois puis des annees ; le bouton « Aujourd'hui » selectionne la date du jour.
+
+```razor
+<UiCalendar @bind-Value="date"
+            Min="DateTime.Today"
+            Max="DateTime.Today.AddYears(1)"
+            IsDateDisabled="d => d.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday" />
+```
+
+`UiDatePicker` est un champ de formulaire (`InputBase<DateTime?>`) qui ouvre ce calendrier sous le champ. Il gere `Label`, `HelperText`, `ErrorMessage`, `Required`, `Disabled`, `ReadOnly`, `Clearable`, `Format` (par exemple `"dd MMMM yyyy"`), `Min`, `Max`, `IsDateDisabled` et la validation `EditForm` :
+
+```razor
+<UiDatePicker Label="Date de paiement" @bind-Value="model.PaidOn" Format="dd MMMM yyyy" Min="DateTime.Today" />
+```
+
+Clavier : fleches (jour et semaine), Debut/Fin (semaine), Page precedente/suivante (mois, avec Maj : annee), Entree ou Espace pour choisir, Echap pour fermer. Les deux composants conservent uniquement la date (l'heure est ignoree) ; pour choisir aussi l'heure, utilisez `UiDateTimePicker`.
+
+## Graphiques
+
+Par defaut, `UiBarChart` et `UiLineChart` affichent les valeurs avec le format `0.##` (culture invariante). `ValueFormat` applique un format .NET dans la culture courante (`"N0"` donne « 50 000 » en francais) et `ValueFormatter` accepte une fonction pour les unites ou devises :
+
+```razor
+<UiBarChart Data="data" ValueFormat="N0" />
+<UiBarChart Data="data" ValueFormatter="v => $@"{v / 1000:0.#} k FC@"" />
+```
+
+La marge gauche s'adapte a la largeur des etiquettes de l'axe.
+
 ## Feedback et services
 
 Placez les providers une seule fois dans le layout principal :
@@ -232,6 +287,8 @@ Placez les providers une seule fois dans le layout principal :
 ```razor
 <UiToastContainer />
 <UiMessageBoxProvider />
+<UiDialogProvider />
+<UiPopoverProvider />
 ```
 
 Puis injectez les services dans une page ou un composant :
@@ -253,6 +310,56 @@ Puis injectez les services dans une page ou un composant :
 
 Pour une confirmation, utilisez `ShowAsync` et verifiez la valeur booleenne retournee.
 
+### Dialogues avec un composant
+
+`IUiDialogService` affiche n'importe quel composant dans une modale et renvoie son resultat (plusieurs dialogues peuvent etre empiles) :
+
+```razor
+@inject IUiDialogService Dialogs
+
+@code {
+    private async Task Edit()
+    {
+        var reference = await Dialogs.ShowAsync<EditUserForm>(
+            "Modifier l'utilisateur",
+            new UiDialogParameters().With(nameof(EditUserForm.UserId), 42),
+            new UiDialogOptions { Size = UiSize.Lg });
+
+        var result = await reference.Result;
+        if (!result.Canceled)
+        {
+            var user = result.GetData<User>();
+        }
+    }
+}
+```
+
+Le composant affiche recoit `[CascadingParameter] UiDialogInstance Dialog` et appelle `Dialog.Close(data)` ou `Dialog.Cancel()`.
+
+### Popovers
+
+`UiPopoverProvider` rend les popovers a la racine de la page : ils ne sont plus rognes par un `overflow: hidden`, se repositionnent (retournement haut/bas, bornes de l'ecran) et passent au-dessus des modales. `UiPopover` l'utilise automatiquement ; sans provider il garde son rendu en place.
+
+Pour un popover personnalise, `UiPopoverPanel` s'ancre sur son element parent (ou `AnchorSelector`) :
+
+```razor
+<button @onclick="() => _open = !_open">Options
+    <UiPopoverPanel @bind-Open="_open" Placement="UiPopoverPlacement.BottomStart" MatchAnchorWidth="true">
+        Contenu...
+    </UiPopoverPanel>
+</button>
+```
+
+Clic exterieur et Echap ferment le panneau (`CloseOnOutsideClick`, `CloseOnEscape`). Le contenu est rendu dans le provider : il n'herite pas des `CascadingValue` du point d'usage.
+
+### Carrousel
+
+`UiCarousel` accepte `Loop`, `AutoCycle` / `AutoCycleInterval` (suspendu au survol et au focus), `Transition` (`Slide`, `Fade`, `None`), `ShowArrows` / `ShowBullets` / `ShowCounter`, le glissement tactile (`EnableSwipe`), le clavier (fleches, Debut, Fin) et `ItemTemplate` pour un contenu personnalise. `ActiveIndex` est optionnel : sans liaison, le carrousel garde son propre etat.
+
+### Composants personnalises
+
+Heritez de `UiComponentBase` pour obtenir `Class`, `Style` et les attributs HTML libres, et utilisez `CssBuilder` / `StyleBuilder` pour composer les classes et styles.
+
 ## Icones
 
 `UiIcon` recoit le contenu SVG d'une icone et peut etre colore avec `UiColor` :
@@ -268,7 +375,7 @@ Les collections sont disponibles sous `Icons.Material.Filled`, `Icons.Material.O
 
 ## Compatibilite et limites
 
-- Le projet cible actuellement `net10.0`.
+- Le projet cible `net9.0` et `net10.0`.
 - `UiAuthorizeView`, `UiAuthState` et `UiRedirectTo` sont reserves au projet WinForms selon les contraintes actuelles de la bibliotheque. Ils ne sont donc pas utilises par `WaesesUIDemo`.
 - `UiModal`, `UiNavMenu`, `UiAutocomplete` et certains composants de formulaire utilisent JavaScript interop. Lors de la deconnexion d'un circuit Blazor Server, les appels JavaScript de nettoyage peuvent echouer et doivent etre traites comme tels.
 - Les assets sous `_content/WaesesUI` sont servis automatiquement par le mecanisme des bibliotheques Razor.

@@ -2,7 +2,7 @@
 @inherits InputBase<TValue>
 @namespace WaesesUI
 
-<UiFormField For="@Id" Label="@Label" HelperText="@HelperText" Error="@GetFirstError()" Required="@Required" Class="@Class">
+<UiFormField For="@Id" Label="@Label" HelperText="@HelperText" Error="@GetFirstError()" Required="@Required" Class="@Class" Style="@Style">
     <div class="ui-color-picker">
         <input id="@Id" type="color" class="ui-color-swatch" value="@ColorValue" disabled="@Disabled" @oninput="HandleInput" @attributes="AdditionalAttributes" />
         <input type="text" class="ui-input" value="@ColorValue" aria-label="Valeur hexadécimale" maxlength="9" disabled="@Disabled" @onchange="HandleInput" />
@@ -16,6 +16,7 @@
     [Parameter] public bool Required { get; set; }
     [Parameter] public bool Disabled { get; set; }
     [Parameter] public string? Class { get; set; }
+    [Parameter] public string? Style { get; set; }
 
     private string ColorValue => CurrentValueAsString is { Length: 7 } value && value.StartsWith('#') ? value : "#000000";
 

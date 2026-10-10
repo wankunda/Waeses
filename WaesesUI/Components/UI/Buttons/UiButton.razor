@@ -1,67 +1,61 @@
 @namespace WaesesUI
+@inherits UiComponentBase
+
+@{
+    RenderFragment content = @<text>
+        @if (Loading)
+        {
+            <span class="ui-spinner ui-spinner-sm" style="margin-right: 0.25rem;" aria-hidden="true"></span>
+        }
+        else if (!string.IsNullOrEmpty(Icon))
+        {
+            @if (Icon.TrimStart().StartsWith('<'))
+            {
+                <UiIcon Icon="@Icon" Size="@(Size is UiSize.Sm or UiSize.Lg ? Size : UiSize.Md)" />
+            }
+            else
+            {
+                <span class="ui-btn-icon">@Icon</span>
+            }
+        }
+        @if (ChildContent != null)
+        {
+            @ChildContent
+        }
+        else if (!string.IsNullOrEmpty(Text))
+        {
+            <span>@Text</span>
+        }
+    </text>;
+}
 
 @if (string.IsNullOrEmpty(Href))
 {
     <button type="@Type"
-            class="ui-btn ui-btn-@Variant.ToString().ToLower() ui-btn-@Size.ToString().ToLower() @Class"
-            disabled="@(Disabled || Loading)"
+            class="@CssClass"
+            style="@Style"
+            disabled="@IsDisabled"
+            aria-busy="@(Loading ? "true" : null)"
             @onclick="OnClick"
             @attributes="AdditionalAttributes">
-        @if (Loading)
-        {
-            <span class="ui-spinner ui-spinner-sm" style="margin-right: 0.25rem;"></span>
-        }
-        @if (!string.IsNullOrEmpty(Icon) && !Loading)
-        {
-            @if (Icon.TrimStart().StartsWith("<"))
-            {
-                <UiIcon Icon="@Icon" Size="@(Size)" />
-            }
-            else
-            {
-                <span class="ui-btn-icon">@Icon</span>
-            }
-        }
-        @if (ChildContent != null)
-        {
-            @ChildContent
-        }
-        else if (!string.IsNullOrEmpty(Text))
-        {
-            <span>@Text</span>
-        }
+        @content
     </button>
 }
 else
 {
-    <a href="@Href"
+    @* Un <a> n'a pas d'attribut disabled : on retire href et on expose l'état via ARIA. *@
+    <a href="@(IsDisabled ? null : Href)"
        target="@Target"
-       class="ui-btn ui-btn-@Variant.ToString().ToLower() ui-btn-@Size.ToString().ToLower() @Class"
-       disabled="@(Disabled || Loading)"
+       rel="@(Target == "_blank" ? "noopener noreferrer" : null)"
+       class="@CssClass"
+       style="@Style"
+       role="@(IsDisabled ? "link" : null)"
+       aria-disabled="@(IsDisabled ? "true" : null)"
+       aria-busy="@(Loading ? "true" : null)"
+       tabindex="@(IsDisabled ? -1 : null)"
+       @onclick="OnClick"
        @attributes="AdditionalAttributes">
-        @if (Loading)
-        {
-            <span class="ui-spinner ui-spinner-sm" style="margin-right: 0.25rem;"></span>
-        }
-        @if (!string.IsNullOrEmpty(Icon) && !Loading)
-        {
-            @if (Icon.TrimStart().StartsWith("<"))
-            {
-                <UiIcon Icon="@Icon" Size="@(Size == UiSize.Sm ? UiSize.Sm : (Size == UiSize.Lg ? UiSize.Lg : UiSize.Md))" />
-            }
-            else
-            {
-                <span class="ui-btn-icon">@Icon</span>
-            }
-        }
-        @if (ChildContent != null)
-        {
-            @ChildContent
-        }
-        else if (!string.IsNullOrEmpty(Text))
-        {
-            <span>@Text</span>
-        }
+        @content
     </a>
 }
 
@@ -76,7 +70,13 @@ else
     [Parameter] public string? Icon { get; set; }
     [Parameter] public string? Href { get; set; }
     [Parameter] public string? Target { get; set; }
-    [Parameter] public string? Class { get; set; }
     [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private bool IsDisabled => Disabled || Loading;
+
+    private string CssClass => CssBuilder
+        .Default($"ui-btn ui-btn-{Variant.ToString().ToLowerInvariant()} ui-btn-{Size.ToString().ToLowerInvariant()}")
+        .AddIf("ui-btn-disabled", IsDisabled && !string.IsNullOrEmpty(Href))
+        .Add(Class)
+        .Build();
 }

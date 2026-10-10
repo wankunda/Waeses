@@ -1,7 +1,8 @@
 @namespace WaesesUI
+@inherits UiComponentBase
 
 <div class="ui-skeleton ui-skeleton-@Variant.ToString().ToLower() @Class"
-     style="@GetStyle()"
+     style="@StyleBuilder.Default(GetStyle()).Add(Style).Build()"
      role="status"
      aria-label="@AriaLabel"
      @attributes="AdditionalAttributes"></div>
@@ -11,8 +12,6 @@
     [Parameter] public string? Width { get; set; }
     [Parameter] public string? Height { get; set; }
     [Parameter] public string AriaLabel { get; set; } = "Chargement";
-    [Parameter] public string? Class { get; set; }
-    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private string GetStyle()
     {

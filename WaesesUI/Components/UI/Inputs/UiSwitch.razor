@@ -7,6 +7,7 @@
      aria-checked="@CurrentValue"
      tabindex="@(Disabled ? -1 : 0)"
      @onkeydown="HandleKeyDown"
+     style="@Style"
      @attributes="AdditionalAttributes">
     <div class="ui-switch-track">
         <div class="ui-switch-thumb"></div>
@@ -35,6 +36,7 @@
     [Parameter] public bool Disabled { get; set; }
     [Parameter] public string? ErrorMessage { get; set; }
     [Parameter] public string? Class { get; set; }
+    [Parameter] public string? Style { get; set; }
 
     private IEnumerable<string> GetErrors()
     {

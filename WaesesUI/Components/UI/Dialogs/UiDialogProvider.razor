@@ -1,0 +1,156 @@
+@namespace WaesesUI
+@inject IUiDialogService DialogService
+@inject IJSRuntime JS
+@inject UiOptions Options
+@implements IAsyncDisposable
+
+@foreach (var dialog in _dialogs)
+{
+    <div class="ui-modal-backdrop"
+         @key="dialog.Info.Reference.Id"
+         @onclick="() => HandleBackdropClick(dialog)"
+         @ref="dialog.BackdropRef">
+        <div class="@(CssBuilder.Default("ui-modal-box").Add(SizeClass(dialog.Info.Options.Size)).Add(dialog.Info.Options.Class).Build())"
+             style="@WidthStyle(dialog.Info.Options.Size)"
+             @onclick:stopPropagation="true"
+             tabindex="-1"
+             role="dialog"
+             aria-modal="true"
+             aria-labelledby="@dialog.TitleId">
+            @if (!string.IsNullOrEmpty(dialog.Instance.Title) || dialog.Info.Options.ShowCloseButton)
+            {
+                <div class="ui-modal-header">
+                    <div id="@dialog.TitleId" class="ui-modal-title h6">@dialog.Instance.Title</div>
+                    @if (dialog.Info.Options.ShowCloseButton)
+                    {
+                        <button type="button" class="ui-modal-close-btn" aria-label="@Options.CloseLabel" @onclick="() => dialog.Info.Reference.Cancel()">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    }
+                </div>
+            }
+            <CascadingValue Value="dialog.Instance" IsFixed="true">
+                <DynamicComponent Type="dialog.Info.ComponentType" Parameters="dialog.Info.Parameters" />
+            </CascadingValue>
+        </div>
+    </div>
+}
+
+@code {
+    private readonly List<OpenDialog> _dialogs = new();
+
+    private sealed class OpenDialog
+    {
+        public required UiDialogInstanceInfo Info { get; init; }
+        public required UiDialogInstance Instance { get; init; }
+        public string TitleId { get; } = $"dialog-title-{Guid.NewGuid():N}";
+        public ElementReference BackdropRef { get; set; }
+        public DotNetObjectReference<DialogCallbacks>? Callbacks { get; set; }
+        public bool IsSetUp { get; set; }
+    }
+
+    /// <summary>Cible JS d'un dialogue : isole Échap par dialogue (le provider en gère plusieurs).</summary>
+    private sealed class DialogCallbacks(UiDialogReference reference, UiDialogOptions options)
+    {
+        [JSInvokable]
+        public Task OnEscapePressed()
+        {
+            if (options.CloseOnEscape) reference.Cancel();
+            return Task.CompletedTask;
+        }
+    }
+
+    protected override void OnInitialized() => DialogService.OnShow += Show;
+
+    private void Show(UiDialogInstanceInfo info)
+    {
+        _ = InvokeAsync(() =>
+        {
+            OpenDialog? dialog = null;
+            dialog = new OpenDialog
+            {
+                Info = info,
+                Instance = new UiDialogInstance(info.Reference, info.Title, () => _ = InvokeAsync(StateHasChanged))
+            };
+            info.Reference.CloseRequested += () => _ = InvokeAsync(() => RemoveAsync(dialog));
+            _dialogs.Add(dialog);
+            StateHasChanged();
+        });
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        foreach (var dialog in _dialogs.Where(d => !d.IsSetUp).ToList())
+        {
+            dialog.IsSetUp = true;
+            try
+            {
+                dialog.Callbacks = DotNetObjectReference.Create(new DialogCallbacks(dialog.Info.Reference, dialog.Info.Options));
+                await JS.InvokeVoidAsync("UiInterop.setupModal", dialog.BackdropRef, dialog.Callbacks);
+                await JS.InvokeVoidAsync("UiInterop.lockBodyScroll");
+            }
+            catch (JSDisconnectedException) { }
+        }
+    }
+
+    private void HandleBackdropClick(OpenDialog dialog)
+    {
+        if (dialog.Info.Options.CloseOnBackdropClick) dialog.Info.Reference.Cancel();
+    }
+
+    private async Task RemoveAsync(OpenDialog dialog)
+    {
+        if (!_dialogs.Remove(dialog)) return;
+        await TeardownAsync(dialog);
+        StateHasChanged();
+    }
+
+    private async Task TeardownAsync(OpenDialog dialog)
+    {
+        if (dialog.IsSetUp)
+        {
+            try
+            {
+                await JS.InvokeVoidAsync("UiInterop.teardownModal", dialog.BackdropRef);
+                await JS.InvokeVoidAsync("UiInterop.unlockBodyScroll");
+            }
+            catch (JSDisconnectedException) { }
+            catch (InvalidOperationException) { }
+        }
+        dialog.Callbacks?.Dispose();
+        dialog.Callbacks = null;
+    }
+
+    private static string SizeClass(UiSize size) => size switch
+    {
+        UiSize.Xs => "ui-modal-xs",
+        UiSize.Sm => "ui-modal-sm",
+        UiSize.Lg => "ui-modal-lg",
+        UiSize.Xl => "ui-modal-xl",
+        UiSize.Max => "ui-modal-max",
+        _ => ""
+    };
+
+    private static string WidthStyle(UiSize size) => size switch
+    {
+        UiSize.Sm => "max-width: 400px;",
+        UiSize.Lg => "max-width: 800px;",
+        UiSize.Xl => "max-width: 1000px;",
+        UiSize.Max => "max-width: 100%;",
+        _ => "max-width: 540px;"
+    };
+
+    public async ValueTask DisposeAsync()
+    {
+        DialogService.OnShow -= Show;
+        foreach (var dialog in _dialogs.ToList())
+        {
+            dialog.Info.Reference.Cancel();
+            await TeardownAsync(dialog);
+        }
+        _dialogs.Clear();
+    }
+}
