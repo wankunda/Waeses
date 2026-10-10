@@ -1,0 +1,18 @@
+<div class="ui-flex-col" style="gap: 1rem;">
+    <UiCheckbox @bind-Value="_newsletter" Label="Recevoir la lettre d'information" />
+    <UiCheckbox @bind-Value="_terms" Color="UiColor.Success" Label="J'ai lu les conditions" />
+    <UiSwitch @bind-Value="_notifications" Color="UiColor.Info" Label="Notifications" />
+    <UiSwitch @bind-Value="_locked" Label="Verrouillé" Disabled="true" />
+
+    <p class="text-secondary">
+        Lettre : <strong>@(_newsletter ? "oui" : "non")</strong> · conditions : <strong>@(_terms ? "lues" : "non lues")</strong> ·
+        notifications : <strong>@(_notifications ? "activées" : "coupées")</strong>
+    </p>
+</div>
+
+@code {
+    private bool _newsletter;
+    private bool _terms;
+    private bool _notifications = true;
+    private bool _locked = true;
+}

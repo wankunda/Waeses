@@ -1,0 +1,17 @@
+<div class="ui-flex-row" style="flex-wrap: wrap; gap: .5rem;">
+    <UiButton Text="@(_saving ? "Enregistrement…" : "Enregistrer")" Loading="_saving" OnClick="SaveAsync" />
+    <UiButton Text="Désactivé" Disabled="true" />
+    <UiButton Text="Ouvrir GitHub" Href="https://github.com/wankunda/Waeses" Target="_blank" Appearance="UiVariant.Outlined" />
+    <UiButton Text="Lien désactivé" Href="https://example.org" Disabled="true" Appearance="UiVariant.Text" />
+</div>
+
+@code {
+    private bool _saving;
+
+    private async Task SaveAsync()
+    {
+        _saving = true;
+        await Task.Delay(1500);
+        _saving = false;
+    }
+}

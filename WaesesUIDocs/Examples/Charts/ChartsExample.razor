@@ -1,0 +1,28 @@
+<div class="ui-grid ui-grid-cols-2" style="width: 100%;">
+    <UiBarChart Data="_sales" AriaLabel="Ventes par jour de la semaine" />
+    <UiLineChart Data="_visits" Color="var(--success)" AriaLabel="Visites par mois" />
+    <UiPieChart Data="_share" AriaLabel="Répartition des ventes par canal" />
+    <UiDonutChart Data="_goal" CenterLabel="72 %" CenterCaption="atteint" AriaLabel="72 pour cent de l'objectif atteint" />
+</div>
+
+@code {
+    private readonly IReadOnlyList<UiChartData> _sales = new[]
+    {
+        new UiChartData("Lun", 42), new UiChartData("Mar", 68), new UiChartData("Mer", 54), new UiChartData("Jeu", 82), new UiChartData("Ven", 74)
+    };
+
+    private readonly IReadOnlyList<UiChartData> _visits = new[]
+    {
+        new UiChartData("Jan", 24), new UiChartData("Fév", 38), new UiChartData("Mar", 32), new UiChartData("Avr", 56), new UiChartData("Mai", 64), new UiChartData("Juin", 78)
+    };
+
+    private readonly IReadOnlyList<UiChartData> _share = new[]
+    {
+        new UiChartData("Boutique", 45), new UiChartData("Web", 35), new UiChartData("Partenaires", 20)
+    };
+
+    private readonly IReadOnlyList<UiChartData> _goal = new[]
+    {
+        new UiChartData("Réalisé", 72, "var(--success)"), new UiChartData("Restant", 28, "var(--bg-surface-tertiary)")
+    };
+}

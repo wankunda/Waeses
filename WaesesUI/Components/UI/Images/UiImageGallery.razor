@@ -13,7 +13,9 @@
 <UiLightbox @bind-IsOpen="_isOpen" Src="@(_selected?.Src ?? string.Empty)" Alt="@(_selected?.Alt ?? "Image")" Caption="@_selected?.Caption" />
 
 @code {
+    /// <summary>Images de la galerie ; un clic ouvre l'image en grand.</summary>
     [Parameter] public IReadOnlyList<UiGalleryItem> Items { get; set; } = Array.Empty<UiGalleryItem>();
+    /// <summary>Rapport largeur/hauteur des vignettes.</summary>
     [Parameter] public ImageRatio Ratio { get; set; } = ImageRatio.Widescreen;
 
     private UiGalleryItem? _selected;

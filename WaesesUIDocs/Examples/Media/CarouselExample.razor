@@ -1,0 +1,15 @@
+<div class="ui-flex-col" style="gap: 1.5rem; width: 100%; max-width: 40rem;">
+    <UiCarousel Items="_slides" AriaLabel="Réalisations" Ratio="ImageRatio.Widescreen" />
+
+    <UiCarousel Items="_slides" AriaLabel="Diaporama automatique" Transition="UiCarouselTransition.Fade" AutoCycle="true"
+                AutoCycleInterval="4000" ShowCounter="false" Loop="true" />
+</div>
+
+@code {
+    private readonly IReadOnlyList<UiCarouselItem> _slides = new[]
+    {
+        new UiCarouselItem(ExampleImages.Placeholder("#173f5f", "Première"), "Première réalisation", "Première réalisation"),
+        new UiCarouselItem(ExampleImages.Placeholder("#0b7c56", "Deuxième"), "Deuxième réalisation", "Deuxième réalisation"),
+        new UiCarouselItem(ExampleImages.Placeholder("#a33b1f", "Troisième"), "Troisième réalisation")
+    };
+}

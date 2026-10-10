@@ -1,4 +1,4 @@
-﻿@namespace WaesesUI
+@namespace WaesesUI
 
 @if (Disabled)
 {
@@ -26,9 +26,14 @@ else
 }
 
 @code {
+    /// <summary>Libellé du lien.</summary>
     [Parameter, EditorRequired] public string Text { get; set; } = string.Empty;
+    /// <summary>Adresse du lien.</summary>
     [Parameter, EditorRequired] public string Href { get; set; } = string.Empty;
+    /// <summary>Icône affichée avant le libellé.</summary>
     [Parameter] public string? Icon { get; set; }
+    /// <summary>Détermine quand le lien est actif : adresse exacte ou préfixe.</summary>
     [Parameter] public NavLinkMatch Match { get; set; } = NavLinkMatch.Prefix;
+    /// <summary>Lien visible mais non navigable.</summary>
     [Parameter] public bool Disabled { get; set; }
 }

@@ -1,5 +1,6 @@
 @namespace WaesesUI
 @inject IJSRuntime JS
+@implements IDisposable
 
 <button type="button" class="ui-copy-button @Class" aria-label="@Label" title="@Label" @onclick="CopyAsync">
     <UiIcon Icon="@Icons.Material.Outlined.ContentCopy" Size="UiSize.Sm" aria-hidden="true" />
@@ -7,21 +8,56 @@
 </button>
 
 @code {
+    /// <summary>Texte copié dans le presse-papiers.</summary>
     [Parameter] public string Text { get; set; } = string.Empty;
+    /// <summary>Libellé du bouton.</summary>
     [Parameter] public string Label { get; set; } = "Copier";
+    /// <summary>Libellé affiché brièvement après la copie.</summary>
     [Parameter] public string CopiedLabel { get; set; } = "Copié";
+    /// <summary>Affiche le libellé à côté de l'icône ; sinon l'icône seule, nommée par <c>Label</c>.</summary>
     [Parameter] public bool ShowLabel { get; set; }
+    /// <summary>Appelé après une copie réussie.</summary>
     [Parameter] public EventCallback OnCopied { get; set; }
+    /// <summary>Classes CSS supplémentaires.</summary>
     [Parameter] public string? Class { get; set; }
 
     private bool _copied;
 
+    private CancellationTokenSource? _reset;
+
     private async Task CopyAsync()
     {
-        await JS.InvokeVoidAsync("UiInterop.copyText", Text);
+        try
+        {
+            await JS.InvokeVoidAsync("UiInterop.copyText", Text);
+        }
+        catch (JSException)
+        {
+            return;   // refusé par le navigateur (permission, contexte non sécurisé) : rien n'a été copié, on n'annonce pas « Copié »
+        }
+
+        // Rendu explicite : sans lui, Blazor ne dessine que l'état précédant le premier await et l'état final, jamais « Copié ».
         _copied = true;
+        StateHasChanged();
         await OnCopied.InvokeAsync();
-        await Task.Delay(1400);
+
+        _reset?.Cancel();
+        _reset?.Dispose();
+        var reset = _reset = new CancellationTokenSource();
+        try
+        {
+            await Task.Delay(1400, reset.Token);
+        }
+        catch (TaskCanceledException)
+        {
+            return;
+        }
         _copied = false;
+    }
+
+    public void Dispose()
+    {
+        _reset?.Cancel();
+        _reset?.Dispose();
     }
 }

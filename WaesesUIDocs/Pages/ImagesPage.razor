@@ -1,0 +1,31 @@
+@page "/composants/images"
+
+<DocPage Href="composants/images">
+    <DocSection Title="Image" Description="`UiImage` impose un rapport largeur/hauteur au cadre (pas de décalage de mise en page au chargement), charge l'image à l'approche de l'écran (`Lazy`) et bascule sur `FallbackSrc` si la source échoue.">
+        <DocExample Example="typeof(ImageExample)" />
+    </DocSection>
+
+    <DocSection Title="Galerie" Description="`UiImageGallery` affiche des vignettes ; un clic ouvre l'image en grand dans une visionneuse.">
+        <DocExample Example="typeof(GalleryExample)" />
+    </DocSection>
+
+    <DocSection Title="Carrousel" Description="`UiCarousel` défile au clavier (flèches, Début, Fin), au geste tactile et, si on le demande, automatiquement (suspendu au survol et au focus). Pendant le défilement automatique, la région n'est plus annoncée en direct aux lecteurs d'écran.">
+        <DocExample Example="typeof(CarouselExample)" />
+    </DocSection>
+
+    <DocSection Title="Visionneuse" Description="`UiLightbox` affiche une image en grand dans une modale (focus piégé, Échap pour fermer).">
+        <DocExample Example="typeof(LightboxExample)" />
+    </DocSection>
+
+    <DocSection Title="Aperçu de fichier" Description="`UiFilePreview` affiche le nom, la taille et une icône selon le type du fichier, avec un aperçu pour les images.">
+        <DocExample Example="typeof(FilePreviewExample)" />
+    </DocSection>
+
+    <DocSection Title="API">
+        <ApiTable Component="typeof(UiImage)" />
+        <ApiTable Component="typeof(UiImageGallery)" />
+        <ApiTable Component="typeof(UiCarousel)" />
+        <ApiTable Component="typeof(UiLightbox)" />
+        <ApiTable Component="typeof(UiFilePreview)" />
+    </DocSection>
+</DocPage>

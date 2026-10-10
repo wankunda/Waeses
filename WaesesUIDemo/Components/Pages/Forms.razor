@@ -14,9 +14,10 @@
                 <UiInput Label="Adresse e-mail" Type="email" @bind-Value="_model.Email" Placeholder="alice@exemple.fr" Required="true" />
                 <UiInput TValue="decimal" Label="Budget mensuel" Type="number" @bind-Value="_model.Budget" Min="0" Max="100000" Step="0.01" SuffixIcon="€" HelperText="Les valeurs numériques sont converties vers le type lié." />
                 <UiSelect TValue="string" Label="Équipe" @bind-Value="_model.Team" Required="true" Placeholder="Choisir une équipe">
-                    <option value="Produit">Produit</option>
-                    <option value="Design">Design</option>
-                    <option value="Ingénierie">Ingénierie</option>
+                    <UiSelectOption Value="@("Produit")" Text="Produit" />
+                    <UiSelectOption Value="@("Design")" Text="Design" />
+                    <UiSelectOption Value="@("Ingénierie")" Text="Ingénierie" />
+                    <UiSelectOption Value="@("Support")" Text="Support (complet)" Disabled="true" />
                 </UiSelect>
                 <UiDateTimePicker Label="Disponibilité" Mode="UiDateTimeMode.Date" @bind-Value="_model.AvailableOn" />
                 <UiTimePicker Label="Heure de disponibilité" @bind-Value="_model.AvailableAt" Step="900" />

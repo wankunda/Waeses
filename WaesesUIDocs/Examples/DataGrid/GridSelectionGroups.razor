@@ -1,0 +1,28 @@
+<UiDataGrid TItem="Employee" Items="_employees" Selectable="true" @bind-SelectedItems="_selected"
+            GroupBy="department" Paginated="false" AriaLabel="Employés par service">
+    <Columns>
+        <UiColumn TItem="Employee" Key="name" Title="Nom" Field="e => e.Name" />
+        <UiColumn TItem="Employee" Key="department" Title="Service" Field="e => e.Department" />
+        <UiColumn TItem="Employee" Key="role" Title="Poste" Field="e => e.Role">
+            <CellTemplate><UiBadge Text="@context.Role" Color="UiColor.Info" Variant="UiVariant.Outlined" /></CellTemplate>
+        </UiColumn>
+    </Columns>
+    <ChildRowContent>
+        <span class="text-secondary">Fiche de @context.Name — service @context.Department.</span>
+    </ChildRowContent>
+</UiDataGrid>
+
+<p class="text-secondary"><strong>@_selected.Count</strong> ligne(s) sélectionnée(s).</p>
+
+@code {
+    private sealed record Employee(string Name, string Department, string Role);
+
+    private HashSet<Employee> _selected = new();
+
+    private readonly List<Employee> _employees = new()
+    {
+        new("Alice", "Produit", "Responsable"), new("Benoît", "Design", "Designer"), new("Chloé", "Ingénierie", "Développeuse"),
+        new("David", "Produit", "Analyste"), new("Élodie", "Support", "Conseillère"), new("Farid", "Ingénierie", "Architecte"),
+        new("Gaëlle", "Design", "Illustratrice"), new("Hugo", "Support", "Responsable")
+    };
+}

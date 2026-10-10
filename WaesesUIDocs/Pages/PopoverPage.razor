@@ -1,0 +1,20 @@
+@page "/composants/popover"
+
+<DocPage Href="composants/popover">
+    <DocSection Title="Pourquoi un provider ?" Description="Avec un `UiPopoverProvider` dans le layout, le contenu des popovers est rendu à la racine de la page : un conteneur à `overflow: hidden` ne le rogne plus, il se repositionne tout seul (retournement haut/bas, bornes de l'écran) et passe au-dessus des modales. Sans provider, `UiPopover` garde son rendu en place.">
+    </DocSection>
+
+    <DocSection Title="Popover avec déclencheur">
+        <DocExample Example="typeof(PopoverBasic)" />
+    </DocSection>
+
+    <DocSection Title="Panneau ancré" Description="`UiPopoverPanel` s'ancre sur son élément parent (ou sur `AnchorSelector`). Clic extérieur et Échap le ferment. Son contenu est rendu dans le provider : il n'hérite pas des valeurs en cascade du point d'usage.">
+        <DocExample Example="typeof(PopoverPlacementExample)" />
+    </DocSection>
+
+    <DocSection Title="API">
+        <ApiTable Component="typeof(UiPopover)" />
+        <ApiTable Component="typeof(UiPopoverPanel)" />
+        <ApiTable Component="typeof(UiPopoverProvider)" Note="À placer une seule fois dans le layout ; il n'a rien à configurer." />
+    </DocSection>
+</DocPage>

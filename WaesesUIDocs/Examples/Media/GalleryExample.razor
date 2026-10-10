@@ -1,0 +1,11 @@
+<UiImageGallery Items="_images" Ratio="ImageRatio.Standard" />
+
+@code {
+    private readonly IReadOnlyList<UiGalleryItem> _images = new[]
+    {
+        new UiGalleryItem(ExampleImages.Placeholder("#173f5f", "Atelier"), "Atelier lumineux", "Atelier"),
+        new UiGalleryItem(ExampleImages.Placeholder("#0b7c56", "Jardin"), "Jardin intérieur", "Jardin"),
+        new UiGalleryItem(ExampleImages.Placeholder("#a33b1f", "Salle"), "Salle de réunion", "Salle"),
+        new UiGalleryItem(ExampleImages.Placeholder("#20639b", "Accueil"), "Espace d'accueil", "Accueil")
+    };
+}

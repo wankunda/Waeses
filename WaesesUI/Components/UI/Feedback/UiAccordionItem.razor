@@ -2,24 +2,31 @@
 @inherits UiComponentBase
 
 <div class="ui-accordion-item @(IsOpen ? "active" : "") @Class" style="@Style" @attributes="AdditionalAttributes">
-    <div class="ui-accordion-header" @onclick="Toggle">
+    <button type="button" id="@_headerId" class="ui-accordion-header" aria-expanded="@(IsOpen ? "true" : "false")" aria-controls="@_bodyId" @onclick="Toggle">
         <span>@Title</span>
-        <svg class="ui-accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg class="ui-accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <polyline points="6 9 12 15 18 9"></polyline>
         </svg>
-    </div>
+    </button>
     @if (IsOpen)
     {
-        <div class="ui-accordion-body">
+        <div id="@_bodyId" role="region" aria-labelledby="@_headerId" class="ui-accordion-body">
             @ChildContent
         </div>
     }
 </div>
 
 @code {
+    private readonly string _uid = Guid.NewGuid().ToString("N");
+    private string _headerId => $"ui-acc-h-{_uid}";
+    private string _bodyId => $"ui-acc-b-{_uid}";
+
     [CascadingParameter] public UiAccordion? ParentAccordion { get; set; }
+    /// <summary>Titre de l'en-tête, qui ouvre et ferme l'élément.</summary>
     [Parameter] public string Title { get; set; } = string.Empty;
+    /// <summary>Indique si l'élément est ouvert au départ.</summary>
     [Parameter] public bool IsOpen { get; set; }
+    /// <summary>Contenu de l'élément, affiché quand il est ouvert.</summary>
     [Parameter] public RenderFragment? ChildContent { get; set; }
 
     protected override void OnInitialized()

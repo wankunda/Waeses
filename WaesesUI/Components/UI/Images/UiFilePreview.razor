@@ -14,9 +14,13 @@
 </article>
 
 @code {
+    /// <summary>Nom du fichier affiché.</summary>
     [Parameter] public string FileName { get; set; } = "Fichier";
+    /// <summary>Type MIME : détermine l'icône et l'aperçu.</summary>
     [Parameter] public string? ContentType { get; set; }
+    /// <summary>Taille en octets, affichée en unité lisible.</summary>
     [Parameter] public long? SizeBytes { get; set; }
+    /// <summary>Adresse du fichier, pour l'aperçu et le téléchargement.</summary>
     [Parameter] public string? Url { get; set; }
 
     private string FormatSize() => !SizeBytes.HasValue ? string.Empty : SizeBytes.Value switch

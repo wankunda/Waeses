@@ -1,0 +1,30 @@
+<div class="ui-flex-col" style="gap: 1rem; width: 100%;">
+    <UiColorPicker @bind-Value="_primary" Label="Couleur primaire (mode clair)" />
+
+    <div class="ui-flex-row" style="flex-wrap: wrap; gap: .5rem;" aria-label="Teintes dérivées">
+        @foreach (var (name, color) in Swatches)
+        {
+            <div style="width: 7.5rem; border: 1px solid var(--border-default); border-radius: var(--radius-md); overflow: hidden;">
+                <div style="height: 3rem; background: @color;"></div>
+                <div style="padding: .35rem .5rem; font-size: .75rem;"><strong>@name</strong><br />@color</div>
+            </div>
+        }
+    </div>
+
+    <UiCodeBlock Language="css" Code="@Theme.ToCss()" />
+</div>
+
+@code {
+    private string _primary = "#0d9488";
+
+    // Seules les valeurs renseignées produisent du CSS ; le reste vient de theme.css.
+    private UiThemeDefinition Theme => new() { Light = { Primary = _primary } };
+
+    private IEnumerable<(string Name, string Color)> Swatches => new[]
+    {
+        ("primary", _primary),
+        ("hover", UiColorMath.Darken(_primary, .10)),
+        ("light", UiColorMath.Lighten(_primary, .92)),
+        ("contrast", UiColorMath.Contrast(_primary))
+    };
+}

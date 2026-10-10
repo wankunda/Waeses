@@ -22,12 +22,19 @@
 </section>
 
 @code {
+    /// <summary>Titre de l'état vide.</summary>
     [Parameter] public string Title { get; set; } = "Aucun résultat";
+    /// <summary>Texte explicatif sous le titre.</summary>
     [Parameter] public string? Description { get; set; }
+    /// <summary>Icône illustrant l'état (SVG de la bibliothèque d'icônes).</summary>
     [Parameter] public string? Icon { get; set; }
+    /// <summary>Couleur de l'icône.</summary>
     [Parameter] public UiColor IconColor { get; set; } = UiColor.Neutral;
+    /// <summary>Libellé du bouton d'action. Le bouton n'apparaît que s'il est défini.</summary>
     [Parameter] public string? ActionText { get; set; }
+    /// <summary>Appelé au clic sur le bouton d'action.</summary>
     [Parameter] public EventCallback OnAction { get; set; }
+    /// <summary>Contenu supplémentaire affiché sous la description.</summary>
     [Parameter] public RenderFragment? ChildContent { get; set; }
 
     private Task OnActionClick() => OnAction.InvokeAsync();

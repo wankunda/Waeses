@@ -1,0 +1,26 @@
+@inject IMessageBoxService MessageBox
+
+<div class="ui-flex-col" style="gap: .75rem;">
+    <div class="ui-flex-row" style="flex-wrap: wrap; gap: .5rem;">
+        <UiButton Text="Confirmer une suppression" Color="UiColor.Danger" OnClick="ConfirmAsync" />
+        <UiButton Text="Afficher une information" Appearance="UiVariant.Outlined" OnClick="InformAsync" />
+    </div>
+    <p class="text-secondary">@_result</p>
+</div>
+
+@code {
+    private string _result = "Aucune action.";
+
+    private async Task ConfirmAsync()
+    {
+        // true si l'utilisateur confirme, false s'il annule ou ferme la boîte.
+        var confirmed = await MessageBox.ShowAsync("Supprimer le fichier ?", "Cette action est définitive.", MessageBoxType.Danger, "Supprimer");
+        _result = confirmed ? "Fichier supprimé." : "Suppression annulée.";
+    }
+
+    private async Task InformAsync()
+    {
+        await MessageBox.ShowAlertAsync("Mise à jour", "La synchronisation est terminée.", MessageBoxType.Success);
+        _result = "Information lue.";
+    }
+}

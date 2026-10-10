@@ -1,0 +1,9 @@
+<div class="ui-flex-col" style="gap: 1rem; width: 100%; max-width: 28rem;">
+    <UiColorPicker @bind-Value="_color" Label="Couleur d'accent" HelperText="Le sélecteur natif et le champ hexadécimal sont synchronisés." />
+
+    <div style="height: 2.5rem; border-radius: var(--radius-md); background: @_color;" role="img" aria-label="Aperçu de la couleur @_color"></div>
+</div>
+
+@code {
+    private string _color = "#0d9488";
+}

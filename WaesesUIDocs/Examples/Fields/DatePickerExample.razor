@@ -1,0 +1,11 @@
+<div class="ui-flex-col" style="gap: 1rem; width: 100%; max-width: 28rem;">
+    <UiDatePicker @bind-Value="_date" Label="Date de livraison" Format="dd MMMM yyyy" Min="DateTime.Today"
+                  FirstDayOfWeek="DayOfWeek.Monday" IsDateDisabled="@(d => d.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)"
+                  HelperText="Les week-ends et les dates passées ne sont pas sélectionnables." />
+
+    <p class="text-secondary">Date choisie : <strong>@(_date?.ToString("D") ?? "aucune")</strong></p>
+</div>
+
+@code {
+    private DateTime? _date;
+}

@@ -26,9 +26,13 @@
 </div>
 
 @code {
+    /// <summary>Parts du graphique (libellé, valeur et couleur facultative).</summary>
     [Parameter] public IReadOnlyList<UiChartData> Data { get; set; } = Array.Empty<UiChartData>();
+    /// <summary>Texte principal au centre de l'anneau.</summary>
     [Parameter] public string CenterLabel { get; set; } = "100 %";
+    /// <summary>Légende sous le texte central.</summary>
     [Parameter] public string CenterCaption { get; set; } = "total";
+    /// <summary>Nom accessible du graphique.</summary>
     [Parameter] public string AriaLabel { get; set; } = "Graphique en anneau";
 
     private double Total => Data.Sum(item => Math.Max(item.Value, 0));

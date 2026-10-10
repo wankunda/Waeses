@@ -26,6 +26,17 @@
         {
             <span>@Text</span>
         }
+        @if (!string.IsNullOrEmpty(EndIcon))
+        {
+            @if (EndIcon.TrimStart().StartsWith('<'))
+            {
+                <UiIcon Icon="@EndIcon" Size="@(Size is UiSize.Sm or UiSize.Lg ? Size : UiSize.Md)" />
+            }
+            else
+            {
+                <span class="ui-btn-icon ui-btn-end-icon">@EndIcon</span>
+            }
+        }
     </text>;
 }
 
@@ -60,22 +71,51 @@ else
 }
 
 @code {
+    /// <summary>Texte du bouton. Ignoré si <c>ChildContent</c> est fourni.</summary>
     [Parameter] public string? Text { get; set; }
+    /// <summary>Contenu libre du bouton (remplace <c>Text</c>).</summary>
     [Parameter] public RenderFragment? ChildContent { get; set; }
+    /// <summary>Style historique du bouton (<c>Primary</c>, <c>Outline</c>, <c>Danger</c>…). Remplacé par <c>Color</c> et <c>Appearance</c> dès que l'un des deux est défini.</summary>
     [Parameter] public UiButtonVariant Variant { get; set; } = UiButtonVariant.Primary;
+    /// <summary>Taille du bouton.</summary>
     [Parameter] public UiSize Size { get; set; } = UiSize.Md;
+    /// <summary>Attribut HTML <c>type</c> : <c>button</c> (défaut), <c>submit</c> ou <c>reset</c>. Utilisez <c>submit</c> pour valider un formulaire.</summary>
     [Parameter] public string Type { get; set; } = "button";
+    /// <summary>Désactive le bouton. Un lien désactivé perd son <c>href</c> et expose <c>aria-disabled</c>.</summary>
     [Parameter] public bool Disabled { get; set; }
+    /// <summary>Affiche un indicateur de chargement et désactive le bouton le temps d'une opération.</summary>
     [Parameter] public bool Loading { get; set; }
+    /// <summary>Icône affichée avant le texte : un SVG de la bibliothèque d'icônes, ou un texte court.</summary>
     [Parameter] public string? Icon { get; set; }
+
+    /// <summary>Icône affichée après le texte (<see cref="Icon"/> reste l'icône de début).</summary>
+    [Parameter] public string? EndIcon { get; set; }
+
+    /// <summary>Couleur du bouton. Avec <see cref="Appearance"/>, remplace <see cref="Variant"/>.</summary>
+    [Parameter] public UiColor? Color { get; set; }
+
+    /// <summary>Apparence (plein, contour, texte) indépendante de la couleur. Avec <see cref="Color"/>, remplace <see cref="Variant"/>.</summary>
+    [Parameter] public UiVariant? Appearance { get; set; }
+
+    /// <summary>Occupe toute la largeur disponible.</summary>
+    [Parameter] public bool FullWidth { get; set; }
+    /// <summary>Adresse de destination : le bouton devient alors un lien <c>a</c>.</summary>
     [Parameter] public string? Href { get; set; }
+    /// <summary>Cible du lien (par exemple <c>_blank</c>). Avec <c>_blank</c>, <c>rel="noopener noreferrer"</c> est ajouté.</summary>
     [Parameter] public string? Target { get; set; }
+    /// <summary>Appelé au clic (ou à l'activation au clavier).</summary>
     [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
 
     private bool IsDisabled => Disabled || Loading;
 
+    private bool UsesColorAppearance => Color.HasValue || Appearance.HasValue;
+
     private string CssClass => CssBuilder
-        .Default($"ui-btn ui-btn-{Variant.ToString().ToLowerInvariant()} ui-btn-{Size.ToString().ToLowerInvariant()}")
+        .Default("ui-btn")
+        .AddIf($"ui-btn-{Variant.ToString().ToLowerInvariant()}", !UsesColorAppearance)
+        .AddIf($"{(Color ?? UiColor.Primary).ToCssClass()} ui-btn-{(Appearance ?? UiVariant.Filled).ToString().ToLowerInvariant()}", UsesColorAppearance)
+        .Add($"ui-btn-{Size.ToString().ToLowerInvariant()}")
+        .AddIf("ui-btn-block", FullWidth)
         .AddIf("ui-btn-disabled", IsDisabled && !string.IsNullOrEmpty(Href))
         .Add(Class)
         .Build();

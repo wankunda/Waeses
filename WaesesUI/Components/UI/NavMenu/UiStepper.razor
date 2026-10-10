@@ -15,9 +15,13 @@
 </ol>
 
 @code {
+    /// <summary>Étapes du parcours.</summary>
     [Parameter] public IReadOnlyList<UiStepItem> Steps { get; set; } = Array.Empty<UiStepItem>();
+    /// <summary>Index de l'étape active (lié avec <c>bind-ActiveIndex</c>).</summary>
     [Parameter] public int ActiveIndex { get; set; }
+    /// <summary>Appelé quand l'utilisateur choisit une autre étape.</summary>
     [Parameter] public EventCallback<int> ActiveIndexChanged { get; set; }
+    /// <summary>Nom accessible de la liste d'étapes.</summary>
     [Parameter] public string AriaLabel { get; set; } = "Étapes";
 
     private Task SelectStep(int index) => ActiveIndexChanged.InvokeAsync(index);

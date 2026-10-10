@@ -1,9 +1,9 @@
-@inherits InputBase<DateTime?>
+@inherits UiInputBase<DateTime?>
 @implements IAsyncDisposable
 @namespace WaesesUI
 @inject IJSRuntime JS
 
-<div class="ui-form-group @Class" style="@Style">
+<div class="ui-form-group @FieldClass @Class" style="@Style">
     @if (!string.IsNullOrEmpty(Label))
     {
         <label class="ui-label" for="@Id">
@@ -23,6 +23,8 @@
                     class="ui-input ui-datepicker-trigger @(HasError ? "ui-input-error" : null) @(CurrentValue is null ? "ui-datepicker-empty" : null)"
                     disabled="@Disabled"
                     aria-haspopup="dialog"
+                    aria-invalid="@AriaInvalid"
+                    aria-describedby="@DescribedBy"
                     aria-expanded="@(_isOpen ? "true" : "false")"
                     @onclick="ToggleAsync">
                 <span class="ui-datepicker-text">@DisplayText</span>
@@ -57,31 +59,18 @@
         }
     </div>
 
-    @if (HasError)
-    {
-        <div class="ui-error-text">
-            <span>⚠</span>
-            <span>@GetFirstError()</span>
-        </div>
-    }
-    else if (!string.IsNullOrEmpty(HelperText))
-    {
-        <div class="ui-helper-text">@HelperText</div>
-    }
+    <UiInputMessages Error="@(HasError ? GetFirstError() : null)" HelperText="@HelperText" ErrorId="@ErrorId" HelperId="@HelperId" />
 </div>
 
 @code {
-    [Parameter] public string? Id { get; set; } = $"datepicker-{Guid.NewGuid():N}";
-    [Parameter] public string? Label { get; set; }
+    protected override string IdPrefix => "datepicker";
+
+    /// <summary>Texte affiché tant qu'aucune date n'est choisie.</summary>
     [Parameter] public string Placeholder { get; set; } = "Choisir une date";
-    [Parameter] public string? HelperText { get; set; }
-    [Parameter] public string? ErrorMessage { get; set; }
-    [Parameter] public bool Required { get; set; }
-    [Parameter] public bool Disabled { get; set; }
-    [Parameter] public bool ReadOnly { get; set; }
 
     /// <summary>Affiche un bouton pour effacer la date.</summary>
     [Parameter] public bool Clearable { get; set; } = true;
+    /// <summary>Nom accessible du bouton d'effacement.</summary>
     [Parameter] public string ClearLabel { get; set; } = "Effacer la date";
 
     /// <summary>Format .NET de la date affichée dans le champ (par exemple <c>"dd MMMM yyyy"</c>). Null : date courte de la culture.</summary>
@@ -93,11 +82,12 @@
     /// <summary>Dernière date sélectionnable.</summary>
     [Parameter] public DateTime? Max { get; set; }
 
+    /// <summary>Indique les dates non sélectionnables (week-ends, jours fériés…).</summary>
     [Parameter] public Func<DateTime, bool>? IsDateDisabled { get; set; }
+    /// <summary>Premier jour de la semaine. Par défaut, celui de la culture courante.</summary>
     [Parameter] public DayOfWeek? FirstDayOfWeek { get; set; }
+    /// <summary>Affiche le bouton « Aujourd'hui » dans le calendrier.</summary>
     [Parameter] public bool ShowToday { get; set; } = true;
-    [Parameter] public string? Class { get; set; }
-    [Parameter] public string? Style { get; set; }
 
     private ElementReference _rootRef;
     private ElementReference _triggerRef;
@@ -112,25 +102,6 @@
     private string DisplayText => CurrentValue is { } date
         ? date.ToString(Format ?? "d", CultureInfo.CurrentCulture)
         : Placeholder;
-
-    private IEnumerable<string> GetErrors()
-    {
-        if (!string.IsNullOrEmpty(ErrorMessage))
-        {
-            yield return ErrorMessage;
-        }
-
-        if (EditContext != null && ValueExpression != null)
-        {
-            foreach (var msg in EditContext.GetValidationMessages(FieldIdentifier))
-            {
-                yield return msg;
-            }
-        }
-    }
-
-    private bool HasError => GetErrors().Any();
-    private string GetFirstError() => GetErrors().FirstOrDefault() ?? string.Empty;
 
     protected override bool TryParseValueFromString(string? value, out DateTime? result, [System.Diagnostics.CodeAnalysis.NotNullWhen(false)] out string? validationErrorMessage)
     {

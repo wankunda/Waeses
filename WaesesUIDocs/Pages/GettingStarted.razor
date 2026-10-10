@@ -1,0 +1,30 @@
+@page "/demarrer"
+
+<DocPage Href="demarrer">
+    <DocSection Title="Paquet NuGet" Description="WaesesUI cible .NET 9 et .NET 10. Ajoutez le paquet au projet Blazor (Server, WebAssembly ou Web App) :">
+        <UiCodeBlock Code="@Snippets.InstallPackage" Language="powershell" />
+    </DocSection>
+
+    <DocSection Title="Services" Description="Enregistrez les services dans `Program.cs`. Ils fournissent les notifications, les boîtes de message, les dialogues, le thème et la localisation.">
+        <UiCodeBlock Code="@Snippets.Services" Language="csharp" />
+        <p class="docs-text">Les valeurs par défaut globales (durée des toasts, libellés, thème…) se règlent avec <code>UiOptions</code> :</p>
+        <UiCodeBlock Code="@Snippets.ServicesWithOptions" Language="csharp" />
+    </DocSection>
+
+    <DocSection Title="Ressources statiques" Description="Chargez le thème et le script d'interopérabilité. Liez les deux feuilles de style séparément : `theme.css` importe déjà `components-extended.css`, mais cet import les ferait télécharger l'une après l'autre.">
+        <UiCodeBlock Code="@Snippets.StaticAssetsWasm" Language="html" />
+    </DocSection>
+
+    <DocSection Title="Imports" Description="Tous les composants publics sont dans l'espace de noms `WaesesUI`. Ajoutez-le à `_Imports.razor` :">
+        <UiCodeBlock Code="@Snippets.Imports" Language="razor" />
+    </DocSection>
+
+    <DocSection Title="Providers" Description="Les notifications, boîtes de message, dialogues et popovers sont affichés par des providers, à placer une seule fois dans le layout principal. N'ajoutez que ceux dont vous vous servez.">
+        <UiCodeBlock Code="@Snippets.Providers" Language="razor" />
+    </DocSection>
+
+    <DocSection Title="Premier composant">
+        <UiCodeBlock Code="@Snippets.FirstComponent" Language="razor" />
+        <p class="docs-text">Poursuivez avec les <a href="composants/boutons">boutons</a>, les <a href="composants/champ-de-saisie">champs de saisie</a> ou le <a href="guides/theme">thème</a>.</p>
+    </DocSection>
+</DocPage>

@@ -1,0 +1,16 @@
+@page "/composants/mise-en-page"
+
+<DocPage Href="composants/mise-en-page">
+    <DocSection Title="Structure de l'application" Description="`UiLayout` assemble l'en-tête (nom, version, bouton clair/sombre), le menu latéral et le contenu : c'est la structure de ce site. `UiSimpleLayout` fait de même sans menu, pour les pages de connexion ou plein cadre. Un layout occupe toute la page : il est présenté en code.">
+        <UiCodeBlock Code="@Snippets.LayoutUsage" Language="razor" />
+        <UiCodeBlock Code="@Snippets.SimpleLayoutUsage" Language="razor" />
+    </DocSection>
+
+    <DocSection Title="Thème, mode et densité" Description="`UiThemeProvider` pose le mode (clair, sombre ou celui du système), la densité et, avec `Definition`, le thème décrit en C#. Voir le [guide du thème](guides/theme)." />
+
+    <DocSection Title="API">
+        <ApiTable Component="typeof(UiLayout)" />
+        <ApiTable Component="typeof(UiSimpleLayout)" />
+        <ApiTable Component="typeof(UiThemeProvider)" />
+    </DocSection>
+</DocPage>

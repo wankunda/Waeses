@@ -3,7 +3,7 @@
 
 @if (Variant == UiSpinnerVariant.Pulse)
 {
-    <div class="ui-pulse-loader @Class" style="@ColorStyle" @attributes="AdditionalAttributes">
+    <div class="ui-pulse-loader @Class" style="@ColorStyle" role="status" aria-label="@AriaLabel" @attributes="AdditionalAttributes">
         <div class="ui-pulse-dot"></div>
         <div class="ui-pulse-dot"></div>
         <div class="ui-pulse-dot"></div>
@@ -12,15 +12,22 @@
 else
 {
     <span class="ui-spinner ui-spinner-@Size.ToString().ToLower() @Class"
-          style="color: @GetColorCss();"
+          style="@ColorStyle"
+          role="status"
+          aria-label="@AriaLabel"
           @attributes="AdditionalAttributes"></span>
 }
 
 @code {
     private string? ColorStyle => StyleBuilder.Default($"color: {GetColorCss()};").Add(Style).Build();
 
+    /// <summary>Nom accessible annoncé aux lecteurs d'écran (<c>role="status"</c>).</summary>
+    [Parameter] public string AriaLabel { get; set; } = "Chargement";
+    /// <summary>Taille de l'indicateur.</summary>
     [Parameter] public UiSize Size { get; set; } = UiSize.Md;
+    /// <summary>Couleur de l'indicateur.</summary>
     [Parameter] public UiColor Color { get; set; } = UiColor.Primary;
+    /// <summary>Forme : <c>Spin</c> (anneau tournant) ou <c>Pulse</c> (trois points).</summary>
     [Parameter] public UiSpinnerVariant Variant { get; set; } = UiSpinnerVariant.Spin; // "spin" or "pulse"
 
     private string GetColorCss() => Color switch

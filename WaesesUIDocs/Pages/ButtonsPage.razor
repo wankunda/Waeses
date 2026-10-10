@@ -1,0 +1,28 @@
+@page "/composants/boutons"
+
+<DocPage Href="composants/boutons">
+    <DocSection Title="Couleur et apparence" Description="La couleur (`Color`) et l'apparence (`Appearance` : plein, contour ou texte) sont indépendantes. Les couleurs viennent des variables du thème, donc suivent le mode sombre.">
+        <DocExample Example="typeof(ButtonColors)" />
+    </DocSection>
+
+    <DocSection Title="Tailles, icônes et largeur" Description="`Icon` s'affiche avant le texte, `EndIcon` après. `FullWidth` occupe toute la largeur disponible.">
+        <DocExample Example="typeof(ButtonSizesAndIcons)" />
+    </DocSection>
+
+    <DocSection Title="États et liens" Description="`Loading` désactive le bouton et affiche un indicateur ; `Href` en fait un lien. Un lien désactivé perd son `href` et expose `aria-disabled`.">
+        <DocExample Example="typeof(ButtonStates)" />
+    </DocSection>
+
+    <DocSection Title="Boutons icône" Description="`UiButtonIcon` est un bouton carré sans texte : donnez-lui un nom accessible avec `aria-label`.">
+        <DocExample Example="typeof(ButtonIconExamples)" />
+    </DocSection>
+
+    <DocSection Title="Variantes historiques" Description="`Variant` reste valable et ne change pas. Dès que `Color` ou `Appearance` est défini, il est ignoré.">
+        <DocExample Example="typeof(ButtonLegacyVariants)" />
+    </DocSection>
+
+    <DocSection Title="API">
+        <ApiTable Component="typeof(UiButton)" />
+        <ApiTable Component="typeof(UiButtonIcon)" />
+    </DocSection>
+</DocPage>

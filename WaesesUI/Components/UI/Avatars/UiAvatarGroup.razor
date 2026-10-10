@@ -12,6 +12,8 @@
 </div>
 
 @code {
+    /// <summary>Les <c>UiAvatar</c> du groupe, affichés en chevauchement.</summary>
     [Parameter] public RenderFragment? ChildContent { get; set; }
+    /// <summary>Nombre d'avatars non affichés ; si supérieur à 0, une pastille « +N » est ajoutée.</summary>
     [Parameter] public int ExtraCount { get; set; }
 }

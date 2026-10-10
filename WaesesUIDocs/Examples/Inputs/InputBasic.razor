@@ -1,0 +1,14 @@
+<div class="ui-flex-col" style="gap: 1rem; width: 100%; max-width: 28rem;">
+    <UiInput @bind-Value="_name" Label="Nom" Placeholder="Alice Martin" HelperText="Tel qu'il apparaît sur la facture." Clearable="true" />
+    <UiInput @bind-Value="_email" Label="E-mail" Type="email" Autocomplete="email" PrefixIcon="@@" Required="true" />
+    <UiInput @bind-Value="_password" Label="Mot de passe" Type="password" />
+    <UiInput @bind-Value="_budget" Label="Budget mensuel" Type="number" Step="0.01" SuffixIcon="€" />
+    <p class="text-secondary">Nom : <strong>@_name</strong> — budget : <strong>@_budget</strong></p>
+</div>
+
+@code {
+    private string? _name;
+    private string? _email;
+    private string? _password;
+    private decimal _budget = 1200;
+}

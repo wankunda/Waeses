@@ -1,0 +1,7 @@
+<UiButton Text="Agrandir l'image" Appearance="UiVariant.Outlined" OnClick="() => _open = true" />
+
+<UiLightbox @bind-IsOpen="_open" Src="@ExampleImages.Placeholder("#173f5f", "Plein écran", 1200, 675)" Alt="Image en plein écran" Caption="Fermeture : Échap, fond ou bouton." />
+
+@code {
+    private bool _open;
+}

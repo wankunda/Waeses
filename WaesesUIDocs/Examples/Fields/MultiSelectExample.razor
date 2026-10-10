@@ -1,0 +1,17 @@
+<div class="ui-flex-col" style="gap: 1rem; width: 100%; max-width: 28rem;">
+    <UiMultiSelect TItem="Skill" TValue="string" Label="Compétences" Placeholder="Choisir des compétences…"
+                   Items="_skills" DisplaySelector="s => s.Name" ValueSelector="s => s.Code" @bind-SelectedValues="_selected" />
+
+    <p class="text-secondary">@_selected.Count sélectionnée(s) : <strong>@string.Join(", ", _selected)</strong></p>
+</div>
+
+@code {
+    private sealed record Skill(string Code, string Name);
+
+    private IReadOnlyList<string> _selected = new[] { "csharp" };
+
+    private readonly Skill[] _skills =
+    {
+        new("csharp", "C#"), new("blazor", "Blazor"), new("sql", "SQL"), new("css", "CSS"), new("docker", "Docker")
+    };
+}

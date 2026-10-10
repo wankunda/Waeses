@@ -1,0 +1,17 @@
+<UiDataGrid TItem="Row" Items="_rows" Virtualize="true" Height="20rem" RowHeight="44" ShowSearch="true" ShowFilters="true" AriaLabel="20 000 lignes">
+    <Columns>
+        <UiColumn TItem="Row" Key="id" Title="#" Field="r => r.Id" Width="6rem" Align="Alignement.Right" />
+        <UiColumn TItem="Row" Key="label" Title="Libellé" Field="r => r.Label" />
+        <UiColumn TItem="Row" Key="score" Title="Score" Field="r => r.Score" Align="Alignement.Right" />
+    </Columns>
+</UiDataGrid>
+
+<p class="text-secondary">20 000 lignes, mais seules les lignes visibles (et quelques-unes de marge) existent dans le DOM.</p>
+
+@code {
+    private sealed record Row(int Id, string Label, int Score);
+
+    private readonly List<Row> _rows = Enumerable.Range(1, 20_000)
+        .Select(i => new Row(i, $"Ligne {i:N0}", i * 37 % 1000))
+        .ToList();
+}

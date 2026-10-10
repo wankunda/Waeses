@@ -14,8 +14,12 @@
 </section>
 
 @code {
+    /// <summary>Titre de l'état d'erreur.</summary>
     [Parameter] public string Title { get; set; } = "Une erreur est survenue";
+    /// <summary>Message détaillant l'erreur.</summary>
     [Parameter] public string Message { get; set; } = "Impossible de charger les données.";
+    /// <summary>Libellé du bouton pour réessayer.</summary>
     [Parameter] public string RetryText { get; set; } = "Réessayer";
+    /// <summary>Appelé au clic sur le bouton « Réessayer ». Le bouton n'apparaît que si un gestionnaire est fourni.</summary>
     [Parameter] public EventCallback OnRetry { get; set; }
 }

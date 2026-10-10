@@ -47,12 +47,20 @@
 </div>
 
 @code {
+    /// <summary>Titre de la carte.</summary>
     [Parameter] public string? Title { get; set; }
+    /// <summary>Sous-titre affiché sous le titre.</summary>
     [Parameter] public string? Subtitle { get; set; }
+    /// <summary>En-tête personnalisé (remplace <c>Title</c> et <c>Subtitle</c>).</summary>
     [Parameter] public RenderFragment? Header { get; set; }
+    /// <summary>Actions alignées à droite dans l'en-tête.</summary>
     [Parameter] public RenderFragment? HeaderActions { get; set; }
+    /// <summary>Contenu de la carte.</summary>
     [Parameter] public RenderFragment? ChildContent { get; set; }
+    /// <summary>Pied de la carte.</summary>
     [Parameter] public RenderFragment? Footer { get; set; }
+    /// <summary>Met la carte en relief au survol.</summary>
     [Parameter] public bool Hoverable { get; set; }
+    /// <summary>Applique un fond translucide flouté.</summary>
     [Parameter] public bool Glass { get; set; }
 }

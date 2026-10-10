@@ -48,7 +48,7 @@
     /* Text Colors */
     --text-main: #0f172a;
     --text-secondary: #475569;
-    --text-muted: #94a3b8;
+    --text-muted: #606f85;
     --text-inverse: #ffffff;
     /* Borders */
     --border-subtle: #f1f5f9;
@@ -132,7 +132,7 @@
     /* Text Colors */
     --text-main: #f1f5f9;
     --text-secondary: #94a3b8;
-    --text-muted: #64748b;
+    --text-muted: #8b9ab3;
     --text-inverse: #0f172a;
 
     /* Borders */
@@ -2422,6 +2422,9 @@ a {
     object-fit: cover;
     transition: opacity var(--trans-normal), transform var(--trans-smooth);
 }
+
+/* Pendant le chargement l'image reste dans la mise en page (un navigateur ne charge pas une image lazy en display:none). */
+.ui-image.ui-image-loading { position: absolute; inset: 0; opacity: 0; }
 
 .ui-image-hover-zoom:hover .ui-image {
     transform: scale(1.05);

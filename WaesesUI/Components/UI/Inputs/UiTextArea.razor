@@ -1,8 +1,8 @@
 @typeparam TValue
-@inherits InputBase<TValue>
+@inherits UiInputBase<TValue>
 @namespace WaesesUI
 
-<div class="ui-form-group @Class" style="@Style">
+<div class="ui-form-group @FieldClass @Class" style="@Style">
     @if (!string.IsNullOrEmpty(Label))
     {
         <label class="ui-label" for="@Id">
@@ -14,6 +14,7 @@
         </label>
     }
     <textarea id="@Id"
+              aria-invalid="@AriaInvalid" aria-describedby="@DescribedBy" aria-required="@(IsRequired ? "true" : null)"
               class="ui-input ui-textarea @CssClass @(HasError ? "ui-input-error" : "")"
               placeholder="@Placeholder"
               rows="@Rows"
@@ -27,45 +28,23 @@
     {
         <div class="ui-textarea-count">@((CurrentValueAsString ?? string.Empty).Length) / @MaxLength</div>
     }
-    @if (HasError)
-    {
-        <div class="ui-error-text"><span>⚠</span><span>@GetFirstError()</span></div>
-    }
-    else if (!string.IsNullOrEmpty(HelperText))
-    {
-        <div class="ui-helper-text">@HelperText</div>
-    }
+    <UiInputMessages Error="@(HasError ? GetFirstError() : null)" HelperText="@HelperText" ErrorId="@ErrorId" HelperId="@HelperId" />
 </div>
 
 @code {
-    [Parameter] public string? Id { get; set; } = $"textarea-{Guid.NewGuid():N}";
-    [Parameter] public string? Label { get; set; }
+    protected override string IdPrefix => "textarea";
+
+    /// <summary>Texte indicatif affiché tant que le champ est vide.</summary>
     [Parameter] public string? Placeholder { get; set; }
-    [Parameter] public string? HelperText { get; set; }
-    [Parameter] public string? ErrorMessage { get; set; }
-    [Parameter] public bool Required { get; set; }
-    [Parameter] public bool Disabled { get; set; }
-    [Parameter] public bool ReadOnly { get; set; }
+    /// <summary>Nombre de lignes visibles.</summary>
     [Parameter] public int Rows { get; set; } = 4;
+    /// <summary>Nombre maximal de caractères saisissables.</summary>
     [Parameter] public int? MaxLength { get; set; }
+    /// <summary>Affiche le compteur de caractères (nécessite <c>MaxLength</c>).</summary>
     [Parameter] public bool ShowCharacterCount { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter] public string? Style { get; set; }
 
-    private IEnumerable<string> GetErrors()
-    {
-        if (!string.IsNullOrEmpty(ErrorMessage)) yield return ErrorMessage;
-        if (EditContext != null && ValueExpression != null)
-        {
-            foreach (var message in EditContext.GetValidationMessages(FieldIdentifier)) yield return message;
-        }
-    }
-
-    private bool HasError => GetErrors().Any();
-    private string GetFirstError() => GetErrors().FirstOrDefault() ?? string.Empty;
-
-    private void HandleInput(ChangeEventArgs args) => CurrentValueAsString = args.Value?.ToString();
-    private void HandleChange(ChangeEventArgs args) => CurrentValueAsString = args.Value?.ToString();
+    private Task HandleInput(ChangeEventArgs args) => HandleTextEventAsync(args.Value?.ToString(), isInput: true);
+    private Task HandleChange(ChangeEventArgs args) => HandleTextEventAsync(args.Value?.ToString(), isInput: false);
 
     protected override bool TryParseValueFromString(string? value, out TValue result, [NotNullWhen(false)] out string? validationErrorMessage)
     {
@@ -81,12 +60,4 @@
         return false;
     }
 
-    private bool IsRequiredByAttribute()
-    {
-        if (EditContext != null && ValueExpression?.Body is System.Linq.Expressions.MemberExpression memberExpression)
-        {
-            return memberExpression.Member.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.RequiredAttribute), true).Any();
-        }
-        return false;
-    }
 }

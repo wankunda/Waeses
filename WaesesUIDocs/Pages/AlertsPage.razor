@@ -1,0 +1,22 @@
+@page "/composants/alertes-et-etats"
+
+<DocPage Href="composants/alertes-et-etats">
+    <DocSection Title="Alertes" Description="`UiAlert` signale un événement avec `role=&quot;alert&quot;`. Avec `Dismissible`, l'utilisateur la ferme.">
+        <DocExample Example="typeof(AlertsExample)" />
+    </DocSection>
+
+    <DocSection Title="Encadrés" Description="`UiCallout` met en avant une remarque dans le flux de la page (`role=&quot;note&quot;`), sans l'interrompre.">
+        <DocExample Example="typeof(CalloutsExample)" />
+    </DocSection>
+
+    <DocSection Title="États vide et erreur" Description="`UiEmptyState` remplace une liste sans contenu et propose une action ; `UiErrorState` explique l'échec d'un chargement et propose de réessayer. `UiTable` et `UiDataGrid` les utilisent.">
+        <DocExample Example="typeof(EmptyErrorStatesExample)" />
+    </DocSection>
+
+    <DocSection Title="API">
+        <ApiTable Component="typeof(UiAlert)" />
+        <ApiTable Component="typeof(UiCallout)" />
+        <ApiTable Component="typeof(UiEmptyState)" />
+        <ApiTable Component="typeof(UiErrorState)" />
+    </DocSection>
+</DocPage>

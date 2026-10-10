@@ -1,0 +1,30 @@
+@page "/guides/theme"
+
+<DocPage Href="guides/theme">
+    <DocSection Title="Comment ça marche" Description="Tout le thème repose sur des variables CSS (`--primary`, `--bg-surface`, `--radius-md`…) définies dans `theme.css`, avec une version sombre sous `[data-theme=&quot;dark&quot;]`. Les composants ne lisent que ces variables : changer une variable change tous les composants. `UiThemeProvider` choisit le mode (clair, sombre ou système) et la densité.">
+        <UiCodeBlock Code="@Snippets.CssVariables" Language="css" />
+    </DocSection>
+
+    <DocSection Title="Décrire le thème en C#" Description="`UiThemeDefinition` génère les variables à votre place. Seules les valeurs renseignées produisent du CSS ; les teintes dérivées (survol, fond clair, couleur du texte) sont calculées depuis la couleur de base hexadécimale.">
+        <UiCodeBlock Code="@Snippets.ThemeDefinition" Language="csharp" />
+        <UiCodeBlock Code="@Snippets.ThemeApply" Language="razor" />
+        <DocExample Example="typeof(ThemeCssPreview)" Title="Aperçu des teintes dérivées"
+                    Description="Choisissez une couleur : voici les teintes calculées et la feuille de style générée pour le mode clair." />
+    </DocSection>
+
+    <DocSection Title="Contraste et accessibilité" Description="Les couleurs sémantiques du thème par défaut (vert, ambre, cyan et, dans une moindre mesure, rouge) sont lumineuses : utilisées comme texte sur fond clair, elles n'atteignent pas le rapport de contraste de 4,5:1 exigé par WCAG AA, et le texte blanc d'un bouton plein y est peu lisible. `UiThemeDefinition.Accessible()` est un préréglage qui assombrit (mode clair) ou éclaircit (mode sombre) ces couleurs juste assez, en gardant leur teinte. Chaque couleur y est vérifiée par des tests dans tous ses rôles : texte sur la surface, sur sa teinte claire, et sous le texte d'un bouton plein, au repos et au survol.">
+        <UiCodeBlock Code="@Snippets.ThemeAccessible" Language="razor" />
+        <DocExample Example="typeof(ContrastTable)" Title="Contrastes mesurés"
+                    Description="Ce site de documentation utilise le préréglage et passe le contrôle automatique axe-core (WCAG 2.0 et 2.1, niveaux A et AA) en mode clair et sombre sur toutes ses pages." />
+        <p class="docs-text">Un contrôle automatique n'attrape qu'une partie des problèmes d'accessibilité : il ne remplace ni un test au clavier ni un test avec un lecteur d'écran.</p>
+    </DocSection>
+
+    <DocSection Title="Bon à savoir">
+        <ul>
+            <li>Le thème global se fixe aussi avec <code>AddWaesesUIServices(o =&gt; o.Theme = ...)</code> ; le paramètre <code>Definition</code> du provider prend alors le dessus.</li>
+            <li>Une définition remplace les paramètres <code>Primary</code>, <code>Secondary</code>… du provider, qui posaient des variables en ligne sur la racine.</li>
+            <li>Les couleurs acceptent <code>#rgb</code>, <code>#rrggbb</code>, <code>rgb()</code>, <code>hsl()</code>, <code>var(--x)</code> ou un nom de couleur ; seul un hexadécimal produit des teintes dérivées.</li>
+            <li>Une valeur invalide (par exemple contenant <code>;</code> ou <code>}</code>) lève une <code>InvalidOperationException</code> au rendu au lieu d'être injectée dans la feuille de style.</li>
+        </ul>
+    </DocSection>
+</DocPage>

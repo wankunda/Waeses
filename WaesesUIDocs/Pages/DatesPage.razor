@@ -1,0 +1,27 @@
+@page "/composants/dates-et-heures"
+
+<DocPage Href="composants/dates-et-heures">
+    <DocSection Title="Sélecteur de date" Description="`UiDatePicker` ouvre un `UiCalendar`. Une date hors de `Min`/`Max`, ou refusée par `IsDateDisabled`, n'est pas sélectionnable et est marquée `aria-disabled`.">
+        <DocExample Example="typeof(DatePickerExample)" />
+    </DocSection>
+
+    <DocSection Title="Calendrier seul" Description="`UiCalendar` s'utilise directement, hors d'un champ.">
+        <DocExample Example="typeof(CalendarExample)" />
+    </DocSection>
+
+    <DocSection Title="Plage de dates" Description="`UiDateRangePicker` lie un début et une fin ; une plage inversée est signalée comme erreur.">
+        <DocExample Example="typeof(DateRangeExample)" />
+    </DocSection>
+
+    <DocSection Title="Date, heure ou les deux" Description="`UiDateTimePicker` saisit une date, une heure ou les deux selon `Mode`. `UiTimePicker` saisit une heure (`TimeSpan?`).">
+        <DocExample Example="typeof(DateTimeExample)" />
+    </DocSection>
+
+    <DocSection Title="API">
+        <ApiTable Component="typeof(UiCalendar)" />
+        <ApiTable Component="typeof(UiDatePicker)" />
+        <ApiTable Component="typeof(UiDateRangePicker)" />
+        <ApiTable Component="typeof(UiDateTimePicker)" />
+        <ApiTable Component="typeof(UiTimePicker)" />
+    </DocSection>
+</DocPage>

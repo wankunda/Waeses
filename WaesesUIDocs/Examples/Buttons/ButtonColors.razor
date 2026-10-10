@@ -1,0 +1,11 @@
+<div class="ui-flex-col" style="gap: .75rem;">
+    @foreach (var appearance in Enum.GetValues<UiVariant>())
+    {
+        <div class="ui-flex-row" style="flex-wrap: wrap; gap: .5rem;">
+            @foreach (var color in Enum.GetValues<UiColor>())
+            {
+                <UiButton Text="@color.ToString()" Color="color" Appearance="appearance" />
+            }
+        </div>
+    }
+</div>

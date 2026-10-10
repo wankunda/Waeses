@@ -1,0 +1,21 @@
+@page "/composants/modale-et-tiroir"
+
+<DocPage Href="composants/modale-et-tiroir">
+    <DocSection Title="Modale" Description="`UiModal` s'ouvre avec `IsOpen`. Elle piège le focus, se ferme avec Échap ou un clic sur le fond (réglable), bloque le défilement de la page et rend le focus au déclencheur. Pour afficher un composant dans une modale et récupérer un résultat, préférez le service de [dialogues](composants/dialogues).">
+        <DocExample Example="typeof(ModalExample)" />
+    </DocSection>
+
+    <DocSection Title="Tiroir" Description="`UiDrawer` est un panneau latéral modal, à gauche ou à droite.">
+        <DocExample Example="typeof(DrawerExample)" />
+    </DocSection>
+
+    <DocSection Title="Infobulle" Description="`UiTooltip` affiche un court texte au survol et au focus clavier (`role=&quot;tooltip&quot;` relié par `aria-describedby`).">
+        <DocExample Example="typeof(TooltipExample)" />
+    </DocSection>
+
+    <DocSection Title="API">
+        <ApiTable Component="typeof(UiModal)" />
+        <ApiTable Component="typeof(UiDrawer)" />
+        <ApiTable Component="typeof(UiTooltip)" />
+    </DocSection>
+</DocPage>

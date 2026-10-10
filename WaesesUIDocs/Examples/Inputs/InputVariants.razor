@@ -1,0 +1,10 @@
+<div class="ui-flex-col" style="gap: 1rem; width: 100%; max-width: 28rem;">
+    <UiInput @bind-Value="_value" Label="Contour (par défaut)" />
+    <UiInput @bind-Value="_value" Label="Fond teinté" Variant="UiVariant.Filled" Color="UiColor.Info" />
+    <UiInput @bind-Value="_value" Label="Soulignement" Variant="UiVariant.Text" Color="UiColor.Success" />
+    <UiInput @bind-Value="_value" Label="Contour, focus rouge" Color="UiColor.Danger" />
+</div>
+
+@code {
+    private string? _value = "Cliquez dans un champ pour voir sa couleur de focus";
+}

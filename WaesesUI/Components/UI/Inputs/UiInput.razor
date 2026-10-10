@@ -1,8 +1,8 @@
 @typeparam TValue
-@inherits InputBase<TValue>
+@inherits UiInputBase<TValue>
 @namespace WaesesUI
 
-<div class="ui-form-group @Class" style="@Style">
+<div class="ui-form-group @FieldClass @Class" style="@Style">
     @if (!string.IsNullOrEmpty(Label))
     {
         <label class="ui-label" for="@Id">
@@ -30,6 +30,7 @@
         }
 
         <input id="@Id"
+               aria-invalid="@AriaInvalid" aria-describedby="@DescribedBy" aria-required="@(IsRequired ? "true" : null)"
                type="@EffectiveType"
                class="ui-input @CssClass @(HasError ? "ui-input-error" : "") @(!string.IsNullOrEmpty(PrefixIcon) ? "ui-input-has-prefix" : "") @((!string.IsNullOrEmpty(SuffixIcon) || Clearable || Type == "password") ? "ui-input-has-suffix" : "")"
                placeholder="@Placeholder"
@@ -66,7 +67,7 @@
                         style="background: transparent; border: none; cursor: pointer; color: var(--text-muted); padding: 0.2rem; display: flex; align-items: center;"
                         @onclick="TogglePasswordVisibility"
                         aria-label="@(_showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe")"
-                        aria-pressed="@_showPassword"
+                        aria-pressed="@(_showPassword ? "true" : "false")"
                         title="@(_showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe")">
                     @if (_showPassword)
                     {
@@ -101,66 +102,40 @@
         </div>
     </div>
 
-    @if (HasError)
-    {
-        <div class="ui-error-text">
-            <span>⚠</span>
-            <span>@GetFirstError()</span>
-        </div>
-    }
-    else if (!string.IsNullOrEmpty(HelperText))
-    {
-        <div class="ui-helper-text">
-            @HelperText
-        </div>
-    }
+    <UiInputMessages Error="@(HasError ? GetFirstError() : null)" HelperText="@HelperText" ErrorId="@ErrorId" HelperId="@HelperId" />
 </div>
 
 @code {
+    protected override string IdPrefix => "input";
+
     private bool _showPassword;
 
-    [Parameter] public string? Id { get; set; } = $"input-{Guid.NewGuid():N}";
-    [Parameter] public string? Label { get; set; }
+    /// <summary>Type HTML du champ : <c>text</c> (défaut), <c>email</c>, <c>number</c>, <c>password</c>, <c>tel</c>, <c>url</c>, <c>date</c>…</summary>
     [Parameter] public string Type { get; set; } = "text";
+    /// <summary>Texte indicatif affiché tant que le champ est vide.</summary>
     [Parameter] public string? Placeholder { get; set; }
-    [Parameter] public string? HelperText { get; set; }
-    [Parameter] public string? ErrorMessage { get; set; }
+    /// <summary>Icône (ou texte court) affichée au début du champ.</summary>
     [Parameter] public string? PrefixIcon { get; set; }
+    /// <summary>Icône (ou texte court, par exemple une unité) affichée à la fin du champ.</summary>
     [Parameter] public string? SuffixIcon { get; set; }
-    [Parameter] public bool Required { get; set; }
-    [Parameter] public bool Disabled { get; set; }
-    [Parameter] public bool ReadOnly { get; set; }
+    /// <summary>Affiche un bouton pour vider le champ.</summary>
     [Parameter] public bool Clearable { get; set; }
+    /// <summary>Pour <c>Type="password"</c> : affiche le bouton qui montre ou masque la saisie.</summary>
     [Parameter] public bool ShowPasswordToggle { get; set; } = true;
+    /// <summary>Valeur de l'attribut HTML <c>autocomplete</c> (<c>off</c>, <c>email</c>, <c>current-password</c>…).</summary>
     [Parameter] public string? Autocomplete { get; set; }
+    /// <summary>Valeur de l'attribut HTML <c>inputmode</c> : clavier proposé sur mobile (<c>numeric</c>, <c>decimal</c>, <c>email</c>…).</summary>
     [Parameter] public string? InputMode { get; set; }
+    /// <summary>Nombre maximal de caractères saisissables.</summary>
     [Parameter] public int? MaxLength { get; set; }
+    /// <summary>Valeur minimale (types <c>number</c>, <c>date</c>…).</summary>
     [Parameter] public string? Min { get; set; }
+    /// <summary>Valeur maximale (types <c>number</c>, <c>date</c>…).</summary>
     [Parameter] public string? Max { get; set; }
+    /// <summary>Pas de variation (types <c>number</c>, <c>date</c>…).</summary>
     [Parameter] public string? Step { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter] public string? Style { get; set; }
 
     private string EffectiveType => Type == "password" ? (_showPassword ? "text" : "password") : Type;
-
-    private IEnumerable<string> GetErrors()
-    {
-        if (!string.IsNullOrEmpty(ErrorMessage))
-        {
-            yield return ErrorMessage;
-        }
-
-        if (EditContext != null && ValueExpression != null)
-        {
-            foreach (var msg in EditContext.GetValidationMessages(FieldIdentifier))
-            {
-                yield return msg;
-            }
-        }
-    }
-
-    private bool HasError => GetErrors().Any();
-    private string GetFirstError() => GetErrors().FirstOrDefault() ?? string.Empty;
 
     protected override bool TryParseValueFromString(string? value, out TValue result, [NotNullWhen(false)] out string? validationErrorMessage)
     {
@@ -176,15 +151,9 @@
         return false;
     }
 
-    private void HandleInput(ChangeEventArgs e)
-    {
-        CurrentValueAsString = e.Value?.ToString();
-    }
+    private Task HandleInput(ChangeEventArgs e) => HandleTextEventAsync(e.Value?.ToString(), isInput: true);
 
-    private void HandleChange(ChangeEventArgs e)
-    {
-        CurrentValueAsString = e.Value?.ToString();
-    }
+    private Task HandleChange(ChangeEventArgs e) => HandleTextEventAsync(e.Value?.ToString(), isInput: false);
 
     private void ClearValue()
     {
@@ -196,17 +165,4 @@
         _showPassword = !_showPassword;
     }
 
-    private bool IsRequiredByAttribute()
-    {
-        if (EditContext != null && ValueExpression != null)
-        {
-            var memberExpression = ValueExpression.Body as MemberExpression;
-            if (memberExpression != null)
-            {
-                var property = memberExpression.Member;
-                return property.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.RequiredAttribute), true).Any();
-            }
-        }
-        return false;
-    }
 }

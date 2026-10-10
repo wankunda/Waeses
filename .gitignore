@@ -4,4 +4,8 @@
 /WaesesUIDemo/bin
 /WaesesUIDemo/obj
 /WaesesUI.Tests/bin
-/WaesesUITests/obj
+/WaesesUI.Tests/obj
+/WaesesUIDocs/bin
+/WaesesUIDocs/obj
+/WaesesUIDocs.E2E/bin
+/WaesesUIDocs.E2E/obj

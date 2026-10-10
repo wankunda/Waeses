@@ -1,0 +1,7 @@
+<div class="ui-grid ui-grid-cols-3" style="width: 100%;">
+    <UiImage Src="@ExampleImages.Placeholder("#173f5f", "16:9")" Alt="Image 16:9" Caption="Rapport 16:9 imposé" Ratio="ImageRatio.Widescreen" />
+    <UiImage Src="@ExampleImages.Placeholder("#a33b1f", "Cercle", 400, 400)" Alt="Image en cercle" Circle="true" Ratio="ImageRatio.Square" HoverZoom="false" />
+
+    @* La source est volontairement illisible (aucune requête réseau) : FallbackSrc prend le relais. *@
+    <UiImage Src="data:image/png;base64,AAAA" FallbackSrc="@ExampleImages.Placeholder("#475569", "Repli")" Alt="Image de remplacement" Caption="Source introuvable" Ratio="ImageRatio.Widescreen" />
+</div>

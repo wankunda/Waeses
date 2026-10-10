@@ -180,3 +180,22 @@ public enum UiCarouselTransition
     Fade,
     None
 }
+
+/// <summary>Apparence d'un bouton ou d'un champ, indépendante de sa couleur (<see cref="UiColor"/>).</summary>
+public enum UiVariant
+{
+    /// <summary>Fond plein (bouton) ; fond teinté avec soulignement (champ).</summary>
+    Filled,
+
+    /// <summary>Contour seul. Apparence par défaut des champs.</summary>
+    Outlined,
+
+    /// <summary>Sans fond ni contour (bouton) ; soulignement seul (champ).</summary>
+    Text
+}
+
+public static class UiColorExtensions
+{
+    /// <summary>Nom de la classe CSS associée à la couleur (<c>ui-color-primary</c>, …).</summary>
+    public static string ToCssClass(this UiColor color) => $"ui-color-{color.ToString().ToLowerInvariant()}";
+}

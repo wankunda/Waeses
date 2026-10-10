@@ -1,0 +1,28 @@
+<div class="ui-flex-col" style="gap: 1rem; width: 100%; max-width: 28rem;">
+    <UiAutocomplete TItem="Country" TValue="string" @bind-Value="_local" Label="Pays (liste locale)" Items="_countries"
+                    DisplaySelector="c => c.Name" ValueSelector="c => c.Code" Clearable="true" DebounceDelay="0" Placeholder="Tapez un pays…" />
+
+    <UiAutocomplete TItem="Country" TValue="string" @bind-Value="_remote" Label="Pays (recherche asynchrone)" SearchFunc="SearchAsync"
+                    DisplaySelector="c => c.Name" ValueSelector="c => c.Code" LoadingText="Recherche en cours…" DebounceDelay="200" />
+
+    <p class="text-secondary">Codes choisis : <strong>@(_local ?? "—")</strong> et <strong>@(_remote ?? "—")</strong></p>
+</div>
+
+@code {
+    private sealed record Country(string Code, string Name);
+
+    private string? _local;
+    private string? _remote;
+
+    private readonly Country[] _countries =
+    {
+        new("FR", "France"), new("BE", "Belgique"), new("CH", "Suisse"), new("CA", "Canada"), new("ES", "Espagne"), new("IT", "Italie"), new("DE", "Allemagne")
+    };
+
+    // En production : un appel d'API. L'annulation évite d'afficher le résultat d'une frappe déjà périmée.
+    private async Task<IEnumerable<Country>> SearchAsync(string query, CancellationToken cancellationToken)
+    {
+        await Task.Delay(400, cancellationToken);
+        return _countries.Where(c => c.Name.Contains(query, StringComparison.OrdinalIgnoreCase));
+    }
+}

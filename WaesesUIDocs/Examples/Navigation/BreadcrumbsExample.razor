@@ -1,0 +1,11 @@
+<UiBreadcrumbs Items="_trail" AriaLabel="Vous êtes ici" />
+
+@code {
+    // Le dernier élément, sans adresse, est la page courante (aria-current="page").
+    private readonly IReadOnlyList<UiBreadcrumbItem> _trail = new[]
+    {
+        new UiBreadcrumbItem("Accueil", ""),
+        new UiBreadcrumbItem("Boutons", "composants/boutons"),
+        new UiBreadcrumbItem("Couleur et apparence")
+    };
+}

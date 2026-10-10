@@ -8,8 +8,11 @@
 </td>
 
 @code{
+ /// <summary>Libellé de la colonne, affiché devant la valeur dans la présentation mobile (<c>data-title</c>).</summary>
  [Parameter] public string? Label { get; set; }
+ /// <summary>Contenu de la cellule.</summary>
  [Parameter] public RenderFragment? ChildContent { get; set; }
+/// <summary>Alignement du contenu.</summary>
 [Parameter] public Alignement Align { get; set; } = Alignement.Left;
 
  /// <summary>

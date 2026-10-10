@@ -1,0 +1,13 @@
+<div class="ui-grid ui-grid-cols-2" style="width: 100%;">
+    <UiEmptyState Title="Aucun projet" Description="Créez votre premier projet pour commencer."
+                  Icon="@Icons.Material.Filled.Info" ActionText="Créer un projet" OnAction="() => _created++" />
+
+    <UiErrorState Title="Chargement impossible" Message="Le serveur n'a pas répondu." RetryText="Réessayer" OnRetry="() => _retries++" />
+</div>
+
+<p class="text-secondary">Projets créés : <strong>@_created</strong> · tentatives : <strong>@_retries</strong></p>
+
+@code {
+    private int _created;
+    private int _retries;
+}

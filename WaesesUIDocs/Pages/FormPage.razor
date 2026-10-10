@@ -1,0 +1,35 @@
+@page "/composants/formulaire"
+
+<DocPage Href="composants/formulaire">
+    <DocSection Title="Validation globale" Description="`UiForm` enveloppe un `EditForm` et expose l'état du formulaire entier. Dans le contenu, `Context=&quot;form&quot;` donne accès à ses membres.">
+        <DocExample Example="typeof(FormValidation)" />
+    </DocSection>
+
+    <DocSection Title="Envoi asynchrone">
+        <DocExample Example="typeof(FormAsyncSubmit)" />
+    </DocSection>
+
+    <DocSection Title="Membres" Description="Disponibles sur l'instance reçue dans le contenu (`form`), ou avec `@@ref` :">
+        <div class="api-table-wrap">
+            <table class="ui-table ui-table-compact">
+                <caption class="api-caption">Propriétés et méthodes</caption>
+                <thead><tr><th scope="col">Membre</th><th scope="col">Description</th></tr></thead>
+                <tbody>
+                    <tr><td><code>bool Validate()</code></td><td>Valide tous les champs (DataAnnotations et <code>Validation</code> de chaque champ) et renvoie le résultat.</td></tr>
+                    <tr><td><code>void ResetValidation()</code></td><td>Efface les erreurs et l'état « modifié » sans toucher aux valeurs du modèle.</td></tr>
+                    <tr><td><code>Task SubmitAsync()</code></td><td>Valide puis appelle <code>OnValidSubmit</code> ou <code>OnInvalidSubmit</code>, comme un clic sur le bouton d'envoi.</td></tr>
+                    <tr><td><code>bool IsValid</code></td><td>Faux tant qu'au moins un champ porte une erreur.</td></tr>
+                    <tr><td><code>IReadOnlyList&lt;string&gt; Errors</code></td><td>Messages de validation de tous les champs.</td></tr>
+                    <tr><td><code>bool IsTouched</code></td><td>Vrai si un champ a été modifié depuis l'ouverture ou la dernière réinitialisation.</td></tr>
+                    <tr><td><code>bool IsSubmitting</code></td><td>Vrai pendant l'exécution de <code>OnValidSubmit</code>.</td></tr>
+                    <tr><td><code>EditContext Context</code></td><td>Contexte d'édition courant.</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <UiCodeBlock Code="@Snippets.FormMethods" Language="razor" />
+    </DocSection>
+
+    <DocSection Title="API">
+        <ApiTable Component="typeof(UiForm)" />
+    </DocSection>
+</DocPage>

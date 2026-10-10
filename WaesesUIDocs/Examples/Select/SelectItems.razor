@@ -1,0 +1,22 @@
+@using System.ComponentModel
+
+<div class="ui-flex-col" style="gap: 1rem; width: 100%; max-width: 28rem;">
+    <UiSelect @bind-Value="_priority" Label="Priorité (énumération)" Items="Enum.GetValues<Priority>()" ItemDisabled="@(p => p == Priority.Critical)" />
+
+    <UiSelect @bind-Value="_year" Label="Année" Items="_years" ItemText="@(year => $"Année {year}")" />
+
+    <p class="text-secondary">Priorité : <strong>@_priority</strong> — année : <strong>@_year</strong></p>
+</div>
+
+@code {
+    private enum Priority
+    {
+        [Description("Basse")] Low,
+        [Description("Normale")] Normal,
+        [Description("Critique (réservé)")] Critical
+    }
+
+    private Priority _priority = Priority.Normal;
+    private int _year = DateTime.Today.Year;
+    private readonly int[] _years = Enumerable.Range(DateTime.Today.Year - 2, 5).ToArray();
+}

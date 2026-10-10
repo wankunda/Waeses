@@ -1,0 +1,14 @@
+<div class="ui-flex-col" style="gap: 1rem; width: 100%; max-width: 28rem;">
+    @* UiFormField habille n'importe quel contrôle natif : libellé relié, astérisque, aide et erreur. *@
+    <UiFormField For="quantity" Label="Quantité" Required="true" HelperText="Entre 1 et 10." Error="@Error">
+        <input id="quantity" type="number" class="ui-input" min="1" max="10" value="@_quantity"
+               aria-invalid="@(Error is null ? null : "true")" aria-describedby="@(Error is null ? "quantity-helper" : "quantity-error")"
+               @onchange="@(e => _quantity = int.TryParse(e.Value?.ToString(), out var n) ? n : 0)" />
+    </UiFormField>
+</div>
+
+@code {
+    private int _quantity = 3;
+
+    private string? Error => _quantity is >= 1 and <= 10 ? null : "La quantité doit être comprise entre 1 et 10.";
+}

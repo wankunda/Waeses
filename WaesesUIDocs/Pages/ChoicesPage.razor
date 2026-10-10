@@ -1,0 +1,23 @@
+@page "/composants/cases-et-curseurs"
+
+<DocPage Href="composants/cases-et-curseurs">
+    <DocSection Title="Cases à cocher et interrupteurs" Description="`UiCheckbox` et `UiSwitch` se lient à un booléen. Ils exposent `role=&quot;checkbox&quot;` / `role=&quot;switch&quot;` et `aria-checked` (toujours `true` ou `false`), et se commandent à la souris, à Espace et à Entrée. `Color` choisit la couleur de l'état activé.">
+        <DocExample Example="typeof(CheckboxSwitchExample)" />
+    </DocSection>
+
+    <DocSection Title="Boutons radio" Description="`UiRadioGroup` porte la valeur choisie ; chaque `UiRadioOption` déclare la sienne. Une seule option est dans l'ordre de tabulation (celle qui est choisie, sinon la première active) et les flèches passent à l'option suivante en la sélectionnant. `Color` du groupe s'applique à toutes les options, chacune peut la surcharger.">
+        <DocExample Example="typeof(RadioGroupExample)" />
+    </DocSection>
+
+    <DocSection Title="Curseurs" Description="`UiSlider` lie un `double`. `Min`, `Max` et `Step` bornent les valeurs ; `Unit` s'affiche après la valeur.">
+        <DocExample Example="typeof(SliderExample)" />
+    </DocSection>
+
+    <DocSection Title="API">
+        <ApiTable Component="typeof(UiCheckbox)" />
+        <ApiTable Component="typeof(UiSwitch)" />
+        <ApiTable Component="typeof(UiRadioGroup<>)" />
+        <ApiTable Component="typeof(UiRadioOption<>)" />
+        <ApiTable Component="typeof(UiSlider)" />
+    </DocSection>
+</DocPage>

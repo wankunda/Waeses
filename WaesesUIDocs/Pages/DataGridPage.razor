@@ -1,0 +1,47 @@
+@page "/composants/grille-de-donnees"
+
+<DocPage Href="composants/grille-de-donnees">
+    <DocSection Title="Tri, filtres et recherche" Description="Les colonnes se déclarent avec `UiColumn`. Un clic sur un en-tête trie, Maj + clic ajoute un critère (avec `MultiSort`). Les filtres ont un opérateur ; les nombres et les dates sont comparés comme tels, pas comme du texte.">
+        <DocExample Example="typeof(GridBasic)" />
+    </DocSection>
+
+    <DocSection Title="Sélection, groupes et détails" Description="`GroupBy` regroupe par la clé d'une colonne (groupes repliables), `ChildRowContent` ajoute des lignes dépliables et `Selectable` une colonne de cases à cocher.">
+        <DocExample Example="typeof(GridSelectionGroups)" />
+    </DocSection>
+
+    <DocSection Title="Données côté serveur" Description="Avec `ServerData`, la grille délègue tri, filtres, recherche et pagination : elle envoie un `UiGridState` et affiche ce qu'on lui renvoie. Les réponses périmées (requête plus ancienne arrivée en retard) sont ignorées.">
+        <DocExample Example="typeof(GridServer)" />
+        <UiCodeBlock Code="@Snippets.GridServerSignature" Language="csharp" />
+    </DocSection>
+
+    <DocSection Title="Édition de ligne" Description="Avec `EditMode=&quot;Row&quot;`, une ligne à la fois devient modifiable. Les gabarits d'édition (`EditTemplate`) travaillent sur une copie : l'original n'est jamais modifié, et `OnRowCommit` reçoit l'original et la copie.">
+        <DocExample Example="typeof(GridEdit)" />
+    </DocSection>
+
+    <DocSection Title="Grands volumes" Description="`Virtualize` n'affiche que les lignes visibles. Il exige une hauteur de ligne fixe (`RowHeight`) et désactive pagination, regroupement et lignes dépliables. Il s'applique aux données côté client.">
+        <DocExample Example="typeof(GridVirtual)" />
+    </DocSection>
+
+    <DocSection Title="Opérateurs de filtre">
+        <p class="docs-text">
+            @foreach (var op in Enum.GetValues<UiFilterOperator>())
+            {
+                <code>@op</code>@(" ")
+            }
+        </p>
+        <p class="docs-text"><code>UiFilterEvaluator.Matches(valeur, opérateur, opérande)</code> est public : réutilisez-le pour appliquer les mêmes règles de filtre dans votre propre code serveur.</p>
+    </DocSection>
+
+    <DocSection Title="Limites">
+        <ul>
+            <li>Pas de redimensionnement des colonnes ni de déplacement par glisser-déposer.</li>
+            <li>Le regroupement s'applique aux données côté client, sur la page affichée.</li>
+            <li>Pour un tableau simple sans déclaration de colonnes, <code>UiTable</code> reste plus léger.</li>
+        </ul>
+    </DocSection>
+
+    <DocSection Title="API">
+        <ApiTable Component="typeof(UiDataGrid<>)" />
+        <ApiTable Component="typeof(UiColumn<>)" />
+    </DocSection>
+</DocPage>

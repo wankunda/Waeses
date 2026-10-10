@@ -1,25 +1,46 @@
 @namespace WaesesUI
 @implements IAsyncDisposable
 @inject IJSRuntime JS
+@inject UiOptions Options
 
+@if (_themeCss is { Length: > 0 })
+{
+    <style data-ui-theme>@((MarkupString)_themeCss)</style>
+}
 <span hidden aria-hidden="true"></span>
 
 @code {
     private bool _configurationChanged = true;
     private string? _lastConfiguration;
+    private string? _themeCss;
 
+    /// <summary>Densité de l'interface : compacte, confortable ou spacieuse.</summary>
     [Parameter] public UiDensity Density { get; set; } = UiDensity.Comfortable;
+    /// <summary>Mode : clair, sombre ou celui du système.</summary>
     [Parameter] public UiTheme Theme { get; set; } = UiTheme.System;
+    /// <summary>
+    /// Thème décrit en C# (couleurs claires/sombres, typographie, rayons). Par défaut <see cref="UiOptions.Theme"/>.
+    /// Lorsqu'il est défini, il remplace les palettes <see cref="Primary"/>… ci-dessous.
+    /// </summary>
+    [Parameter] public UiThemeDefinition? Definition { get; set; }
+
+    /// <summary>Palette primaire. Ignorée si <c>Definition</c> est défini.</summary>
     [Parameter] public UiColorPalette Primary { get; set; } = UiColors.Indigo;
+    /// <summary>Palette secondaire. Ignorée si <c>Definition</c> est défini.</summary>
     [Parameter] public UiColorPalette Secondary { get; set; } = UiColors.BlueGray;
+    /// <summary>Palette de succès. Ignorée si <c>Definition</c> est défini.</summary>
     [Parameter] public UiColorPalette Success { get; set; } = UiColors.Green;
+    /// <summary>Palette de danger. Ignorée si <c>Definition</c> est défini.</summary>
     [Parameter] public UiColorPalette Danger { get; set; } = UiColors.Red;
+    /// <summary>Palette d'avertissement. Ignorée si <c>Definition</c> est défini.</summary>
     [Parameter] public UiColorPalette Warning { get; set; } = UiColors.Amber;
+    /// <summary>Palette d'information. Ignorée si <c>Definition</c> est défini.</summary>
     [Parameter] public UiColorPalette Info { get; set; } = UiColors.LightBlue;
 
     protected override void OnParametersSet()
     {
-        var configuration = $"{Theme}|{Density}|{Primary.Name}|{Secondary.Name}|{Success.Name}|{Danger.Name}|{Warning.Name}|{Info.Name}";
+        _themeCss = (Definition ?? Options.Theme)?.ToCss();
+        var configuration = $"{_themeCss}|{Theme}|{Density}|{Primary.Name}|{Secondary.Name}|{Success.Name}|{Danger.Name}|{Warning.Name}|{Info.Name}";
         _configurationChanged = !string.Equals(configuration, _lastConfiguration, StringComparison.Ordinal);
         _lastConfiguration = configuration;
     }
@@ -41,7 +62,10 @@
         }
     }
 
-    private Dictionary<string, string> GetPaletteTokens() => new()
+    // Une définition de thème remplace les palettes : les variables posées en ligne sur la racine l'emporteraient sinon sur la feuille générée.
+    private Dictionary<string, string> GetPaletteTokens() => (Definition ?? Options.Theme) is not null ? new() : GetLegacyPaletteTokens();
+
+    private Dictionary<string, string> GetLegacyPaletteTokens() => new()
     {
         ["primary"] = Primary.Default,
         ["primary-hover"] = Primary.Darken1,
@@ -71,31 +95,10 @@
         ["info-contrast"] = GetContrast(Info.Default)
     };
 
-    private static string GetContrast(string hex)
-    {
-        if (hex.Length != 7 || !hex.StartsWith('#'))
-        {
-            return "#ffffff";
-        }
-
-        var red = Convert.ToInt32(hex.Substring(1, 2), 16) / 255d;
-        var green = Convert.ToInt32(hex.Substring(3, 2), 16) / 255d;
-        var blue = Convert.ToInt32(hex.Substring(5, 2), 16) / 255d;
-        red = red <= .04045 ? red / 12.92 : Math.Pow((red + .055) / 1.055, 2.4);
-        green = green <= .04045 ? green / 12.92 : Math.Pow((green + .055) / 1.055, 2.4);
-        blue = blue <= .04045 ? blue / 12.92 : Math.Pow((blue + .055) / 1.055, 2.4);
-        var luminance = .2126 * red + .7152 * green + .0722 * blue;
-        return luminance > .42 ? "#0f172a" : "#ffffff";
-    }
+    private static string GetContrast(string hex) => UiColorMath.Contrast(hex);
 
     public async ValueTask DisposeAsync()
     {
-        try
-        {
-            await JS.InvokeVoidAsync("UiInterop.clearGlobalTheme");
-        }
-        catch (JSDisconnectedException)
-        {
-        }
+        await JS.TryTeardownAsync("UiInterop.clearGlobalTheme");
     }
 }

@@ -26,6 +26,19 @@
     </UiTable>
 </UiCard>
 
+<UiCard Title="Grille de données" Subtitle="Colonnes déclaratives, filtres par colonne, tri multiple (Maj + clic), menu des colonnes" Class="mt-sm">
+    <UiDataGrid TItem="DemoMember" Items="_members" ShowSearch="true" ShowFilters="true" MultiSort="true" StickyHeader="true" PageSize="5" AriaLabel="Membres de l'équipe">
+        <Columns>
+            <UiColumn TItem="DemoMember" Key="name" Title="Membre" Field="member => member.Name" />
+            <UiColumn TItem="DemoMember" Key="role" Title="Rôle" Field="member => member.Role" />
+            <UiColumn TItem="DemoMember" Key="status" Title="Statut" Field="member => member.Status">
+                <CellTemplate><UiBadge Text="@context.Status" Variant="UiVariant.Outlined" Color="@(context.Status == "Actif" ? UiColor.Success : UiColor.Neutral)" /></CellTemplate>
+            </UiColumn>
+            <UiColumn TItem="DemoMember" Key="activity" Title="Activité (%)" Field="member => member.Activity" Align="Alignement.Right" />
+        </Columns>
+    </UiDataGrid>
+</UiCard>
+
 <section class="ui-grid ui-grid-cols-2 mt-sm">
     <UiCard Title="Progression" Subtitle="Suivre une opération longue">
         <div class="ui-flex-col">

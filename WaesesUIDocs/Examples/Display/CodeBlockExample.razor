@@ -1,0 +1,12 @@
+<div style="width: 100%; max-width: 40rem;">
+    <UiCodeBlock Language="csharp" Code="@Snippet" />
+</div>
+
+@code {
+    private const string Snippet = """
+        builder.Services.AddWaesesUIServices(options =>
+        {
+            options.ToastDurationMs = 6000;
+        });
+        """;
+}

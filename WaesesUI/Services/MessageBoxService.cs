@@ -25,7 +25,7 @@ public class MessageBoxService : IMessageBoxService
             Type = type,
             ConfirmText = confirmText ?? _options.ConfirmText,
             CancelText = cancelText ?? _options.CancelText,
-            ShowCancel = type == MessageBoxType.Confirm
+            ShowCancel = true
         };
 
         OnShow?.Invoke(options, tcs);

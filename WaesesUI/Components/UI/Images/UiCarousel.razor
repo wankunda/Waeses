@@ -85,6 +85,7 @@
     private Timer? _timer;
     private (bool Cycle, int Interval, int Count) _timerConfig;
 
+    /// <summary>Diapositives du carrousel.</summary>
     [Parameter] public IReadOnlyList<UiCarouselItem> Items { get; set; } = Array.Empty<UiCarouselItem>();
 
     /// <summary>Contenu personnalisé d'une diapositive (remplace l'image et la légende).</summary>
@@ -92,25 +93,36 @@
 
     /// <summary>Index affiché. Optionnel : sans liaison, le carrousel garde son propre état.</summary>
     [Parameter] public int ActiveIndex { get; set; }
+    /// <summary>Appelé quand la diapositive affichée change ; reçoit son index.</summary>
     [Parameter] public EventCallback<int> ActiveIndexChanged { get; set; }
+    /// <summary>Rapport largeur/hauteur des images.</summary>
     [Parameter] public ImageRatio Ratio { get; set; } = ImageRatio.Widescreen;
+    /// <summary>Animation de passage : glissement, fondu ou aucune.</summary>
     [Parameter] public UiCarouselTransition Transition { get; set; } = UiCarouselTransition.Slide;
 
     /// <summary>Revient à la première diapositive après la dernière (et inversement).</summary>
     [Parameter] public bool Loop { get; set; } = true;
+    /// <summary>Passe automatiquement à la diapositive suivante. Suspendu au survol et au focus avec <c>PauseOnHover</c>.</summary>
     [Parameter] public bool AutoCycle { get; set; }
+    /// <summary>Délai en millisecondes entre deux diapositives automatiques.</summary>
     [Parameter] public int AutoCycleInterval { get; set; } = 5000;
 
     /// <summary>Suspend le défilement automatique au survol et au focus.</summary>
     [Parameter] public bool PauseOnHover { get; set; } = true;
+    /// <summary>Affiche les flèches précédent/suivant.</summary>
     [Parameter] public bool ShowArrows { get; set; } = true;
+    /// <summary>Affiche les pastilles de navigation.</summary>
     [Parameter] public bool ShowBullets { get; set; } = true;
+    /// <summary>Affiche le compteur « 2 / 5 ».</summary>
     [Parameter] public bool ShowCounter { get; set; } = true;
 
     /// <summary>Navigation par glissement tactile.</summary>
     [Parameter] public bool EnableSwipe { get; set; } = true;
+    /// <summary>Nom accessible du carrousel.</summary>
     [Parameter] public string AriaLabel { get; set; } = "Carrousel";
+    /// <summary>Nom accessible de la flèche précédente.</summary>
     [Parameter] public string PreviousText { get; set; } = "Image précédente";
+    /// <summary>Nom accessible de la flèche suivante.</summary>
     [Parameter] public string NextText { get; set; } = "Image suivante";
 
     private int SafeIndex => Math.Clamp(_index, 0, Math.Max(Items.Count - 1, 0));

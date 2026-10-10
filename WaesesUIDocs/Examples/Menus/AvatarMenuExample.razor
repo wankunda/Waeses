@@ -1,0 +1,13 @@
+<div class="ui-flex-row" style="align-items: center; gap: 1rem;">
+    <UiAvatarMenu Initials="AM" Status="AvatarStatus.Online" BackgroundColor="#173f5f" MenuAriaLabel="Menu du profil d'Alice Martin">
+        <button type="button" @onclick="@(() => _choice = "Mon profil")">Mon profil</button>
+        <button type="button" @onclick="@(() => _choice = "Paramètres")">Paramètres</button>
+        <button type="button" @onclick="@(() => _choice = "Déconnexion")">Déconnexion</button>
+    </UiAvatarMenu>
+
+    <span class="text-secondary">Choix : <strong>@_choice</strong></span>
+</div>
+
+@code {
+    private string _choice = "aucun";
+}

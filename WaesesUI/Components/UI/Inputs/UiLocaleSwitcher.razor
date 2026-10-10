@@ -14,9 +14,13 @@
 </div>
 
 @code {
+    /// <summary>Cultures proposées (français et anglais américain par défaut).</summary>
     [Parameter] public IReadOnlyList<CultureInfo> Cultures { get; set; } = new[] { CultureInfo.GetCultureInfo("fr-FR"), CultureInfo.GetCultureInfo("en-US") };
+    /// <summary>Libellé du sélecteur.</summary>
     [Parameter] public string Label { get; set; } = "Langue";
+    /// <summary>Identifiant de l'élément ; généré automatiquement si absent.</summary>
     [Parameter] public string? Id { get; set; } = $"locale-{Guid.NewGuid():N}";
+    /// <summary>Appelé quand l'utilisateur choisit une culture.</summary>
     [Parameter] public EventCallback<CultureInfo> CultureChanged { get; set; }
 
     protected override void OnInitialized() => Localization.OnCultureChanged += HandleCultureChanged;

@@ -1,0 +1,25 @@
+<div class="ui-flex-col" style="gap: .75rem;">
+    <UiButton Text="Supprimer le projet" Color="UiColor.Danger" OnClick="() => _open = true" />
+    <p class="text-secondary">Résultat : <strong>@_result</strong></p>
+</div>
+
+<UiModal @bind-IsOpen="_open" Title="Supprimer le projet ?" Size="UiSize.Sm">
+    <ChildContent>
+        <p>Cette action est définitive : le projet et ses fichiers seront supprimés.</p>
+    </ChildContent>
+    <Footer>
+        <UiButton Text="Annuler" Appearance="UiVariant.Text" Color="UiColor.Neutral" OnClick="@(() => Close("annulé"))" />
+        <UiButton Text="Supprimer" Color="UiColor.Danger" OnClick="@(() => Close("supprimé"))" />
+    </Footer>
+</UiModal>
+
+@code {
+    private bool _open;
+    private string _result = "aucun";
+
+    private void Close(string result)
+    {
+        _result = result;
+        _open = false;
+    }
+}

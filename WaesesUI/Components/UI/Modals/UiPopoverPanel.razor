@@ -16,15 +16,22 @@
 @code {
     private readonly UiPopoverEntry _entry = new();
 
+    /// <summary>Indique si le panneau est ouvert (lié avec <c>bind-Open</c>).</summary>
     [Parameter] public bool Open { get; set; }
+    /// <summary>Appelé lorsque le panneau demande sa fermeture (clic extérieur, Échap).</summary>
     [Parameter] public EventCallback<bool> OpenChanged { get; set; }
+    /// <summary>Contenu du panneau.</summary>
     [Parameter] public RenderFragment? ChildContent { get; set; }
+    /// <summary>Position préférée par rapport à l'ancre ; inversée automatiquement s'il manque de la place.</summary>
     [Parameter] public UiPopoverPlacement Placement { get; set; } = UiPopoverPlacement.BottomStart;
+    /// <summary>Distance en pixels entre l'ancre et le panneau.</summary>
     [Parameter] public int Offset { get; set; } = 8;
 
     /// <summary>Donne au popover au moins la largeur de l'ancre (listes déroulantes).</summary>
     [Parameter] public bool MatchAnchorWidth { get; set; }
+    /// <summary>Ferme le panneau au clic en dehors de l'ancre et du panneau.</summary>
     [Parameter] public bool CloseOnOutsideClick { get; set; } = true;
+    /// <summary>Ferme le panneau avec la touche Échap.</summary>
     [Parameter] public bool CloseOnEscape { get; set; } = true;
 
     /// <summary>Sélecteur CSS de l'ancre, relatif au document. Par défaut : l'élément parent.</summary>

@@ -1,0 +1,38 @@
+<UiDataGrid TItem="Product" Items="_products" EditMode="UiGridEditMode.Row" Paginated="false"
+            OnRowCommit="Commit" OnRowCancel="Cancel" AriaLabel="Produits">
+    <Columns>
+        <UiColumn TItem="Product" Key="name" Title="Produit" Field="p => p.Name">
+            <EditTemplate><UiInput @bind-Value="context.Name" aria-label="Nom du produit" /></EditTemplate>
+        </UiColumn>
+        <UiColumn TItem="Product" Key="price" Title="Prix" Field="p => p.Price" Format="C2" Align="Alignement.Right">
+            <EditTemplate><UiInput @bind-Value="context.Price" Type="number" Step="0.01" aria-label="Prix" /></EditTemplate>
+        </UiColumn>
+    </Columns>
+</UiDataGrid>
+
+<p class="text-secondary">@_log</p>
+
+@code {
+    // Classe modifiable : pendant l'édition, la grille travaille sur une COPIE (EditClone, copie superficielle par défaut).
+    private sealed class Product
+    {
+        public string Name { get; set; } = "";
+        public decimal Price { get; set; }
+    }
+
+    private readonly List<Product> _products = new()
+    {
+        new() { Name = "Cahier", Price = 3.5m }, new() { Name = "Stylo", Price = 1.2m }, new() { Name = "Classeur", Price = 6.9m }
+    };
+
+    private string _log = "Cliquez sur ✎ pour modifier une ligne.";
+
+    // OnRowCommit reçoit l'original et la copie modifiée : à vous de les appliquer à vos données.
+    private void Commit(UiRowEdit<Product> edit)
+    {
+        _products[_products.IndexOf(edit.Original)] = edit.Edited;
+        _log = $"Enregistré : {edit.Edited.Name} à {edit.Edited.Price:C2} (avant : {edit.Original.Price:C2}).";
+    }
+
+    private void Cancel(Product original) => _log = $"Modification de « {original.Name} » annulée : l'original est intact.";
+}

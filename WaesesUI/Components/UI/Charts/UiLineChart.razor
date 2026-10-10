@@ -28,11 +28,17 @@
 </div>
 
 @code {
+    /// <summary>Points de la courbe (libellé et valeur).</summary>
     [Parameter] public IReadOnlyList<UiChartData> Data { get; set; } = Array.Empty<UiChartData>();
+    /// <summary>Largeur du dessin en pixels (le graphique s'adapte à son conteneur).</summary>
     [Parameter] public int Width { get; set; } = 640;
+    /// <summary>Hauteur du dessin en pixels.</summary>
     [Parameter] public int Height { get; set; } = 320;
+    /// <summary>Couleur CSS de la courbe (par exemple <c>var(--success)</c>).</summary>
     [Parameter] public string Color { get; set; } = "var(--primary)";
+    /// <summary>Affiche les lignes de repère horizontales.</summary>
     [Parameter] public bool ShowGrid { get; set; } = true;
+    /// <summary>Nom accessible du graphique.</summary>
     [Parameter] public string AriaLabel { get; set; } = "Graphique linéaire";
     /// <summary>
     /// Format .NET des valeurs (axe, étiquettes, info-bulles), par exemple <c>"N0"</c> pour « 50 000 » selon la culture.

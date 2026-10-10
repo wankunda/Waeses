@@ -1,0 +1,11 @@
+<div style="width: 100%; max-width: 40rem;">
+    <UiBarChart Data="_revenue" ValueFormatter="@(v => $"{v:N0} €")" ShowGrid="false" AriaLabel="Chiffre d'affaires par trimestre" />
+</div>
+
+@code {
+    private readonly IReadOnlyList<UiChartData> _revenue = new[]
+    {
+        new UiChartData("T1", 125_000, "var(--primary)"), new UiChartData("T2", 148_500, "var(--info)"),
+        new UiChartData("T3", 98_200, "var(--warning)"), new UiChartData("T4", 171_900, "var(--success)")
+    };
+}

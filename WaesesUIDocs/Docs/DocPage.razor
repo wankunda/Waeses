@@ -1,0 +1,40 @@
+<PageTitle>@Title · WaesesUI</PageTitle>
+
+<article class="docs-content">
+    <header class="docs-header">
+        @if (!string.IsNullOrEmpty(Group))
+        {
+            <span class="docs-eyebrow">@Group</span>
+        }
+        <h1>@Title</h1>
+        @if (!string.IsNullOrEmpty(Description))
+        {
+            <p class="docs-lead"><DocText Text="@Description" /></p>
+        }
+    </header>
+
+    @ChildContent
+</article>
+
+@code {
+    /// <summary>Adresse de la page dans <see cref="DocsCatalog"/> : titre, description et rubrique en sont tirés (source unique).</summary>
+    [Parameter] public string? Href { get; set; }
+
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public string? Description { get; set; }
+
+    /// <summary>Rubrique affichée au-dessus du titre.</summary>
+    [Parameter] public string? Group { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        if (Href is null) return;
+
+        var entry = DocsCatalog.Entries.FirstOrDefault(e => e.Href == Href)
+            ?? throw new InvalidOperationException($"Aucune page « {Href} » dans DocsCatalog.");
+        Title = entry.Title;
+        Description = entry.Description;
+        Group = entry.Group;
+    }
+}

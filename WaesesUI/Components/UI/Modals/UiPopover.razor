@@ -7,7 +7,7 @@
 <div class="ui-popover @Class" @ref="_rootRef" style="@Style" @attributes="AdditionalAttributes">
     <button type="button"
             class="ui-popover-trigger"
-            aria-expanded="@_isOpen"
+            aria-expanded="@(_isOpen ? "true" : "false")"
             aria-haspopup="dialog"
             @onclick="Toggle">
         @Trigger
@@ -27,15 +27,22 @@
 </div>
 
 @code {
+    /// <summary>Contenu du bouton qui ouvre ou ferme le popover.</summary>
     [Parameter] public RenderFragment? Trigger { get; set; }
+    /// <summary>Contenu du popover.</summary>
     [Parameter] public RenderFragment? ChildContent { get; set; }
+    /// <summary>Indique si le popover est ouvert (lié avec <c>bind-IsOpen</c>).</summary>
     [Parameter] public bool IsOpen { get; set; }
+    /// <summary>Appelé lorsque l'état d'ouverture change (clic sur le déclencheur, clic extérieur, Échap).</summary>
     [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
 
     /// <summary>Position du contenu quand un <see cref="UiPopoverProvider"/> est présent.</summary>
     [Parameter] public UiPopoverPlacement Placement { get; set; } = UiPopoverPlacement.BottomEnd;
+    /// <summary>Distance en pixels entre le déclencheur et le contenu (avec un <c>UiPopoverProvider</c>).</summary>
     [Parameter] public int Offset { get; set; } = 8;
+    /// <summary>Donne au contenu au moins la largeur du déclencheur (avec un <c>UiPopoverProvider</c>).</summary>
     [Parameter] public bool MatchAnchorWidth { get; set; }
+    /// <summary>Nom accessible du contenu du popover.</summary>
     [Parameter] public string? AriaLabel { get; set; }
 
     private bool _isOpen;
@@ -84,11 +91,11 @@
 
     public async ValueTask DisposeAsync()
     {
-        try
+        // Rien à démonter si le composant n'a jamais été rendu côté client (prérendu) ou s'il passe par le UiPopoverProvider.
+        if (_dotNetRef is not null)
         {
-            await JS.InvokeVoidAsync("UiInterop.teardownOverlay", _rootRef);
+            await JS.TryTeardownAsync("UiInterop.teardownOverlay", _rootRef);
         }
-        catch (JSDisconnectedException) { }
         _dotNetRef?.Dispose();
     }
 }

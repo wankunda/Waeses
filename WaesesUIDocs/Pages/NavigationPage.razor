@@ -1,0 +1,35 @@
+@page "/composants/navigation"
+
+<DocPage Href="composants/navigation">
+    <DocSection Title="Menu latéral" Description="`UiNavMenu` est le menu de l'application (celui de cette documentation). Il se règle avec une liste de `NavigationItem`, se replie en tiroir sur petit écran et accepte `HeaderContent` pour une recherche. Il occupe le bord de l'écran : il est donc présenté en code plutôt qu'en exemple vivant.">
+        <UiCodeBlock Code="@Snippets.NavMenuUsage" Language="razor" />
+        <div class="api-table-wrap">
+            <table class="ui-table ui-table-compact">
+                <caption class="api-caption">NavigationItem</caption>
+                <thead><tr><th scope="col">Propriété</th><th scope="col">Rôle</th></tr></thead>
+                <tbody>
+                    <tr><td><code>Text</code></td><td>Libellé du lien.</td></tr>
+                    <tr><td><code>Href</code></td><td>Adresse du lien.</td></tr>
+                    <tr><td><code>Icon</code></td><td>Icône affichée avant le libellé.</td></tr>
+                    <tr><td><code>Match</code></td><td><code>All</code> (adresse exacte) ou <code>Prefix</code> (défaut) : quand le lien est actif.</td></tr>
+                    <tr><td><code>Disabled</code></td><td>Lien visible mais non navigable.</td></tr>
+                    <tr><td><code>Group</code></td><td>Titre de section : un en-tête s'affiche à chaque changement de groupe (les éléments d'un même groupe doivent se suivre).</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </DocSection>
+
+    <DocSection Title="Fil d'Ariane" Description="`UiBreadcrumbs` indique où l'on se trouve. Le dernier élément, sans adresse, est la page courante (`aria-current=&quot;page&quot;`).">
+        <DocExample Example="typeof(BreadcrumbsExample)" />
+    </DocSection>
+
+    <DocSection Title="Étapes" Description="`UiStepper` présente un parcours en plusieurs étapes ; l'étape active se lie avec `ActiveIndex`.">
+        <DocExample Example="typeof(StepperExample)" />
+    </DocSection>
+
+    <DocSection Title="API">
+        <ApiTable Component="typeof(UiNavMenu)" />
+        <ApiTable Component="typeof(UiBreadcrumbs)" />
+        <ApiTable Component="typeof(UiStepper)" />
+    </DocSection>
+</DocPage>

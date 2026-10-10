@@ -26,17 +26,36 @@
 </button>
 
 @code {
+    /// <summary>Style historique du bouton. Remplacé par <c>Color</c> et <c>Appearance</c> dès que l'un des deux est défini.</summary>
     [Parameter] public UiButtonVariant Variant { get; set; } = UiButtonVariant.Primary;
+    /// <summary>Taille du bouton.</summary>
     [Parameter] public UiSize Size { get; set; } = UiSize.Md;
+    /// <summary>Attribut HTML <c>type</c> : <c>button</c> (défaut), <c>submit</c> ou <c>reset</c>.</summary>
     [Parameter] public string Type { get; set; } = "button";
+    /// <summary>Désactive le bouton.</summary>
     [Parameter] public bool Disabled { get; set; }
+    /// <summary>Affiche un indicateur de chargement à la place de l'icône et désactive le bouton.</summary>
     [Parameter] public bool Loading { get; set; }
+    /// <summary>Icône du bouton : un SVG de la bibliothèque d'icônes, ou un texte court. Ajoutez un <c>aria-label</c> pour les lecteurs d'écran.</summary>
     [Parameter] public string? Icon { get; set; }
+
+    /// <summary>Couleur du bouton. Avec <see cref="Appearance"/>, remplace <see cref="Variant"/>.</summary>
+    [Parameter] public UiColor? Color { get; set; }
+
+    /// <summary>Apparence (plein, contour, texte). Avec <see cref="Color"/>, remplace <see cref="Variant"/>.</summary>
+    [Parameter] public UiVariant? Appearance { get; set; }
+    /// <summary>Sans effet sur ce bouton (conservé pour compatibilité).</summary>
     [Parameter] public string? Target { get; set; }
+    /// <summary>Appelé au clic (ou à l'activation au clavier).</summary>
     [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
 
+    private bool UsesColorAppearance => Color.HasValue || Appearance.HasValue;
+
     private string CssClass => CssBuilder
-        .Default($"ui-btn-fab ui-btn-{Variant.ToString().ToLowerInvariant()} ui-btn-fab-{Size.ToString().ToLowerInvariant()}")
+        .Default("ui-btn-fab")
+        .AddIf($"ui-btn-{Variant.ToString().ToLowerInvariant()}", !UsesColorAppearance)
+        .AddIf($"{(Color ?? UiColor.Primary).ToCssClass()} ui-btn-{(Appearance ?? UiVariant.Filled).ToString().ToLowerInvariant()}", UsesColorAppearance)
+        .Add($"ui-btn-fab-{Size.ToString().ToLowerInvariant()}")
         .Add(Class)
         .Build();
 }

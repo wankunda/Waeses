@@ -1,0 +1,28 @@
+@page "/composants/autres-champs"
+
+<DocPage Href="composants/autres-champs">
+    <DocSection Title="Couleur" Description="`UiColorPicker` lie une couleur hexadécimale ; le sélecteur natif et le champ texte sont synchronisés.">
+        <DocExample Example="typeof(ColorPickerExample)" />
+    </DocSection>
+
+    <DocSection Title="Import de fichiers" Description="`UiInputFile` encapsule `InputFile` : zone de dépôt ou simple bouton. Les fichiers sont décrits par `IBrowserFile` ; aucun contenu n'est lu avant que vous n'ouvriez leur flux (`OpenReadStream`). `Accept`, `MaxAllowedFiles` et `MaxFileSize` limitent la sélection.">
+        <DocExample Example="typeof(InputFileExample)" />
+    </DocSection>
+
+    <DocSection Title="Habiller un contrôle natif" Description="`UiFormField` ajoute le libellé relié, l'astérisque, le texte d'aide et l'erreur à n'importe quel contrôle. `UiInputMessages` est la zone d'erreur et d'aide des champs de la bibliothèque, à réutiliser dans vos propres champs (voir le guide des formulaires).">
+        <DocExample Example="typeof(FormFieldExample)" />
+    </DocSection>
+
+    <DocSection Title="Langue" Description="`IUiLocalizationService` fournit les libellés internes en français et en anglais (clés `ui.copy`, `ui.copied`, `ui.close`, `ui.cancel`, `ui.confirm`, `ui.retry`, `ui.loading`, `ui.empty`) et les formats de nombre et de date de la culture choisie. `UiLocalizedText` affiche une clé, `UiLocaleSwitcher` change la culture.">
+        <DocExample Example="typeof(LocaleExample)" />
+    </DocSection>
+
+    <DocSection Title="API">
+        <ApiTable Component="typeof(UiColorPicker<>)" />
+        <ApiTable Component="typeof(UiInputFile)" />
+        <ApiTable Component="typeof(UiFormField)" />
+        <ApiTable Component="typeof(UiInputMessages)" />
+        <ApiTable Component="typeof(UiLocaleSwitcher)" />
+        <ApiTable Component="typeof(UiLocalizedText)" />
+    </DocSection>
+</DocPage>

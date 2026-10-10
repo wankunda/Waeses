@@ -1,0 +1,39 @@
+@page "/composants/table"
+
+<DocPage Href="composants/table">
+    <DocSection Title="Tri, recherche, sélection et pagination" Description="Les colonnes se déclarent avec des `UiTh` (le tri est un sélecteur `SortBy`) et chaque ligne avec des `UiTd`. `Label` des cellules sert d'intitulé dans la présentation mobile.">
+        <DocExample Example="typeof(TableBasicExample)" />
+    </DocSection>
+
+    <DocSection Title="Données côté serveur" Description="Avec `ServerData`, la table envoie un `UiTableState` (page, taille, recherche, tri) et affiche la page renvoyée. Les colonnes triables déclarent une `SortKey`.">
+        <DocExample Example="typeof(TableServerExample)" />
+    </DocSection>
+
+    <DocSection Title="Pagination seule" Description="`UiPagination` s'utilise aussi hors d'une table.">
+        <DocExample Example="typeof(PaginationExample)" />
+    </DocSection>
+
+    <DocSection Title="Table ou grille ?">
+        <div class="api-table-wrap">
+            <table class="ui-table ui-table-compact">
+                <caption class="api-caption">Comparaison</caption>
+                <thead><tr><th scope="col"></th><th scope="col"><code>UiTable</code></th><th scope="col"><code>UiDataGrid</code></th></tr></thead>
+                <tbody>
+                    <tr><td>Colonnes</td><td>En-têtes (<code>UiTh</code>) et cellules (<code>UiTd</code>) écrits à la main</td><td>Déclarées une fois avec <code>UiColumn</code></td></tr>
+                    <tr><td>Tri</td><td>Une ou plusieurs colonnes</td><td>Une ou plusieurs colonnes, avec rang affiché</td></tr>
+                    <tr><td>Filtres par colonne</td><td>Non</td><td>Oui, avec opérateurs</td></tr>
+                    <tr><td>Groupes, édition de ligne, menu des colonnes</td><td>Non</td><td>Oui</td></tr>
+                    <tr><td>Virtualisation</td><td>Non</td><td>Oui</td></tr>
+                    <tr><td>Quand choisir</td><td>Tableau simple, peu de logique</td><td>Tableau riche, gros volumes</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </DocSection>
+
+    <DocSection Title="API">
+        <ApiTable Component="typeof(UiTable<>)" />
+        <ApiTable Component="typeof(UiTh<>)" />
+        <ApiTable Component="typeof(UiTd)" />
+        <ApiTable Component="typeof(UiPagination)" />
+    </DocSection>
+</DocPage>

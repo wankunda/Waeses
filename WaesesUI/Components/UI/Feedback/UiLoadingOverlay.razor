@@ -16,8 +16,12 @@
 </div>
 
 @code {
+    /// <summary>Affiche le voile de chargement par-dessus le contenu.</summary>
     [Parameter] public bool IsLoading { get; set; }
+    /// <summary>Texte affiché à côté de l'indicateur.</summary>
     [Parameter] public string? Text { get; set; } = "Chargement...";
+    /// <summary>Taille de l'indicateur.</summary>
     [Parameter] public UiSize Size { get; set; } = UiSize.Md;
+    /// <summary>Contenu recouvert par le voile pendant le chargement. Le composant fournit lui-même le conteneur positionné.</summary>
     [Parameter] public RenderFragment? ChildContent { get; set; }
 }

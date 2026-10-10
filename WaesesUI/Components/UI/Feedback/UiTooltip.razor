@@ -1,15 +1,20 @@
 @namespace WaesesUI
 @inherits UiComponentBase
 
-<div class="ui-tooltip-wrapper @Class" style="@Style" @attributes="AdditionalAttributes">
+<div class="ui-tooltip-wrapper @Class" style="@Style" aria-describedby="@_id" @attributes="AdditionalAttributes">
     @ChildContent
-    <div class="ui-tooltip-content ui-tooltip-@Position.ToString().ToLower()">
+    <div id="@_id" role="tooltip" class="ui-tooltip-content ui-tooltip-@Position.ToString().ToLower()">
         @Text
     </div>
 </div>
 
 @code {
+    private readonly string _id = $"ui-tooltip-{Guid.NewGuid():N}";
+
+    /// <summary>Texte de l'infobulle.</summary>
     [Parameter] public string Text { get; set; } = string.Empty;
+    /// <summary>Côté d'affichage de l'infobulle par rapport au contenu.</summary>
     [Parameter] public TooltipPosition Position { get; set; } = TooltipPosition.Top; // top, bottom, left, right
+    /// <summary>Élément qui déclenche l'infobulle (au survol et au focus clavier).</summary>
     [Parameter] public RenderFragment? ChildContent { get; set; }
 }

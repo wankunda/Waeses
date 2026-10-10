@@ -23,6 +23,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\WaesesUI\WaesesUI.csproj" />
+        <ProjectReference Include="..\WaesesUIDocs\WaesesUIDocs.csproj" />
     </ItemGroup>
 
 </Project>

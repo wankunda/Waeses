@@ -1,0 +1,20 @@
+@inject IUiLocalizationService Localization
+
+<div class="ui-flex-col" style="gap: 1rem;">
+    <UiLocaleSwitcher CultureChanged="OnCultureChanged" />
+
+    <p class="text-secondary">
+        <UiLocalizedText Key="ui.copy" Fallback="Copy" /> ·
+        <UiLocalizedText Key="ui.cancel" Fallback="Cancel" /> ·
+        <UiLocalizedText Key="ui.retry" Fallback="Retry" />
+    </p>
+    <p class="text-secondary">
+        Nombre : <strong>@Localization.FormatNumber(1234567.891)</strong> ·
+        date : <strong>@Localization.FormatDate(new DateTime(2026, 3, 14), "D")</strong>
+    </p>
+</div>
+
+@code {
+    // Le changement de culture notifie déjà UiLocalizedText ; ce gestionnaire fait aussi réafficher les formats ci-dessus.
+    private void OnCultureChanged(System.Globalization.CultureInfo culture) { }
+}

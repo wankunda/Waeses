@@ -1,0 +1,11 @@
+<div class="ui-flex-col" style="gap: 1rem; width: 100%; max-width: 32rem;">
+    <UiDateTimePicker @bind-Value="_appointment" Label="Rendez-vous" Mode="UiDateTimeMode.DateTime" MinuteStep="15" />
+    <UiTimePicker @bind-Value="_reminder" Label="Rappel" Step="900" />
+
+    <p class="text-secondary">Rendez-vous : <strong>@(_appointment?.ToString("g") ?? "—")</strong> · rappel : <strong>@(_reminder?.ToString(@"hh\:mm") ?? "—")</strong></p>
+</div>
+
+@code {
+    private DateTime? _appointment = DateTime.Today.AddHours(14);
+    private TimeSpan? _reminder;
+}

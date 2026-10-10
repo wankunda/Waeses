@@ -79,8 +79,11 @@ Dans `Components/App.razor`, ajoutez le theme et le script d'interoperabilite :
 
 ```razor
 <link rel="stylesheet" href="_content/WaesesUI/css/theme.css" />
+<link rel="stylesheet" href="_content/WaesesUI/css/components-extended.css" />
 <script src="_content/WaesesUI/js/ui-interop.js"></script>
 ```
+
+`theme.css` importe deja `components-extended.css`, mais ce `@import` force le navigateur a le telecharger *apres* `theme.css`. Le declarer avec son propre `<link>` permet de charger les deux en parallele (sans double telechargement : le second est servi depuis le cache).
 
 Le script doit etre charge apres le rendu Blazor, generalement juste avant `</body>`.
 
@@ -355,6 +358,139 @@ Clic exterieur et Echap ferment le panneau (`CloseOnOutsideClick`, `CloseOnEscap
 ### Carrousel
 
 `UiCarousel` accepte `Loop`, `AutoCycle` / `AutoCycleInterval` (suspendu au survol et au focus), `Transition` (`Slide`, `Fade`, `None`), `ShowArrows` / `ShowBullets` / `ShowCounter`, le glissement tactile (`EnableSwipe`), le clavier (fleches, Debut, Fin) et `ItemTemplate` pour un contenu personnalise. `ActiveIndex` est optionnel : sans liaison, le carrousel garde son propre etat.
+
+### Champs de saisie
+
+Les champs (`UiInput`, `UiSelect`, `UiTextArea`, `UiCheckbox`, `UiSwitch`, `UiSlider`, `UiTimePicker`, `UiColorPicker`, `UiCombobox`) partagent les memes parametres : `Label`, `HelperText`, `ErrorMessage`, `Error`, `Required`, `Disabled`, `ReadOnly`, `Class`, `Style`. Une regle personnalisee se declare avec `Validation` ; dans un `EditForm` elle est evaluee a `Validate()` et a la soumission :
+
+```razor
+<UiInput @bind-Value="model.Name"
+         Validation="@(v => string.IsNullOrWhiteSpace(v) ? "Nom requis" : null)"
+         DebounceInterval="300" />
+```
+
+`Immediate="false"` n'applique la valeur qu'a la validation du champ ; `DebounceInterval` attend la fin de la frappe. Pour creer votre propre champ, heritez de `UiInputBase<TValue>` et affichez `<UiInputMessages Error="@(HasError ? GetFirstError() : null)" HelperText="@HelperText" ErrorId="@ErrorId" HelperId="@HelperId" />`.
+
+### Grille de donnees
+
+`UiDataGrid` declare ses colonnes avec `UiColumn` :
+
+```razor
+<UiDataGrid TItem="Order" Items="_orders" ShowSearch="true" ShowFilters="true" MultiSort="true"
+            StickyHeader="true" Height="30rem" GroupBy="status" PageSize="25">
+    <Columns>
+        <UiColumn TItem="Order" Key="number" Title="N°" Field="o => o.Number" Width="6rem" />
+        <UiColumn TItem="Order" Key="status" Title="Statut" Field="o => o.Status" />
+        <UiColumn TItem="Order" Key="total" Title="Total" Field="o => o.Total" Format="C2" Align="Alignement.Right" />
+        <UiColumn TItem="Order" Key="date" Title="Date" Field="o => o.Date" Format="d" @bind-Hidden="_hideDate" />
+        <UiColumn TItem="Order" Key="actions" Title="" Sortable="false" Filterable="false">
+            <CellTemplate><UiButton Text="Ouvrir" Appearance="UiVariant.Text" OnClick="() => Open(context)" /></CellTemplate>
+        </UiColumn>
+    </Columns>
+</UiDataGrid>
+```
+
+- **Tri et filtres** : un clic trie, Maj + clic ajoute un critere (avec `MultiSort`). Chaque filtre a un operateur (contient, egal, superieur a, est vide…) ; les nombres et dates sont compares comme tels, pas comme du texte.
+- **Colonnes** : le menu « Colonnes » masque/affiche. `Hidden` n'ecrase le choix de l'utilisateur que lorsque sa valeur change.
+- **Gros volumes** : `Virtualize="true"` (`RowHeight` fixe, `Height` obligatoire en pratique) n'affiche que les lignes visibles ; il desactive pagination, regroupement et lignes depliables.
+- **Serveur** : `ServerData` recoit un `UiGridState` (page, taille, recherche, tri, filtres) et renvoie un `UiGridData<T>` ; les reponses perimees sont ignorees et `ReloadServerDataAsync()` relit la page.
+
+```csharp
+private Task<UiGridData<Order>> Load(UiGridState state, CancellationToken ct) => Api.SearchAsync(state, ct);
+```
+
+- **Edition** : avec `EditMode="UiGridEditMode.Row"`, une ligne devient modifiable ; les `EditTemplate` travaillent sur une **copie** (`EditClone`, copie superficielle par defaut), `OnRowCommit` recoit l'original et la copie, `OnRowCancel` l'original.
+- **Limites** : pas de redimensionnement de colonnes ni de glisser-deposer ; regroupement et filtres d'operateur non types cote serveur (a vous d'interpreter `UiGridState`).
+
+`UiTable` reste la solution legere (sans declaration de colonnes) ; `UiDataGrid` est faite pour les tableaux riches.
+
+### Theme en C#
+
+`UiThemeDefinition` decrit le theme sans ecrire de CSS. Seules les valeurs renseignees sont generees ; le reste vient de `theme.css`. Les teintes derivees (survol, fond clair, contraste du texte) sont calculees a partir de la couleur de base hexadecimale.
+
+```razor
+<UiThemeProvider Theme="UiTheme.System" Definition="_theme" />
+
+@code {
+    private readonly UiThemeDefinition _theme = new()
+    {
+        Light = { Primary = "#0d9488", Success = "#16a34a", Background = "#f8fafc" },
+        Dark  = { Primary = "#2dd4bf", Background = "#020617", Surface = "#0f172a" },
+        Typography = { FontFamily = "'Inter', system-ui, sans-serif" },
+        Layout = { BorderRadius = 14 }   // rayon de reference ; les autres rayons en sont deduits
+    };
+}
+```
+
+Pour un theme global, evitez de le repasser a chaque provider : `builder.Services.AddWaesesUIServices(o => o.Theme = ...)`. Le parametre `Definition` du provider prend alors le dessus.
+
+- La definition remplace les parametres `Primary`, `Secondary`… du provider (qui posaient des variables en ligne sur la racine).
+- Les couleurs acceptent `#rgb`, `#rrggbb`, `rgb()`, `hsl()`, `var(--x)` ou un nom de couleur ; seules les couleurs hexadecimales produisent des teintes derivees. Une valeur invalide (par exemple contenant `;` ou `}`) leve une `InvalidOperationException` au rendu plutot que d'etre injectee dans la feuille de style.
+- `UiColorMath` (`Darken`, `Lighten`, `WithAlpha`, `Contrast`) est public si vous voulez calculer vos propres teintes.
+- Les `z-index`, ombres et espacements ne sont pas encore configurables.
+
+### Couleur et apparence
+
+La couleur (`UiColor`) et l'apparence (`UiVariant` : `Filled`, `Outlined`, `Text`) sont independantes, comme dans MudBlazor :
+
+```razor
+<UiButton Text="Valider" Color="UiColor.Success" />
+<UiButton Text="Annuler" Color="UiColor.Danger" Appearance="UiVariant.Outlined" EndIcon="✕" />
+<UiButton Text="Plus tard" Appearance="UiVariant.Text" FullWidth="true" />
+
+<UiInput @bind-Value="_name" Label="Nom" Variant="UiVariant.Filled" Color="UiColor.Info" />
+```
+
+Pour un bouton, `Color` et/ou `Appearance` remplacent `Variant` (qui reste valable, par exemple `UiButtonVariant.Primary`). Pour un champ, `Outlined` est le rendu habituel, `Filled` ajoute un fond teinte et `Text` ne garde que le soulignement ; `Color` choisit la couleur du focus. Les couleurs viennent des variables du theme (`--primary`, `--success`…), donc suivent le mode sombre.
+
+### Harmonisation des couleurs
+
+`UiChip`, `UiBadge`, `UiAlert` et `UiCallout` prennent `Variant` (`Filled`, `Outlined`, `Text`) en plus de `Color` ; sans `Variant`, leur rendu historique est conserve. `UiCheckbox`, `UiSwitch`, `UiSlider` et `UiRadioOption` (ou `UiRadioGroup` pour toutes ses options) prennent `Color` ; `UiTagInput`, `UiMultiSelect` et `UiDateRangePicker` prennent `Variant` et `Color` comme les autres champs.
+
+### Liste de choix
+
+`UiSelect` accepte des `UiSelectOption` typees (ou des `<option>` natives) :
+
+```razor
+<UiSelect TValue="Level" Label="Niveau" @bind-Value="_level" Placeholder="Choisir">
+    <UiSelectOption Value="Level.Low" Text="Bas" />
+    <UiSelectOption Value="Level.High" Text="Haut" />
+    <UiSelectOption Value="Level.Critical" Text="Critique (reserve)" Disabled="true" />
+</UiSelect>
+```
+
+Pour generer les options depuis une liste, utilisez `Items` (une option par valeur, avant celles du contenu) :
+
+```razor
+<UiSelect TValue="Level" @bind-Value="_level" Items="Enum.GetValues<Level>()" />
+
+<UiSelect TValue="int" @bind-Value="_year" Items="_years"
+          ItemText="y => $"Annee {y}"" ItemDisabled="y => y < 2020" />
+```
+
+Le libelle par defaut est l'attribut `[Description]` d'une enumeration, sinon `ToString()` ; `ItemText` le remplace. `Items` est une liste de valeurs (`TValue`) : pour des objets avec un identifiant, utilisez `UiCombobox` / `UiAutocomplete`, ou des `UiSelectOption` dans une boucle `@foreach`.
+
+La valeur d'une option a le type de la valeur liee (enum, `Guid`, `decimal`, nullable…). Le format est invariant des deux cotes : `1.5m` s'ecrit `1.5` dans le HTML quelle que soit la culture et se relit correctement.
+
+### Formulaires
+
+`UiForm` enveloppe un `EditForm` et expose l'etat global du formulaire :
+
+```razor
+<UiForm Model="_model" Context="form" OnValidSubmit="Save" @bind-IsValid="_valid">
+    <UiInput @bind-Value="_model.Name" Label="Nom"
+             Validation="@(v => v == "admin" ? "Nom reserve" : null)" />
+    <UiDatePicker @bind-Value="_model.Birthday" Label="Naissance" />
+
+    <UiButton Type="submit" Text="Enregistrer" Loading="form.IsSubmitting" Disabled="@(!form.IsValid)" />
+    <UiButton Text="Effacer les erreurs" OnClick="form.ResetValidation" />
+</UiForm>
+```
+
+- `Validate()` valide tous les champs (attributs `DataAnnotations` et parametre `Validation` de chaque champ) ; `Errors` liste les messages.
+- `ResetValidation()` efface erreurs et etat « modifie » sans toucher aux valeurs du modele.
+- `SubmitAsync()` equivaut a un clic sur le bouton d'envoi ; `IsSubmitting` est vrai pendant `OnValidSubmit` (une soumission en cours ignore les doubles clics).
+- `DataAnnotations="false"` ne garde que les regles `Validation` des champs.
 
 ### Composants personnalises
 

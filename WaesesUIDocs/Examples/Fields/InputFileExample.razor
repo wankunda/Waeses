@@ -1,0 +1,17 @@
+@using Microsoft.AspNetCore.Components.Forms
+
+<div class="ui-flex-col" style="gap: 1rem; width: 100%; max-width: 32rem;">
+    <UiInputFile Label="Pièces jointes" Multiple="true" Accept=".pdf,image/*" MaxAllowedFiles="3" MaxFileSize="@(2 * 1024 * 1024)"
+                 HelperText="PDF ou images, 2 Mo maximum chacun, trois fichiers au plus." FilesChanged="OnFilesChanged" />
+
+    <UiInputFile Variant="FileUploadVariant.Button" ButtonText="Importer un justificatif" ShowFileList="false" FilesChanged="OnFilesChanged" />
+
+    <p class="text-secondary">Dernière sélection : <strong>@(_names.Count == 0 ? "aucun fichier" : string.Join(", ", _names))</strong></p>
+</div>
+
+@code {
+    private List<string> _names = new();
+
+    // Les fichiers ne sont pas lus ici : IBrowserFile.OpenReadStream() permet de les envoyer ou de les traiter.
+    private void OnFilesChanged(IReadOnlyList<IBrowserFile> files) => _names = files.Select(f => f.Name).ToList();
+}

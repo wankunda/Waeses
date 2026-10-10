@@ -1,4 +1,4 @@
-﻿@inject IThemeService ThemeService
+@inject IThemeService ThemeService
 @namespace WaesesUI
 
 <main class="auth-layout">
@@ -47,9 +47,13 @@
 
 
 @code {
+    /// <summary>Indique si le mode sombre est actif.</summary>
     [Parameter] public bool IsDarkMode { get; set; }
+    /// <summary>Appelé quand l'utilisateur change de mode.</summary>
     [Parameter] public EventCallback<bool> IsDarkModeChanged { get; set; }
+    /// <summary>Contenu de la page (le <c>Body</c> du layout Blazor).</summary>
     [Parameter] public RenderFragment? MainBody { get; set; }
+    /// <summary>Contenu supplémentaire du pied de page.</summary>
     [Parameter] public RenderFragment? Footer { get; set; }
 
     /// <summary>Affiche le pied de page (texte et fragment <see cref="Footer"/>). Vrai par défaut.</summary>
@@ -57,8 +61,11 @@
 
     /// <summary>Texte du pied de page. Null : « © année Waeses. All rights reserved. » ; chaîne vide : aucun texte.</summary>
     [Parameter] public string? FooterText { get; set; }
+    /// <summary>Affiche le bouton clair/sombre.</summary>
     [Parameter] public bool ShowThemeToggle { get; set; } = true;
+    /// <summary>Nom de l'application.</summary>
     [Parameter] public string BrandText { get; set; } = "Waeses UI";
+    /// <summary>Icône ou emoji devant le nom.</summary>
     [Parameter] public string? BrandIcon { get; set; } = "⚡";
     string ModeText => IsDarkMode ? "Mode Clair" : "Mode Sombre";
     string ModeIcon => IsDarkMode ? "☀️" : "🌙";

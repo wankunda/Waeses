@@ -1,31 +1,21 @@
-@inherits InputBase<TimeSpan?>
+@inherits UiInputBase<TimeSpan?>
 @namespace WaesesUI
 
 <UiFormField For="@Id" Label="@Label" HelperText="@HelperText" Error="@GetFirstError()" Required="@Required" Class="@Class" Style="@Style">
-    <input id="@Id" type="time" class="ui-input @CssClass" value="@CurrentValueAsString" min="@Min" max="@Max" step="@Step" disabled="@Disabled" @onchange="HandleChange" @attributes="AdditionalAttributes" />
+    <input id="@Id" aria-invalid="@AriaInvalid" aria-describedby="@DescribedBy" aria-required="@(IsRequired ? "true" : null)" type="time" class="ui-input @CssClass" value="@CurrentValueAsString" min="@Min" max="@Max" step="@Step" disabled="@Disabled" @onchange="HandleChange" @attributes="AdditionalAttributes" />
 </UiFormField>
 
 @code {
-    [Parameter] public string? Id { get; set; } = $"time-{Guid.NewGuid():N}";
-    [Parameter] public string? Label { get; set; }
-    [Parameter] public string? HelperText { get; set; }
-    [Parameter] public bool Required { get; set; }
-    [Parameter] public bool Disabled { get; set; }
+    protected override string IdPrefix => "time";
+
+    /// <summary>Heure minimale au format <c>HH:mm</c>.</summary>
     [Parameter] public string? Min { get; set; }
+    /// <summary>Heure maximale au format <c>HH:mm</c>.</summary>
     [Parameter] public string? Max { get; set; }
+    /// <summary>Pas en secondes (60 : à la minute, 900 : au quart d'heure).</summary>
     [Parameter] public int Step { get; set; } = 60;
-    [Parameter] public string? Class { get; set; }
-    [Parameter] public string? Style { get; set; }
 
     private void HandleChange(ChangeEventArgs args) => CurrentValueAsString = args.Value?.ToString();
-
-    private IEnumerable<string> GetErrors()
-    {
-        if (EditContext != null && ValueExpression != null)
-            foreach (var error in EditContext.GetValidationMessages(FieldIdentifier)) yield return error;
-    }
-
-    private string GetFirstError() => GetErrors().FirstOrDefault() ?? string.Empty;
 
     protected override string? FormatValueAsString(TimeSpan? value) => value?.ToString(@"hh\:mm");
 

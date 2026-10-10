@@ -1,0 +1,59 @@
+.docs-loading { display: grid; place-items: center; min-height: 100vh; color: var(--text-secondary, #475569); font-family: system-ui, sans-serif; }
+#blazor-error-ui { display: none; position: fixed; inset: auto 0 0 0; z-index: 10001; padding: .75rem 1.25rem; color: #450a0a; background: #fef2f2; border-top: 1px solid #ef4444; }
+#blazor-error-ui .dismiss { float: right; cursor: pointer; }
+
+/* Contenu */
+.docs-content { width: min(100%, 62rem); margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+.docs-header { margin-bottom: 2rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--border-default); }
+.docs-eyebrow { display: block; margin-bottom: .35rem; color: var(--text-secondary); font-size: .8rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.docs-header h1 { margin: 0; font-size: clamp(1.75rem, 3vw + 1rem, 2.5rem); line-height: 1.15; }
+.docs-lead { margin: .75rem 0 0; max-width: 46rem; color: var(--text-secondary); font-size: 1.1rem; line-height: 1.6; }
+.docs-section { margin-top: 2.5rem; }
+.docs-section > h2 { margin: 0 0 .75rem; font-size: 1.5rem; scroll-margin-top: 5rem; }
+.docs-text { margin: 0 0 1rem; max-width: 46rem; color: var(--text-secondary); line-height: 1.65; }
+.docs-text code, .api-table code, .docs-lead code, .docs-content li code { padding: .1rem .35rem; border-radius: var(--radius-xs); background: var(--bg-surface-secondary); color: var(--text-main); font-family: var(--font-mono); font-size: .875em; }
+.docs-content ul, .docs-content ol { max-width: 46rem; padding-left: 1.25rem; color: var(--text-secondary); line-height: 1.7; }
+
+/* Recherche du menu */
+.docs-search .ui-input { width: 100%; }
+.docs-search-empty { margin: .5rem 0 0; color: var(--text-muted); font-size: .85rem; }
+
+/* Exemples */
+.doc-example { margin: 1.25rem 0 2rem; border: 1px solid var(--border-default); border-radius: var(--radius-md); background: var(--bg-surface); overflow: hidden; }
+.doc-example-title { margin: 0; padding: .9rem 1.1rem 0; font-size: 1.05rem; }
+.doc-example > .docs-text { margin: .35rem 1.1rem 0; }
+.doc-example-preview { padding: 1.25rem 1.1rem; display: flex; flex-wrap: wrap; align-items: flex-start; gap: .75rem; }
+.doc-example-preview > * { max-width: 100%; }
+.doc-example-code { border-top: 1px solid var(--border-default); background: var(--bg-surface-secondary); }
+.doc-example-code > summary { padding: .6rem 1.1rem; cursor: pointer; color: var(--text-secondary); font-size: .85rem; font-weight: 600; user-select: none; }
+.doc-example-code > summary:hover { color: var(--text-main); }
+.doc-example-code .ui-code-block { margin: 0; border-radius: 0; }
+.doc-example-file { margin: 0; padding: .5rem 1.1rem; color: var(--text-muted); font-family: var(--font-mono); font-size: .8rem; }
+
+/* Tableau d'API */
+.api-table { margin: 1.5rem 0 2.5rem; }
+.api-title { margin: 0 0 .5rem; font-size: 1.15rem; }
+.api-table-wrap { margin-bottom: 1rem; overflow-x: auto; border: 1px solid var(--border-default); border-radius: var(--radius-md); }
+.api-table-wrap table { width: 100%; margin: 0; }
+.api-caption { padding: .6rem .9rem; color: var(--text-secondary); font-size: .8rem; font-weight: 700; letter-spacing: .04em; text-align: left; text-transform: uppercase; caption-side: top; }
+.api-table td, .api-table th { vertical-align: top; }
+.api-table td:nth-child(1) { white-space: nowrap; }
+.api-type { color: var(--info); white-space: normal; }
+.api-required { margin-left: .2rem; color: var(--danger); text-decoration: none; cursor: help; }
+.api-note { color: var(--text-secondary); font-size: .85rem; }
+.text-muted { color: var(--text-secondary); }
+
+/* Accueil */
+.docs-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: 1rem; margin-top: 1rem; }
+.docs-card { display: block; padding: 1.1rem 1.2rem; border: 1px solid var(--border-default); border-radius: var(--radius-md); background: var(--bg-surface); color: inherit; text-decoration: none; transition: border-color var(--trans-fast), box-shadow var(--trans-fast); }
+.docs-card:hover, .docs-card:focus-visible { border-color: var(--primary); box-shadow: var(--shadow-md); outline: none; }
+.docs-card strong { display: block; margin-bottom: .3rem; color: var(--text-main); }
+.docs-card span { color: var(--text-secondary); font-size: .9rem; line-height: 1.5; }
+
+@media (max-width: 640px) {
+    .docs-content { padding: 1.25rem 1rem 3rem; }
+    .doc-example-preview { padding: 1rem; }
+}
+
+/* Un lien dans un paragraphe ne doit pas se distinguer par la seule couleur (WCAG 1.4.1). */
+.docs-content :is(p, li, .docs-text) a:not(.ui-btn) { text-decoration: underline; text-underline-offset: .15em; }

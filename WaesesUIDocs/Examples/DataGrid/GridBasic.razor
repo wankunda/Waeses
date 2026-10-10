@@ -1,0 +1,26 @@
+<UiDataGrid TItem="Employee" Items="_employees" ShowSearch="true" ShowFilters="true" MultiSort="true"
+            PageSize="8" AriaLabel="Employés">
+    <Columns>
+        <UiColumn TItem="Employee" Key="name" Title="Nom" Field="e => e.Name" />
+        <UiColumn TItem="Employee" Key="department" Title="Service" Field="e => e.Department" />
+        <UiColumn TItem="Employee" Key="salary" Title="Salaire" Field="e => e.Salary" Format="C0" Align="Alignement.Right" />
+        <UiColumn TItem="Employee" Key="hired" Title="Embauche" Field="e => e.Hired" Format="d" />
+    </Columns>
+</UiDataGrid>
+
+<p class="text-secondary">Cliquez sur un en-tête pour trier, Maj + clic pour ajouter un critère. Les filtres comparent les nombres et les dates comme tels.</p>
+
+@code {
+    private sealed record Employee(string Name, string Department, decimal Salary, DateTime Hired);
+
+    private static readonly string[] Names = { "Alice", "Benoît", "Chloé", "David", "Élodie", "Farid", "Gaëlle", "Hugo", "Inès", "Jules" };
+    private static readonly string[] Departments = { "Produit", "Design", "Ingénierie", "Support" };
+
+    private readonly List<Employee> _employees = Enumerable.Range(0, 40)
+        .Select(i => new Employee(
+            $"{Names[i % Names.Length]} {(char)('A' + i / Names.Length)}.",
+            Departments[i % Departments.Length],
+            2800 + (i * 137 % 2400),
+            new DateTime(2018, 1, 1).AddDays(i * 53)))
+        .ToList();
+}

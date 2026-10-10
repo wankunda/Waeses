@@ -1,0 +1,32 @@
+<div class="ui-flex-col" style="gap: 1.25rem; width: 100%; max-width: 32rem;">
+    <div class="ui-flex-row" style="align-items: center; gap: 1.25rem;">
+        <UiSpinner AriaLabel="Chargement en cours" />
+        <UiSpinner Size="UiSize.Lg" Color="UiColor.Success" AriaLabel="Enregistrement" />
+        <UiSpinner Variant="UiSpinnerVariant.Pulse" Color="UiColor.Info" AriaLabel="Connexion" />
+    </div>
+
+    <div class="ui-flex-col" style="gap: .5rem;">
+        <UiSkeleton Variant="UiSkeletonVariant.Text" Width="60%" />
+        <UiSkeleton Variant="UiSkeletonVariant.Text" />
+        <UiSkeleton Variant="UiSkeletonVariant.Rect" Height="5rem" />
+        <UiSkeleton Variant="UiSkeletonVariant.Circle" Width="3rem" Height="3rem" />
+    </div>
+
+    <UiLoadingOverlay IsLoading="_loading" Text="Mise à jour…">
+        <div style="padding: 1rem; border: 1px solid var(--border-default); border-radius: var(--radius-md);">
+            <p>Ce contenu est recouvert pendant le chargement.</p>
+            <UiButton Text="Simuler un chargement" Size="UiSize.Sm" OnClick="SimulateAsync" />
+        </div>
+    </UiLoadingOverlay>
+</div>
+
+@code {
+    private bool _loading;
+
+    private async Task SimulateAsync()
+    {
+        _loading = true;
+        await Task.Delay(1500);
+        _loading = false;
+    }
+}

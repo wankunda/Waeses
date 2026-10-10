@@ -20,6 +20,8 @@
 </nav>
 
 @code {
+    /// <summary>Étapes du fil d'Ariane ; la dernière est la page courante.</summary>
     [Parameter] public IReadOnlyList<UiBreadcrumbItem> Items { get; set; } = Array.Empty<UiBreadcrumbItem>();
+    /// <summary>Nom accessible de la navigation.</summary>
     [Parameter] public string AriaLabel { get; set; } = "Fil d’Ariane";
 }

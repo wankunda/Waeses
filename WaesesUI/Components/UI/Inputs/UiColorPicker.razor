@@ -1,32 +1,18 @@
 @typeparam TValue
-@inherits InputBase<TValue>
+@inherits UiInputBase<TValue>
 @namespace WaesesUI
 
 <UiFormField For="@Id" Label="@Label" HelperText="@HelperText" Error="@GetFirstError()" Required="@Required" Class="@Class" Style="@Style">
     <div class="ui-color-picker">
-        <input id="@Id" type="color" class="ui-color-swatch" value="@ColorValue" disabled="@Disabled" @oninput="HandleInput" @attributes="AdditionalAttributes" />
+        <input id="@Id" aria-invalid="@AriaInvalid" aria-describedby="@DescribedBy" type="color" class="ui-color-swatch" value="@ColorValue" disabled="@Disabled" @oninput="HandleInput" @attributes="AdditionalAttributes" />
         <input type="text" class="ui-input" value="@ColorValue" aria-label="Valeur hexadécimale" maxlength="9" disabled="@Disabled" @onchange="HandleInput" />
     </div>
 </UiFormField>
 
 @code {
-    [Parameter] public string? Id { get; set; } = $"color-{Guid.NewGuid():N}";
-    [Parameter] public string? Label { get; set; }
-    [Parameter] public string? HelperText { get; set; }
-    [Parameter] public bool Required { get; set; }
-    [Parameter] public bool Disabled { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter] public string? Style { get; set; }
+    protected override string IdPrefix => "color";
 
     private string ColorValue => CurrentValueAsString is { Length: 7 } value && value.StartsWith('#') ? value : "#000000";
-
-    private IEnumerable<string> GetErrors()
-    {
-        if (EditContext != null && ValueExpression != null)
-            foreach (var error in EditContext.GetValidationMessages(FieldIdentifier)) yield return error;
-    }
-
-    private string GetFirstError() => GetErrors().FirstOrDefault() ?? string.Empty;
 
     private void HandleInput(ChangeEventArgs args)
     {

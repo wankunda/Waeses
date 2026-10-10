@@ -10,4 +10,7 @@ public class UiOptions
     public string CancelText { get; set; } = "Annuler";
     public string OkText { get; set; } = "OK";
     public string CloseLabel { get; set; } = "Fermer";
+
+    /// <summary>Thème par défaut appliqué par <see cref="UiThemeProvider"/> (surchargé par son paramètre <c>Definition</c>).</summary>
+    public UiThemeDefinition? Theme { get; set; }
 }

@@ -1,0 +1,29 @@
+@inject IUiDialogService Dialogs
+
+<div class="ui-flex-col" style="gap: .75rem;">
+    <UiButton Text="Renommer le projet" OnClick="RenameAsync" />
+    <p class="text-secondary">Projet : <strong>@_name</strong> — @_status</p>
+</div>
+
+@code {
+    private string _name = "Projet Alpha";
+    private string _status = "aucune modification.";
+
+    private async Task RenameAsync()
+    {
+        var reference = await Dialogs.ShowAsync<EditNameDialog>(
+            "Renommer le projet",
+            new UiDialogParameters().With(nameof(EditNameDialog.Name), _name),
+            new UiDialogOptions { Size = UiSize.Sm });
+
+        var result = await reference.Result;
+        if (result.Canceled)
+        {
+            _status = "renommage annulé.";
+            return;
+        }
+
+        _name = result.GetData<string>() ?? _name;
+        _status = "renommé.";
+    }
+}

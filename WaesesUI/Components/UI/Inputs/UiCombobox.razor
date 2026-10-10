@@ -1,43 +1,74 @@
 @typeparam TItem
 @typeparam TValue
-@inherits InputBase<TValue>
+@inherits UiInputBase<TValue>
+@inject IUiPopoverService PopoverService
 @namespace WaesesUI
 
-<UiFormField For="@Id" Label="@Label" HelperText="@HelperText" Error="@GetFirstError()" Required="@Required" Class="@Class" Style="@Style">
-    <div class="ui-combobox">
-        <input id="@Id" class="ui-input @CssClass" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-expanded="@_isOpen" aria-controls="@ListId" aria-activedescendant="@ActiveOptionId" value="@_query" placeholder="@Placeholder" disabled="@Disabled" readonly="@ReadOnly" @onfocus="Open" @oninput="HandleInput" @onkeydown="HandleKeyDown" @attributes="AdditionalAttributes" />
-        @if (_isOpen)
+@{
+    RenderFragment list = @<ul id="@ListId" class="ui-combobox-options" role="listbox" aria-label="@Label">
+        @foreach (var option in FilteredItems.Select((item, index) => (item, index)))
         {
-            <ul id="@ListId" class="ui-combobox-options" role="listbox">
-                @foreach (var option in FilteredItems.Select((item, index) => (item, index)))
-                {
-                    var selected = EqualityComparer<TValue>.Default.Equals(ValueSelector(option.item), CurrentValue);
-                    <li id="@OptionId(option.index)" role="option" aria-selected="@selected" class="ui-combobox-option @(option.index == _activeIndex ? "active" : "")" @onmousedown="() => Select(option.item)">
-                        @if (ItemTemplate != null) { @ItemTemplate(option.item) } else { @DisplaySelector(option.item) }
-                    </li>
-                }
-                @if (!FilteredItems.Any()) { <li class="ui-combobox-empty" role="status">@EmptyText</li> }
-            </ul>
+            var selected = EqualityComparer<TValue>.Default.Equals(ValueSelector(option.item), CurrentValue);
+            <li id="@OptionId(option.index)" role="option" aria-selected="@(selected ? "true" : "false")" class="ui-combobox-option @(option.index == _activeIndex ? "active" : "")" @onmousedown="() => Select(option.item)">
+                @if (ItemTemplate != null) { @ItemTemplate(option.item) } else { @DisplaySelector(option.item) }
+            </li>
+        }
+        @if (!FilteredItems.Any()) { <li class="ui-combobox-empty" role="status">@EmptyText</li> }
+    </ul>;
+}
+
+<UiFormField For="@Id" Label="@Label" HelperText="@HelperText" Error="@(HasError ? GetFirstError() : null)" Required="@IsRequired" Class="@($"{FieldClass} {Class}")" Style="@Style">
+    <div class="ui-combobox">
+        <input id="@Id"
+               class="ui-input @CssClass @(HasError ? "ui-input-error" : "")"
+               role="combobox"
+               aria-autocomplete="list"
+               aria-haspopup="listbox"
+               aria-expanded="@(_isOpen ? "true" : "false")"
+               aria-controls="@ListId"
+               aria-activedescendant="@ActiveOptionId"
+               aria-invalid="@AriaInvalid"
+               aria-describedby="@DescribedBy"
+               aria-required="@(IsRequired ? "true" : null)"
+               value="@_query"
+               placeholder="@Placeholder"
+               disabled="@Disabled"
+               readonly="@ReadOnly"
+               @onfocus="Open"
+               @oninput="HandleInput"
+               @onkeydown="HandleKeyDown"
+               @attributes="AdditionalAttributes" />
+        @if (PopoverService.HasProvider)
+        {
+            @* Liste rendue à la racine de la page : jamais rognée, ferme au clic extérieur et sur Échap. *@
+            <UiPopoverPanel Open="_isOpen" OpenChanged="HandlePanelOpenChanged" MatchAnchorWidth="true" Offset="4" Class="ui-listbox-surface">
+                @list
+            </UiPopoverPanel>
+        }
+        else if (_isOpen)
+        {
+            @list
         }
     </div>
 </UiFormField>
 
 @code {
-    [Parameter] public string? Id { get; set; } = $"combobox-{Guid.NewGuid():N}";
-    [Parameter] public string? Label { get; set; }
+    protected override string IdPrefix => "combobox";
+
+    /// <summary>Texte indicatif affiché tant que le champ est vide.</summary>
     [Parameter] public string? Placeholder { get; set; }
-    [Parameter] public string? HelperText { get; set; }
+    /// <summary>Message affiché quand aucune option ne correspond à la saisie.</summary>
     [Parameter] public string EmptyText { get; set; } = "Aucun résultat";
-    [Parameter] public bool Required { get; set; }
-    [Parameter] public bool Disabled { get; set; }
-    [Parameter] public bool ReadOnly { get; set; }
+    /// <summary>Éléments proposés dans la liste.</summary>
     [Parameter] public IEnumerable<TItem> Items { get; set; } = Array.Empty<TItem>();
+    /// <summary>Texte affiché pour un élément (obligatoire).</summary>
     [Parameter, EditorRequired] public Func<TItem, string> DisplaySelector { get; set; } = default!;
+    /// <summary>Valeur liée correspondant à un élément (obligatoire).</summary>
     [Parameter, EditorRequired] public Func<TItem, TValue> ValueSelector { get; set; } = default!;
+    /// <summary>Gabarit d'une option de la liste.</summary>
     [Parameter] public RenderFragment<TItem>? ItemTemplate { get; set; }
+    /// <summary>Remplace le filtre par défaut (texte contenant la saisie, sans tenir compte de la casse).</summary>
     [Parameter] public Func<TItem, string, bool>? FilterPredicate { get; set; }
-    [Parameter] public string? Class { get; set; }
-    [Parameter] public string? Style { get; set; }
 
     private bool _isOpen;
     private int _activeIndex = -1;
@@ -48,6 +79,7 @@
 
     protected override void OnParametersSet()
     {
+        base.OnParametersSet();
         if (!_isOpen)
         {
             var selected = Items.FirstOrDefault(item => EqualityComparer<TValue>.Default.Equals(ValueSelector(item), CurrentValue));
@@ -58,6 +90,18 @@
     private string OptionId(int index) => $"{Id}-option-{index}";
     private void Open() { if (!Disabled && !ReadOnly) _isOpen = true; }
     private void HandleInput(ChangeEventArgs args) { _query = args.Value?.ToString() ?? string.Empty; _isOpen = true; _activeIndex = FilteredItems.Count > 0 ? 0 : -1; }
+
+    private void HandlePanelOpenChanged(bool open)
+    {
+        _isOpen = open;
+        if (!open)
+        {
+            // Fermeture sans choix : le champ reprend le libellé de la valeur sélectionnée.
+            var selected = Items.FirstOrDefault(item => EqualityComparer<TValue>.Default.Equals(ValueSelector(item), CurrentValue));
+            _query = selected is null ? string.Empty : DisplaySelector(selected);
+            _activeIndex = -1;
+        }
+    }
 
     private void HandleKeyDown(KeyboardEventArgs args)
     {
@@ -73,14 +117,6 @@
         _query = DisplaySelector(item);
         _isOpen = false;
     }
-
-    private IEnumerable<string> GetErrors()
-    {
-        if (EditContext != null && ValueExpression != null)
-            foreach (var error in EditContext.GetValidationMessages(FieldIdentifier)) yield return error;
-    }
-
-    private string GetFirstError() => GetErrors().FirstOrDefault() ?? string.Empty;
 
     protected override string? FormatValueAsString(TValue? value)
     {

@@ -1,0 +1,27 @@
+<UiTable TItem="Person" Items="_people" ShowSearch="true" Selectable="true" @bind-SelectedItems="_selected"
+         PageSize="5" AriaLabel="Personnes" SearchPlaceholder="Rechercher une personne…">
+    <HeaderContent>
+        <UiTh TItem="Person" Title="Nom" SortBy="p => p.Name" />
+        <UiTh TItem="Person" Title="Ville" SortBy="p => p.City" />
+        <UiTh TItem="Person" Title="Âge" SortBy="p => p.Age" Align="Alignement.Right" />
+    </HeaderContent>
+    <RowTemplate Context="person">
+        <UiTd Label="Nom">@person.Name</UiTd>
+        <UiTd Label="Ville">@person.City</UiTd>
+        <UiTd Label="Âge" Align="Alignement.Right">@person.Age</UiTd>
+    </RowTemplate>
+</UiTable>
+
+<p class="text-secondary"><strong>@_selected.Count</strong> ligne(s) sélectionnée(s).</p>
+
+@code {
+    private sealed record Person(string Name, string City, int Age);
+
+    private HashSet<Person> _selected = new();
+
+    private readonly List<Person> _people = new()
+    {
+        new("Alice", "Paris", 34), new("Benoît", "Lyon", 41), new("Chloé", "Nice", 29), new("David", "Lille", 52),
+        new("Élodie", "Nantes", 38), new("Farid", "Paris", 45), new("Gaëlle", "Toulouse", 27), new("Hugo", "Lyon", 33)
+    };
+}

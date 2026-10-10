@@ -311,6 +311,11 @@ window.UiInterop = {
         delete rootEl._uiCalendarKeydown;
     },
 
+    focusById: function (id) {
+        const element = document.getElementById(id);
+        if (element && typeof element.focus === 'function') element.focus();
+    },
+
     focusElement: function (element) {
         if (element && typeof element.focus === 'function') element.focus();
     },
@@ -369,6 +374,7 @@ window.UiInterop = {
 
         modalEl.addEventListener('keydown', modalEl._uiHandleKeyDown);
         modalEl._uiPreviousFocus = document.activeElement;
+        window.UiInterop._modalStack.push(modalEl);
 
         // Focus the first focusable element (or the modal box itself)
         requestAnimationFrame(function () {
@@ -381,15 +387,34 @@ window.UiInterop = {
         });
     },
 
+    // Modales ouvertes, de la plus ancienne à la plus récente.
+    _modalStack: [],
+
     // Tear down focus trap
     teardownModal: function (modalEl) {
-        if (!modalEl || !modalEl._uiHandleKeyDown) return;
-        modalEl.removeEventListener('keydown', modalEl._uiHandleKeyDown);
-        delete modalEl._uiHandleKeyDown;
+        const stack = window.UiInterop._modalStack;
+
+        // Quand le parent ferme la modale (IsOpen = false), son élément est déjà retiré du DOM et la référence reçue est vide :
+        // on retrouve alors la modale détachée la plus récente pour rendre le focus au déclencheur.
+        let target = modalEl && modalEl._uiHandleKeyDown ? modalEl : null;
+        if (!target) {
+            for (let i = stack.length - 1; i >= 0; i--) {
+                if (!stack[i].isConnected) { target = stack[i]; break; }
+            }
+        }
+        if (!target) return;
+
+        const index = stack.indexOf(target);
+        if (index >= 0) stack.splice(index, 1);
+
+        if (target._uiHandleKeyDown) {
+            target.removeEventListener('keydown', target._uiHandleKeyDown);
+            delete target._uiHandleKeyDown;
+        }
 
         // Rend le focus à l'élément qui a ouvert la modale
-        const previous = modalEl._uiPreviousFocus;
-        delete modalEl._uiPreviousFocus;
+        const previous = target._uiPreviousFocus;
+        delete target._uiPreviousFocus;
         if (previous && previous.isConnected && typeof previous.focus === 'function') {
             previous.focus();
         }

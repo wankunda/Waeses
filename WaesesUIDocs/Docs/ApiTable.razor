@@ -1,0 +1,78 @@
+@* Tableau d'API généré : paramètres lus par réflexion, descriptions lues dans les commentaires XML de la bibliothèque. *@
+<section class="api-table" aria-label="@($"API de {ApiDocs.DisplayName(Component)}")">
+    <h3 class="api-title"><code>&lt;@ApiDocs.DisplayName(Component)&gt;</code></h3>
+
+    @if (ApiDocs.Summary(Component) is { } summary)
+    {
+        <p class="docs-text"><DocText Text="@summary" /></p>
+    }
+
+    @if (Parameters.Count == 0)
+    {
+        <p class="api-note">
+            Ce composant n'a pas de paramètre.
+            @if (!string.IsNullOrEmpty(Note)) { <DocText Text="@Note" /> }
+        </p>
+    }
+
+    @foreach (var (kind, title) in Groups)
+    {
+        var rows = Parameters.Where(p => p.Kind == kind).ToList();
+        if (rows.Count == 0) continue;
+
+        <div class="api-table-wrap">
+            <table class="ui-table ui-table-compact">
+                <caption class="api-caption">@title</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Nom</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Défaut</th>
+                        <th scope="col">Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in rows)
+                    {
+                        <tr>
+                            <td data-title="Nom"><code>@row.Name</code>@if (row.Required) { <abbr class="api-required" title="Obligatoire">*</abbr> }</td>
+                            <td data-title="Type"><code class="api-type">@row.TypeName</code></td>
+                            <td data-title="Défaut">@if (row.Default is not null) { <code>@row.Default</code> } else { <span class="text-muted">—</span> }</td>
+                            <td data-title="Description">
+                                @if (row.Summary.Length > 0) { <DocText Text="@row.Summary" /> }
+                                else { <span class="text-muted">—</span> }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    @if (!IncludeCommon && ApiDocs.HasCommonParameters(Component))
+    {
+        <p class="api-note">
+            Comme tous les composants WaesesUI, il accepte aussi <code>Class</code>, <code>Style</code> et des attributs HTML libres (<code>id</code>, <code>data-*</code>, <code>aria-*</code>).
+        </p>
+    }
+</section>
+
+@code {
+    private static readonly (ApiParameterKind Kind, string Title)[] Groups =
+    {
+        (ApiParameterKind.Parameter, "Paramètres"),
+        (ApiParameterKind.Content, "Contenu"),
+        (ApiParameterKind.Event, "Événements")
+    };
+
+    /// <summary>Composant à documenter : <c>typeof(UiButton)</c>, ou <c>typeof(UiInput&lt;&gt;)</c> pour un composant générique.</summary>
+    [Parameter, EditorRequired] public Type Component { get; set; } = default!;
+
+    /// <summary>Précision affichée quand le composant n'a aucun paramètre (comment le configurer autrement).</summary>
+    [Parameter] public string? Note { get; set; }
+
+    /// <summary>Inclut <c>Class</c>, <c>Style</c> et <c>AdditionalAttributes</c> dans le tableau.</summary>
+    [Parameter] public bool IncludeCommon { get; set; }
+
+    private IReadOnlyList<ApiParameter> Parameters => ApiDocs.Parameters(Component, IncludeCommon);
+}

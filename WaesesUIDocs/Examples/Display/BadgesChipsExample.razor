@@ -1,0 +1,30 @@
+<div class="ui-flex-col" style="gap: 1.25rem;">
+    <div class="ui-flex-row" style="flex-wrap: wrap; gap: .5rem;">
+        @foreach (var color in Enum.GetValues<UiColor>())
+        {
+            <UiBadge Text="@color.ToString()" Color="color" />
+        }
+    </div>
+
+    <div class="ui-flex-row" style="flex-wrap: wrap; gap: .5rem;">
+        <UiBadge Text="Plein" Variant="UiVariant.Filled" Color="UiColor.Success" />
+        <UiBadge Text="Contour" Variant="UiVariant.Outlined" Color="UiColor.Info" />
+        <UiBadge Text="Teinté" Variant="UiVariant.Text" Color="UiColor.Danger" />
+    </div>
+
+    <div class="ui-flex-row" style="flex-wrap: wrap; gap: .5rem;">
+        @foreach (var tag in _tags)
+        {
+            var captured = tag;
+            <UiChip Text="@captured" Dismissible="true" Color="UiColor.Primary" OnDismiss="@(() => _tags.Remove(captured))" />
+        }
+        @if (_tags.Count == 0)
+        {
+            <span class="text-secondary">Toutes les puces ont été retirées.</span>
+        }
+    </div>
+</div>
+
+@code {
+    private readonly List<string> _tags = new() { "blazor", "razor", "ui" };
+}

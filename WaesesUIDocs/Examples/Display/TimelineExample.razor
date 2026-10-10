@@ -1,0 +1,13 @@
+<div style="width: 100%; max-width: 32rem;">
+    <UiTimeline Items="_events" AriaLabel="Historique de la commande" />
+</div>
+
+@code {
+    private readonly IReadOnlyList<UiTimelineItem> _events = new[]
+    {
+        new UiTimelineItem("Commande passée", "Paiement accepté.", "12 mars", UiColor.Primary),
+        new UiTimelineItem("Préparation", "L'entrepôt prépare le colis.", "13 mars", UiColor.Info),
+        new UiTimelineItem("Expédiée", "Prise en charge par le transporteur.", "14 mars", UiColor.Warning),
+        new UiTimelineItem("Livrée", "Remise en main propre.", "16 mars", UiColor.Success)
+    };
+}

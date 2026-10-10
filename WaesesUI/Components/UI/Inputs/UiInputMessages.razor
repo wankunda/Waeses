@@ -1,0 +1,25 @@
+@namespace WaesesUI
+
+@* Zone sous le champ : erreur (annoncée aux lecteurs d'écran) ou texte d'aide, reliée au champ par aria-describedby. *@
+@if (!string.IsNullOrEmpty(Error))
+{
+    <div id="@ErrorId" class="ui-error-text" role="alert">
+        <span aria-hidden="true">⚠</span>
+        <span>@Error</span>
+    </div>
+}
+else if (!string.IsNullOrEmpty(HelperText))
+{
+    <div id="@HelperId" class="ui-helper-text">@HelperText</div>
+}
+
+@code {
+    /// <summary>Message d'erreur (annoncé aux lecteurs d'écran). Prioritaire sur le texte d'aide.</summary>
+    [Parameter] public string? Error { get; set; }
+    /// <summary>Texte d'aide affiché en l'absence d'erreur.</summary>
+    [Parameter] public string? HelperText { get; set; }
+    /// <summary>Identifiant du message d'erreur, référencé par <c>aria-describedby</c>.</summary>
+    [Parameter] public string? ErrorId { get; set; }
+    /// <summary>Identifiant du texte d'aide, référencé par <c>aria-describedby</c>.</summary>
+    [Parameter] public string? HelperId { get; set; }
+}

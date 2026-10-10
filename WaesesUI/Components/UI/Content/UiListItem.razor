@@ -8,7 +8,10 @@
 </div>
 
 @code {
+    /// <summary>Contenu au début de la ligne (avatar, icône…).</summary>
     [Parameter] public RenderFragment? Leading { get; set; }
+    /// <summary>Contenu principal de la ligne.</summary>
     [Parameter] public RenderFragment? ChildContent { get; set; }
+    /// <summary>Contenu à la fin de la ligne (action, valeur…).</summary>
     [Parameter] public RenderFragment? Trailing { get; set; }
 }

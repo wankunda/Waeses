@@ -1,0 +1,855 @@
+@typeparam TItem
+@namespace WaesesUI
+@inherits UiComponentBase
+@implements IDisposable
+
+@{
+    // Ligne d'un élément : partagée entre le rendu normal et le rendu virtualisé.
+    RenderFragment<TItem> row = item => @<text>
+        @{
+            var isSelected = SelectedItems != null && SelectedItems.Contains(item);
+            var isExpanded = HasDetail && _expanded.Contains(item);
+            var isEditing = IsEditing(item);
+            var rowClass = CssBuilder.Default()
+                .AddIf("ui-table-row-selected", isSelected)
+                .AddIf("ui-table-row-clickable", OnRowClick.HasDelegate)
+                .AddIf("ui-datagrid-row-editing", isEditing)
+                .Add(RowClass?.Invoke(item))
+                .Build();
+        }
+        <tr class="@rowClass"
+            style="@(Virtualize ? $"height:{RowHeight}px" : null)"
+            aria-selected="@(Selectable ? (isSelected ? "true" : "false") : null)"
+            @onclick="() => HandleRowClick(item)">
+            @if (HasDetail)
+            {
+                <td class="ui-table-expand-col" @onclick:stopPropagation="true">
+                    <button type="button" class="ui-table-expand-btn" aria-expanded="@(isExpanded ? "true" : "false")" aria-label="@ExpandColumnLabel" @onclick="() => ToggleExpand(item)">
+                        <span aria-hidden="true">@(isExpanded ? "▾" : "▸")</span>
+                    </button>
+                </td>
+            }
+            @if (Selectable)
+            {
+                <td class="ui-datagrid-select-col" @onclick:stopPropagation="true">
+                    <input type="checkbox" aria-label="@SelectRowLabel" checked="@isSelected" @onchange="() => ToggleSelectItem(item)" />
+                </td>
+            }
+            @foreach (var col in VisibleColumns)
+            {
+                <td class="@col.Class" style="@CellStyle(col)" data-title="@col.Title">
+                    @if (isEditing && col.EditTemplate != null)
+                    {
+                        @col.EditTemplate(_editCopy!)
+                    }
+                    else if (col.CellTemplate != null)
+                    {
+                        @col.CellTemplate(item)
+                    }
+                    else
+                    {
+                        @col.GetText(item)
+                    }
+                </td>
+            }
+            @if (EditMode == UiGridEditMode.Row)
+            {
+                <td class="ui-datagrid-actions-col" @onclick:stopPropagation="true">
+                    @if (isEditing)
+                    {
+                        <button type="button" class="ui-datagrid-action" aria-label="@SaveLabel" @onclick="CommitEditAsync"><span aria-hidden="true">✓</span></button>
+                        <button type="button" class="ui-datagrid-action" aria-label="@CancelLabel" @onclick="CancelEditAsync"><span aria-hidden="true">✕</span></button>
+                    }
+                    else
+                    {
+                        <button type="button" class="ui-datagrid-action" aria-label="@EditLabel" @onclick="() => BeginEditAsync(item)"><span aria-hidden="true">✎</span></button>
+                    }
+                </td>
+            }
+        </tr>
+        @if (isExpanded)
+        {
+            <tr class="ui-table-detail-row"><td colspan="100">@ChildRowContent!(item)</td></tr>
+        }
+    </text>;
+}
+
+<CascadingValue Value="this" IsFixed="true">
+    @Columns
+    <div class="@CssBuilder.Default("ui-table-container ui-datagrid").AddIf("ui-datagrid-sticky", StickyHeader || Virtualize).AddIf("ui-datagrid-loading", IsServerMode && _serverLoading && _serverItems.Count > 0).Add(Class).Build()"
+         style="@Style"
+         @attributes="AdditionalAttributes">
+        @if (ShowSearch || ShowColumnMenu || ToolbarContent != null)
+        {
+            <div class="ui-table-toolbar">
+                @if (ShowSearch)
+                {
+                    <div class="ui-table-search-box">
+                        <span class="ui-table-search-icon" aria-hidden="true">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                        </span>
+                        <input type="search" class="ui-input" placeholder="@SearchPlaceholder" aria-label="@SearchPlaceholder" value="@_searchQuery" @oninput="HandleSearchInputAsync" />
+                    </div>
+                }
+                <div class="ui-flex-row">
+                    @if (ShowColumnMenu && _columns.Any(c => c.Hideable))
+                    {
+                        <UiPopover Class="ui-datagrid-columns-menu" AriaLabel="@ColumnsLabel" Placement="UiPopoverPlacement.BottomEnd">
+                            <Trigger><span class="ui-datagrid-columns-trigger">@ColumnsLabel</span></Trigger>
+                            <ChildContent>
+                                <div class="ui-datagrid-columns-list">
+                                    @foreach (var col in _columns.Where(c => c.Hideable))
+                                    {
+                                        var captured = col;
+                                        <label class="ui-datagrid-columns-item">
+                                            <input type="checkbox" checked="@(!captured.IsHidden)" @onchange="e => ToggleColumnAsync(captured, e)" />
+                                            <span>@(captured.Title ?? captured.EffectiveKey)</span>
+                                        </label>
+                                    }
+                                </div>
+                            </ChildContent>
+                        </UiPopover>
+                    }
+                    @ToolbarContent
+                </div>
+            </div>
+        }
+
+        <div class="ui-table-responsive ui-datagrid-scroll" style="@ScrollStyle" tabindex="@(Virtualize || StickyHeader ? 0 : null)">
+            <table class="@CssBuilder.Default("ui-table").AddIf("ui-table-striped", Striped).AddIf("ui-table-hover", Hoverable).AddIf("ui-table-bordered", Bordered).AddIf("ui-table-compact", Dense).Build()"
+                   aria-label="@AriaLabel"
+                   aria-colcount="@ColumnCount"
+                   aria-rowcount="@(TotalCount + 1)"
+                   aria-busy="@(ShowLoading || (IsServerMode && _serverLoading) ? "true" : null)">
+                <thead>
+                    <tr>
+                        @if (HasDetail)
+                        {
+                            <th scope="col" class="ui-table-expand-col"><span class="ui-sr-only">@ExpandColumnLabel</span></th>
+                        }
+                        @if (Selectable)
+                        {
+                            <th scope="col" class="ui-datagrid-select-col">
+                                <input type="checkbox" aria-label="@SelectAllLabel" checked="@IsAllSelected" @onchange="ToggleSelectAllAsync" />
+                            </th>
+                        }
+                        @foreach (var col in VisibleColumns)
+                        {
+                            var captured = col;
+                            var sortable = CanSort(col);
+                            var sortState = GetSortState(col);
+                            <th scope="col"
+                                class="@CssBuilder.Default().AddIf("ui-th-sortable", sortable).AddIf("ui-th-sorted", sortState != null).Add(col.Class).Build()"
+                                style="@HeaderStyle(col)"
+                                aria-sort="@(sortable ? (sortState is { } s ? (s.Descending ? "descending" : "ascending") : "none") : null)"
+                                tabindex="@(sortable ? 0 : null)"
+                                @onclick="e => SortAsync(captured, e.ShiftKey)"
+                                @onkeydown="e => HandleHeaderKeyDownAsync(captured, e)">
+                                <div class="ui-th-content" style="@JustifyStyle(col)">
+                                    @if (col.HeaderTemplate != null) { @col.HeaderTemplate } else { <span>@col.Title</span> }
+                                    @if (sortable)
+                                    {
+                                        <span class="ui-th-sort-icon" aria-hidden="true">
+                                            @if (sortState is { } state)
+                                            {
+                                                @(state.Descending ? "▼" : "▲")
+                                                @if (state.Total > 1) { <sup>@state.Position</sup> }
+                                            }
+                                            else
+                                            {
+                                                <span>⇅</span>
+                                            }
+                                        </span>
+                                    }
+                                </div>
+                            </th>
+                        }
+                        @if (EditMode == UiGridEditMode.Row)
+                        {
+                            <th scope="col" class="ui-datagrid-actions-col"><span class="ui-sr-only">@ActionsLabel</span></th>
+                        }
+                    </tr>
+                    @if (ShowFilters)
+                    {
+                        <tr class="ui-datagrid-filter-row">
+                            @if (HasDetail) { <th class="ui-table-expand-col"></th> }
+                            @if (Selectable) { <th class="ui-datagrid-select-col"></th> }
+                            @foreach (var col in VisibleColumns)
+                            {
+                                var captured = col;
+                                <th>
+                                    @if (CanFilter(col))
+                                    {
+                                        var filter = GetFilter(col);
+                                        <div class="ui-datagrid-filter">
+                                            <select class="ui-select ui-datagrid-filter-op" aria-label="@($"{OperatorLabel} : {col.Title}")" @onchange="e => SetFilterOperatorAsync(captured, e)">
+                                                @foreach (var op in Operators)
+                                                {
+                                                    <option value="@op" selected="@(filter.Operator == op)">@OperatorTextOf(op)</option>
+                                                }
+                                            </select>
+                                            @if (!IsValueless(filter.Operator))
+                                            {
+                                                <input class="ui-input ui-datagrid-filter-value" aria-label="@($"{FilterLabel} : {col.Title}")" value="@filter.Value" @oninput="e => SetFilterValueAsync(captured, e)" />
+                                            }
+                                        </div>
+                                    }
+                                </th>
+                            }
+                            @if (EditMode == UiGridEditMode.Row) { <th class="ui-datagrid-actions-col"></th> }
+                        </tr>
+                    }
+                </thead>
+                <tbody>
+                    @if (ShowLoading)
+                    {
+                        <tr><td colspan="100" class="ui-table-state"><UiSkeleton Variant="UiSkeletonVariant.Rect" Height="8rem" /></td></tr>
+                    }
+                    else if (!string.IsNullOrWhiteSpace(CurrentError))
+                    {
+                        <tr><td colspan="100" class="ui-table-state"><UiErrorState Message="@CurrentError" OnRetry="HandleRetryAsync" /></td></tr>
+                    }
+                    else if (View.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="100" class="ui-table-empty">
+                                @if (EmptyContent != null) { @EmptyContent } else { <UiEmptyState Title="@EmptyText" /> }
+                            </td>
+                        </tr>
+                    }
+                    else if (Virtualize && !IsServerMode)
+                    {
+                        <Virtualize Items="View" Context="virtualItem" ItemSize="RowHeight" OverscanCount="OverscanCount" SpacerElement="tr">
+                            @row(virtualItem)
+                        </Virtualize>
+                    }
+                    else if (GroupedBy is { } groupColumn)
+                    {
+                        @foreach (var group in Groups(groupColumn))
+                        {
+                            var collapsed = _collapsedGroups.Contains(group.Key);
+                            var capturedKey = group.Key;
+                            <tr class="ui-datagrid-group-row">
+                                <td colspan="100">
+                                    <button type="button" class="ui-datagrid-group-toggle" aria-expanded="@(collapsed ? "false" : "true")" @onclick="() => ToggleGroup(capturedKey)">
+                                        <span aria-hidden="true">@(collapsed ? "▸" : "▾")</span>
+                                        @if (GroupTemplate != null) { @GroupTemplate(group) } else { <span>@group.Label (@group.Items.Count)</span> }
+                                    </button>
+                                </td>
+                            </tr>
+                            @if (!collapsed)
+                            {
+                                @foreach (var item in group.Items)
+                                {
+                                    @row(item)
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        @foreach (var item in DisplayedItems)
+                        {
+                            @row(item)
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (Paginated && !(Virtualize && !IsServerMode) && View.Count > 0)
+        {
+            <UiPagination TotalItems="@TotalCount"
+                          CurrentPage="@EffectivePage"
+                          CurrentPageChanged="SetPageAsync"
+                          PageSize="@PageSize"
+                          PageSizeChanged="HandlePageSizeChangedAsync"
+                          PageSizeOptions="@PageSizeOptions"
+                          ShowInfo="true"
+                          AlwaysShow="true" />
+        }
+    </div>
+</CascadingValue>
+
+@code {
+    private sealed record SortEntry(string Key, bool Descending);
+
+    private static readonly UiFilterOperator[] Operators = Enum.GetValues<UiFilterOperator>();
+
+    private readonly List<UiColumn<TItem>> _columns = new();
+    private readonly List<SortEntry> _sorts = new();
+    private readonly Dictionary<string, (UiFilterOperator Operator, string? Value)> _filters = new();
+    private readonly HashSet<TItem> _expanded = new();
+    private readonly HashSet<string> _collapsedGroups = new();
+
+    private string _searchQuery = string.Empty;
+    private List<TItem>? _view;
+    private bool _parentDriven;
+
+    private TItem? _editing;
+    private TItem? _editCopy;
+    private bool _isEditingRow;
+
+    private List<TItem> _serverItems = new();
+    private int _serverTotal;
+    private bool _serverLoading;
+    private string? _serverError;
+    private bool _serverStarted;
+    private CancellationTokenSource? _loadCts;
+    private CancellationTokenSource? _debounceCts;
+
+    // ---------- Données ----------
+    /// <summary>Éléments affichés (mode client). Ignoré si <c>ServerData</c> est défini.</summary>
+    [Parameter] public IEnumerable<TItem>? Items { get; set; }
+
+    /// <summary>Colonnes : des <see cref="UiColumn{TItem}"/>.</summary>
+    [Parameter] public RenderFragment? Columns { get; set; }
+
+    /// <summary>
+    /// Source serveur : tri, filtres, recherche et pagination sont délégués à l'appelant (<c>Items</c> est alors ignoré).
+    /// Les colonnes doivent avoir une <c>Key</c> stable.
+    /// </summary>
+    [Parameter] public Func<UiGridState, CancellationToken, Task<UiGridData<TItem>>>? ServerData { get; set; }
+    /// <summary>Délai en millisecondes avant d'interroger le serveur après une saisie dans la recherche ou un filtre.</summary>
+    [Parameter] public int DebounceMs { get; set; } = 300;
+    /// <summary>Force l'affichage de l'état de chargement. En mode serveur, le chargement est géré par la grille.</summary>
+    [Parameter] public bool IsLoading { get; set; }
+    /// <summary>Message d'erreur affiché à la place des lignes, avec un bouton pour réessayer.</summary>
+    [Parameter] public string? ErrorMessage { get; set; }
+    /// <summary>Appelé au clic sur le bouton « Réessayer » de l'état d'erreur.</summary>
+    [Parameter] public EventCallback OnRetry { get; set; }
+
+    // ---------- Fonctions ----------
+    /// <summary>Affiche la zone de recherche globale.</summary>
+    [Parameter] public bool ShowSearch { get; set; }
+    /// <summary>Affiche la ligne de filtres par colonne.</summary>
+    [Parameter] public bool ShowFilters { get; set; }
+    /// <summary>Affiche le menu permettant de masquer ou d'afficher des colonnes.</summary>
+    [Parameter] public bool ShowColumnMenu { get; set; } = true;
+    /// <summary>Autorise le tri sur plusieurs colonnes (Maj + clic sur les en-têtes).</summary>
+    [Parameter] public bool MultiSort { get; set; }
+    /// <summary>Remplace la recherche globale par défaut (texte contenu dans une colonne visible).</summary>
+    [Parameter] public Func<TItem, string, bool>? FilterPredicate { get; set; }
+
+    /// <summary>Clé de la colonne de regroupement (client uniquement ; incompatible avec <c>Virtualize</c>).</summary>
+    [Parameter] public string? GroupBy { get; set; }
+    /// <summary>Gabarit de l'en-tête de chaque groupe (reçoit le groupe : clé, libellé et éléments).</summary>
+    [Parameter] public RenderFragment<UiGridGroup<TItem>>? GroupTemplate { get; set; }
+
+    /// <summary>Affiche seulement les lignes visibles (grands volumes côté client). Désactive pagination, regroupement et lignes dépliables.</summary>
+    [Parameter] public bool Virtualize { get; set; }
+    /// <summary>Hauteur fixe d'une ligne en pixels, nécessaire à la virtualisation.</summary>
+    [Parameter] public int RowHeight { get; set; } = 44;
+    /// <summary>Nombre de lignes rendues au-delà de la zone visible, pour un défilement fluide.</summary>
+    [Parameter] public int OverscanCount { get; set; } = 6;
+
+    /// <summary>Affiche la pagination. Ignoré avec <c>Virtualize</c> en mode client.</summary>
+    [Parameter] public bool Paginated { get; set; } = true;
+    /// <summary>Nombre de lignes par page.</summary>
+    [Parameter] public int PageSize { get; set; } = 10;
+    /// <summary>Tailles de page proposées dans le sélecteur de la pagination.</summary>
+    [Parameter] public IReadOnlyList<int> PageSizeOptions { get; set; } = new[] { 5, 10, 25, 50 };
+    /// <summary>Page affichée, à partir de 1. Bornée à la dernière page.</summary>
+    [Parameter] public int CurrentPage { get; set; } = 1;
+    /// <summary>Appelé lorsque la page courante change (changement de page, de tri ou de filtre).</summary>
+    [Parameter] public EventCallback<int> CurrentPageChanged { get; set; }
+
+    /// <summary>Affiche une colonne de cases à cocher pour sélectionner des lignes.</summary>
+    [Parameter] public bool Selectable { get; set; }
+    /// <summary>Éléments sélectionnés. La grille modifie cet ensemble ; relisez-le dans <c>SelectedItemsChanged</c>.</summary>
+    [Parameter] public HashSet<TItem>? SelectedItems { get; set; }
+    /// <summary>Appelé lorsque la sélection change.</summary>
+    [Parameter] public EventCallback<HashSet<TItem>> SelectedItemsChanged { get; set; }
+    /// <summary>Appelé au clic sur une ligne (hors cases à cocher et boutons de la ligne).</summary>
+    [Parameter] public EventCallback<TItem> OnRowClick { get; set; }
+    /// <summary>Contenu déplié sous une ligne. Active la colonne de dépliage ; ignoré avec <c>Virtualize</c>.</summary>
+    [Parameter] public RenderFragment<TItem>? ChildRowContent { get; set; }
+
+    // ---------- Édition ----------
+    /// <summary>Mode d'édition : <c>Row</c> rend une ligne à la fois modifiable.</summary>
+    [Parameter] public UiGridEditMode EditMode { get; set; }
+
+    /// <summary>Copie de l'élément modifiée par les <c>EditTemplate</c> ; par défaut une copie superficielle.</summary>
+    [Parameter] public Func<TItem, TItem>? EditClone { get; set; }
+    /// <summary>Appelé quand l'utilisateur enregistre une ligne : reçoit l'élément d'origine et sa copie modifiée.</summary>
+    [Parameter] public EventCallback<UiRowEdit<TItem>> OnRowCommit { get; set; }
+    /// <summary>Appelé quand l'utilisateur annule la modification d'une ligne : reçoit l'élément d'origine.</summary>
+    [Parameter] public EventCallback<TItem> OnRowCancel { get; set; }
+
+    // ---------- Apparence ----------
+    /// <summary>Alterne la couleur de fond des lignes.</summary>
+    [Parameter] public bool Striped { get; set; } = true;
+    /// <summary>Met en évidence la ligne survolée.</summary>
+    [Parameter] public bool Hoverable { get; set; } = true;
+    /// <summary>Affiche les bordures des cellules.</summary>
+    [Parameter] public bool Bordered { get; set; }
+    /// <summary>Réduit l'espacement des cellules.</summary>
+    [Parameter] public bool Dense { get; set; }
+    /// <summary>Garde l'en-tête visible pendant le défilement (nécessite <c>Height</c>).</summary>
+    [Parameter] public bool StickyHeader { get; set; }
+
+    /// <summary>Hauteur maximale de la zone des lignes (CSS) ; défaut <c>28rem</c> avec <c>Virtualize</c>.</summary>
+    [Parameter] public string? Height { get; set; }
+    /// <summary>Fournit des classes CSS supplémentaires pour une ligne, selon son élément.</summary>
+    [Parameter] public Func<TItem, string?>? RowClass { get; set; }
+    /// <summary>Contenu ajouté à la barre d'outils, à côté de la recherche et du menu des colonnes.</summary>
+    [Parameter] public RenderFragment? ToolbarContent { get; set; }
+    /// <summary>Contenu affiché quand aucune ligne ne correspond. Remplace <c>EmptyText</c>.</summary>
+    [Parameter] public RenderFragment? EmptyContent { get; set; }
+
+    // ---------- Libellés ----------
+    /// <summary>Message affiché quand aucune ligne ne correspond.</summary>
+    [Parameter] public string EmptyText { get; set; } = "Aucune donnée disponible";
+    /// <summary>Texte indicatif de la zone de recherche, aussi utilisé comme nom accessible.</summary>
+    [Parameter] public string SearchPlaceholder { get; set; } = "Rechercher...";
+    /// <summary>Nom accessible du tableau.</summary>
+    [Parameter] public string? AriaLabel { get; set; }
+    /// <summary>Libellé du menu des colonnes.</summary>
+    [Parameter] public string ColumnsLabel { get; set; } = "Colonnes";
+    /// <summary>Nom accessible du bouton de dépliage d'une ligne.</summary>
+    [Parameter] public string ExpandColumnLabel { get; set; } = "Afficher les détails";
+    /// <summary>Nom accessible de la case « tout sélectionner ».</summary>
+    [Parameter] public string SelectAllLabel { get; set; } = "Tout sélectionner";
+    /// <summary>Nom accessible de la case de sélection d'une ligne.</summary>
+    [Parameter] public string SelectRowLabel { get; set; } = "Sélectionner la ligne";
+    /// <summary>Début du nom accessible d'un champ de filtre (suivi du titre de la colonne).</summary>
+    [Parameter] public string FilterLabel { get; set; } = "Filtrer";
+    /// <summary>Début du nom accessible d'un sélecteur d'opérateur (suivi du titre de la colonne).</summary>
+    [Parameter] public string OperatorLabel { get; set; } = "Opérateur";
+    /// <summary>Nom accessible de la colonne d'actions (édition de ligne).</summary>
+    [Parameter] public string ActionsLabel { get; set; } = "Actions";
+    /// <summary>Nom accessible du bouton qui rend une ligne modifiable.</summary>
+    [Parameter] public string EditLabel { get; set; } = "Modifier la ligne";
+    /// <summary>Nom accessible du bouton d'enregistrement d'une ligne.</summary>
+    [Parameter] public string SaveLabel { get; set; } = "Enregistrer";
+    /// <summary>Nom accessible du bouton d'annulation d'une ligne.</summary>
+    [Parameter] public string CancelLabel { get; set; } = "Annuler";
+
+    /// <summary>Libellé d'un opérateur de filtre (par défaut, français).</summary>
+    [Parameter] public Func<UiFilterOperator, string>? OperatorText { get; set; }
+
+    // ---------- État ----------
+    public bool IsServerMode => ServerData != null;
+    public IReadOnlyList<UiColumn<TItem>> RegisteredColumns => _columns;
+
+    /// <summary>Filtres actifs (colonne, opérateur, valeur).</summary>
+    public IReadOnlyList<UiFilterDefinition> ActiveFilters => _filters
+        .Where(f => IsActive(f.Value.Operator, f.Value.Value))
+        .Select(f => new UiFilterDefinition(f.Key, f.Value.Operator, f.Value.Value))
+        .ToList();
+
+    private IEnumerable<UiColumn<TItem>> VisibleColumns => _columns.Where(c => !c.IsHidden);
+    private bool HasDetail => ChildRowContent != null && !Virtualize;
+    private int ColumnCount => VisibleColumns.Count() + (HasDetail ? 1 : 0) + (Selectable ? 1 : 0) + (EditMode == UiGridEditMode.Row ? 1 : 0);
+    private bool ShowLoading => IsLoading || (IsServerMode && _serverLoading && _serverItems.Count == 0 && _serverError == null);
+    private string? CurrentError => !string.IsNullOrWhiteSpace(ErrorMessage) ? ErrorMessage : _serverError;
+    private UiColumn<TItem>? GroupedBy => Virtualize || IsServerMode || string.IsNullOrEmpty(GroupBy) ? null : _columns.FirstOrDefault(c => c.EffectiveKey == GroupBy);
+
+    private string? ScrollStyle
+    {
+        get
+        {
+            var height = Height ?? (Virtualize ? "28rem" : null);
+            return height is null ? null : $"max-height:{height}";
+        }
+    }
+
+    private string OperatorTextOf(UiFilterOperator op) => OperatorText?.Invoke(op) ?? op switch
+    {
+        UiFilterOperator.Contains => "Contient",
+        UiFilterOperator.Equals => "Égal à",
+        UiFilterOperator.NotEquals => "Différent de",
+        UiFilterOperator.StartsWith => "Commence par",
+        UiFilterOperator.EndsWith => "Finit par",
+        UiFilterOperator.GreaterThan => "Supérieur à",
+        UiFilterOperator.GreaterThanOrEqual => "Supérieur ou égal à",
+        UiFilterOperator.LessThan => "Inférieur à",
+        UiFilterOperator.LessThanOrEqual => "Inférieur ou égal à",
+        UiFilterOperator.IsEmpty => "Est vide",
+        UiFilterOperator.IsNotEmpty => "N'est pas vide",
+        _ => op.ToString()
+    };
+
+    // ---------- Colonnes ----------
+    internal void AddColumn(UiColumn<TItem> column)
+    {
+        if (_columns.Contains(column)) return;
+        _columns.Add(column);
+        _view = null;
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    internal void RemoveColumn(UiColumn<TItem> column)
+    {
+        if (!_columns.Remove(column)) return;
+        _view = null;
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    /// <summary>
+    /// Appelé par une colonne dont les paramètres viennent d'être posés. Quand c'est le parent qui a re-rendu la grille,
+    /// les gabarits des colonnes ne sont à jour qu'après ce rendu : on en demande un second (une seule fois).
+    /// </summary>
+    internal void NotifyColumnsChanged()
+    {
+        if (!_parentDriven) return;
+        _parentDriven = false;
+        _view = null;
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private async Task ToggleColumnAsync(UiColumn<TItem> column, ChangeEventArgs e)
+    {
+        await column.SetHiddenAsync(!(e.Value is true));
+        _view = null;
+    }
+
+    private bool CanSort(UiColumn<TItem> col) => col.Sortable && (col.Field != null || IsServerMode);
+    private bool CanFilter(UiColumn<TItem> col) => col.Filterable && (col.Field != null || IsServerMode);
+
+    // ---------- Pipeline client ----------
+    private List<TItem> View => _view ??= BuildView();
+
+    private List<TItem> BuildView()
+    {
+        if (IsServerMode) return _serverItems;
+        if (Items == null) return new List<TItem>();
+
+        IEnumerable<TItem> list = Items;
+
+        if (ShowSearch && !string.IsNullOrWhiteSpace(_searchQuery))
+        {
+            list = FilterPredicate != null
+                ? list.Where(item => FilterPredicate(item, _searchQuery))
+                : list.Where(item => VisibleColumns.Any(col => col.GetText(item).Contains(_searchQuery, StringComparison.CurrentCultureIgnoreCase)));
+        }
+
+        foreach (var (key, (op, value)) in _filters)
+        {
+            if (!IsActive(op, value)) continue;
+            var col = _columns.FirstOrDefault(c => c.EffectiveKey == key);
+            if (col?.Field == null) continue;
+            list = list.Where(item => UiFilterEvaluator.Matches(col.GetValue(item), op, value));
+        }
+
+        IOrderedEnumerable<TItem>? ordered = null;
+        foreach (var sort in _sorts)
+        {
+            var col = _columns.FirstOrDefault(c => c.EffectiveKey == sort.Key);
+            if (col?.Field == null) continue;
+            var selector = col.Field;
+            ordered = ordered switch
+            {
+                null => sort.Descending ? list.OrderByDescending(selector) : list.OrderBy(selector),
+                _ => sort.Descending ? ordered.ThenByDescending(selector) : ordered.ThenBy(selector)
+            };
+        }
+
+        return (ordered ?? list).ToList();
+    }
+
+    private int TotalCount => IsServerMode ? _serverTotal : View.Count;
+
+    private int EffectivePage
+    {
+        get
+        {
+            var pages = Math.Max(1, (int)Math.Ceiling(TotalCount / (double)Math.Max(PageSize, 1)));
+            return Math.Clamp(CurrentPage, 1, pages);
+        }
+    }
+
+    private IEnumerable<TItem> DisplayedItems =>
+        Paginated && !IsServerMode && !Virtualize ? View.Skip((EffectivePage - 1) * PageSize).Take(PageSize) : View;
+
+    private IEnumerable<UiGridGroup<TItem>> Groups(UiColumn<TItem> column) =>
+        DisplayedItems
+            .GroupBy(item => column.GetText(item))
+            .Select(g => new UiGridGroup<TItem>(g.Key, string.IsNullOrEmpty(g.Key) ? "—" : g.Key, g.ToList()));
+
+    private bool IsAllSelected
+    {
+        get
+        {
+            var current = DisplayedItems.ToList();
+            return current.Count > 0 && SelectedItems != null && current.All(SelectedItems.Contains);
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        _view = null;
+        _parentDriven = true;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (IsServerMode && !_serverStarted)
+        {
+            _serverStarted = true;
+            await ReloadServerDataAsync();
+        }
+    }
+
+    // ---------- Serveur ----------
+    /// <summary>Relit la page courante depuis <c>ServerData</c> (annule une requête en cours).</summary>
+    public async Task ReloadServerDataAsync()
+    {
+        if (ServerData == null) return;
+
+        _loadCts?.Cancel();
+        _loadCts?.Dispose();
+        var cts = _loadCts = new CancellationTokenSource();
+
+        _serverLoading = true;
+        _serverError = null;
+        StateHasChanged();
+
+        var state = new UiGridState(
+            Paginated ? EffectivePage : 1,
+            PageSize,
+            string.IsNullOrWhiteSpace(_searchQuery) ? null : _searchQuery,
+            _sorts.Select(s => new UiSortDefinition(s.Key, s.Descending)).ToList(),
+            ActiveFilters);
+
+        try
+        {
+            var data = await ServerData(state, cts.Token);
+            if (cts.IsCancellationRequested) return;
+            _serverItems = data.Items.ToList();
+            _serverTotal = data.TotalItems;
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+        catch (Exception ex)
+        {
+            if (cts.IsCancellationRequested) return;
+            _serverError = ex.Message;
+        }
+        finally
+        {
+            if (!cts.IsCancellationRequested)
+            {
+                _serverLoading = false;
+                _view = null;
+                StateHasChanged();
+            }
+        }
+    }
+
+    private async Task DebouncedReloadAsync()
+    {
+        _debounceCts?.Cancel();
+        _debounceCts?.Dispose();
+        var cts = _debounceCts = new CancellationTokenSource();
+        try
+        {
+            await Task.Delay(DebounceMs, cts.Token);
+            await ReloadServerDataAsync();
+        }
+        catch (TaskCanceledException) { }
+    }
+
+    private async Task AfterQueryChangedAsync()
+    {
+        CurrentPage = 1;
+        _view = null;
+        await CurrentPageChanged.InvokeAsync(CurrentPage);
+        if (IsServerMode) await ReloadServerDataAsync();
+    }
+
+    // ---------- Tri ----------
+    private (int Position, bool Descending, int Total)? GetSortState(UiColumn<TItem> col)
+    {
+        var index = _sorts.FindIndex(s => s.Key == col.EffectiveKey);
+        return index < 0 ? null : (index + 1, _sorts[index].Descending, _sorts.Count);
+    }
+
+    private async Task SortAsync(UiColumn<TItem> col, bool additive)
+    {
+        if (!CanSort(col)) return;
+
+        var key = col.EffectiveKey;
+        var index = _sorts.FindIndex(s => s.Key == key);
+        if (index >= 0)
+        {
+            var flipped = _sorts[index] with { Descending = !_sorts[index].Descending };
+            if (!additive || !MultiSort) _sorts.Clear();
+            if (!additive || !MultiSort) _sorts.Add(flipped); else _sorts[index] = flipped;
+        }
+        else
+        {
+            if (!additive || !MultiSort) _sorts.Clear();
+            _sorts.Add(new SortEntry(key, false));
+        }
+
+        await AfterQueryChangedAsync();
+    }
+
+    private Task HandleHeaderKeyDownAsync(UiColumn<TItem> col, KeyboardEventArgs e) =>
+        e.Key == "Enter" ? SortAsync(col, e.ShiftKey) : Task.CompletedTask;
+
+    // ---------- Filtres et recherche ----------
+    private static bool IsValueless(UiFilterOperator op) => op is UiFilterOperator.IsEmpty or UiFilterOperator.IsNotEmpty;
+    private static bool IsActive(UiFilterOperator op, string? value) => IsValueless(op) || !string.IsNullOrEmpty(value);
+
+    private (UiFilterOperator Operator, string? Value) GetFilter(UiColumn<TItem> col) =>
+        _filters.TryGetValue(col.EffectiveKey, out var filter) ? filter : (UiFilterOperator.Contains, null);
+
+    private async Task SetFilterOperatorAsync(UiColumn<TItem> col, ChangeEventArgs e)
+    {
+        if (!Enum.TryParse<UiFilterOperator>(e.Value?.ToString(), out var op)) return;
+        var current = GetFilter(col);
+        _filters[col.EffectiveKey] = (op, current.Value);
+        await FilterChangedAsync();
+    }
+
+    private async Task SetFilterValueAsync(UiColumn<TItem> col, ChangeEventArgs e)
+    {
+        var current = GetFilter(col);
+        _filters[col.EffectiveKey] = (current.Operator, e.Value?.ToString());
+        await FilterChangedAsync();
+    }
+
+    private async Task FilterChangedAsync()
+    {
+        CurrentPage = 1;
+        _view = null;
+        if (IsServerMode) await DebouncedReloadAsync();
+        else await CurrentPageChanged.InvokeAsync(CurrentPage);
+    }
+
+    private async Task HandleSearchInputAsync(ChangeEventArgs e)
+    {
+        _searchQuery = e.Value?.ToString() ?? string.Empty;
+        await FilterChangedAsync();
+    }
+
+    // ---------- Pagination ----------
+    private async Task HandlePageSizeChangedAsync(int size)
+    {
+        PageSize = size;
+        await AfterQueryChangedAsync();
+    }
+
+    private async Task SetPageAsync(int page)
+    {
+        if (CurrentPage == page) return;
+        CurrentPage = page;
+        await CurrentPageChanged.InvokeAsync(page);
+        if (IsServerMode) await ReloadServerDataAsync();
+    }
+
+    private async Task HandleRetryAsync()
+    {
+        _serverError = null;
+        if (IsServerMode) await ReloadServerDataAsync();
+        await OnRetry.InvokeAsync();
+    }
+
+    // ---------- Lignes ----------
+    private Task HandleRowClick(TItem item) => OnRowClick.InvokeAsync(item);
+
+    private void ToggleExpand(TItem item)
+    {
+        if (!_expanded.Remove(item)) _expanded.Add(item);
+    }
+
+    private void ToggleGroup(string key)
+    {
+        if (!_collapsedGroups.Remove(key)) _collapsedGroups.Add(key);
+    }
+
+    private async Task ToggleSelectItem(TItem item)
+    {
+        SelectedItems ??= new HashSet<TItem>();
+        if (!SelectedItems.Remove(item)) SelectedItems.Add(item);
+        await SelectedItemsChanged.InvokeAsync(SelectedItems);
+    }
+
+    private async Task ToggleSelectAllAsync(ChangeEventArgs e)
+    {
+        SelectedItems ??= new HashSet<TItem>();
+        var isChecked = e.Value is true;
+        foreach (var item in DisplayedItems.ToList())
+        {
+            if (isChecked) SelectedItems.Add(item);
+            else SelectedItems.Remove(item);
+        }
+        await SelectedItemsChanged.InvokeAsync(SelectedItems);
+    }
+
+    // ---------- Édition ----------
+    private bool IsEditing(TItem item) => _isEditingRow && EqualityComparer<TItem>.Default.Equals(_editing, item);
+
+    private async Task BeginEditAsync(TItem item)
+    {
+        if (_isEditingRow && _editing is { } previous) await OnRowCancel.InvokeAsync(previous);
+
+        _editing = item;
+        _editCopy = EditClone != null ? EditClone(item) : ShallowClone(item);
+        _isEditingRow = true;
+    }
+
+    private async Task CommitEditAsync()
+    {
+        if (!_isEditingRow || _editing is null || _editCopy is null) return;
+
+        var edit = new UiRowEdit<TItem>(_editing, _editCopy);
+        EndEdit();
+        await OnRowCommit.InvokeAsync(edit);
+    }
+
+    private async Task CancelEditAsync()
+    {
+        if (!_isEditingRow || _editing is null) return;
+
+        var original = _editing;
+        EndEdit();
+        await OnRowCancel.InvokeAsync(original);
+    }
+
+    private void EndEdit()
+    {
+        _isEditingRow = false;
+        _editing = default;
+        _editCopy = default;
+        _view = null;
+    }
+
+    // Copie superficielle par défaut (classes et records) quand aucun EditClone n'est fourni.
+    private static TItem ShallowClone(TItem item)
+    {
+        if (item is null) throw new InvalidOperationException("Impossible de modifier une ligne null.");
+        if (item is ICloneable cloneable) return (TItem)cloneable.Clone();
+
+        var method = typeof(object).GetMethod("MemberwiseClone", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!;
+        return (TItem)method.Invoke(item, null)!;
+    }
+
+    // ---------- Styles ----------
+    private static string JustifyStyle(UiColumn<TItem> col) => col.Align switch
+    {
+        Alignement.Right => "justify-content: flex-end;",
+        Alignement.Center => "justify-content: center;",
+        _ => string.Empty
+    };
+
+    private static string CellStyle(UiColumn<TItem> col) => $"text-align: {col.Align.ToString().ToLowerInvariant()};";
+
+    private static string HeaderStyle(UiColumn<TItem> col) =>
+        $"text-align: {col.Align.ToString().ToLowerInvariant()};" + (string.IsNullOrEmpty(col.Width) ? string.Empty : $" width: {col.Width};");
+
+    public void Dispose()
+    {
+        _loadCts?.Cancel();
+        _loadCts?.Dispose();
+        _debounceCts?.Cancel();
+        _debounceCts?.Dispose();
+    }
+}

@@ -30,15 +30,25 @@
 </div>
 
 @code {
+    /// <summary>Contenu du bouton qui ouvre le menu.</summary>
     [Parameter, EditorRequired] public RenderFragment? Trigger { get; set; }
+    /// <summary>Éléments du menu (boutons, liens ou éléments <c>role="menuitem"</c>).</summary>
     [Parameter] public RenderFragment? ChildContent { get; set; }
+    /// <summary>Nom accessible du menu.</summary>
     [Parameter] public string AriaLabel { get; set; } = "Menu d'actions";
+    /// <summary>Indique si le menu est ouvert (lié avec <c>bind-IsOpen</c>).</summary>
     [Parameter] public bool IsOpen { get; set; }
+    /// <summary>Appelé lorsque le menu s'ouvre ou se ferme.</summary>
     [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
+    /// <summary>Désactive le déclencheur.</summary>
     [Parameter] public bool Disabled { get; set; }
+    /// <summary>Réduit l'espacement des éléments.</summary>
     [Parameter] public bool Dense { get; set; }
+    /// <summary>Ferme le menu au clic sur un élément.</summary>
     [Parameter] public bool CloseOnItemClick { get; set; } = true;
+    /// <summary>Bord du déclencheur sur lequel le menu s'aligne.</summary>
     [Parameter] public UiMenuAlignment Alignment { get; set; } = UiMenuAlignment.End;
+    /// <summary>Hauteur maximale CSS du menu, au-delà de laquelle il défile.</summary>
     [Parameter] public string? MaxHeight { get; set; } = "20rem";
 
     private readonly string _menuId = $"ui-menu-{Guid.NewGuid():N}";
@@ -171,11 +181,7 @@
             return;
         }
 
-        try
-        {
-            await JS.InvokeVoidAsync("UiInterop.teardownMenu", _rootRef);
-        }
-        catch (JSDisconnectedException) { }
+        await JS.TryTeardownAsync("UiInterop.teardownMenu", _rootRef);
 
         _dotNetRef?.Dispose();
         _dotNetRef = null;

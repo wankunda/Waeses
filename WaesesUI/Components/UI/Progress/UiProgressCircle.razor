@@ -36,10 +36,15 @@
     private string? WrapStyle => StyleBuilder.Default($"width: {Diameter}px; height: {Diameter}px;").Add(Style).Build();
 
     [Parameter] public double Value { get; set; }
+    /// <summary>Valeur correspondant à 100 %.</summary>
     [Parameter] public double Max { get; set; } = 100;
+    /// <summary>Diamètre en pixels.</summary>
     [Parameter] public int Diameter { get; set; } = 72;
+    /// <summary>Épaisseur du trait en pixels.</summary>
     [Parameter] public int StrokeWidth { get; set; } = 6;
+    /// <summary>Couleur de l'arc.</summary>
     [Parameter] public UiColor Color { get; set; } = UiColor.Primary;
+    /// <summary>Affiche le pourcentage au centre.</summary>
     [Parameter] public bool ShowValue { get; set; } = true;
 
     private double Radius => (Diameter - StrokeWidth) / 2.0;

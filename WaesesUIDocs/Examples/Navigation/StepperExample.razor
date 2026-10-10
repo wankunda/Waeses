@@ -1,0 +1,22 @@
+<div class="ui-flex-col" style="gap: 1.25rem; width: 100%;">
+    <UiStepper Steps="_steps" @bind-ActiveIndex="_current" AriaLabel="Étapes de la commande" />
+
+    <div class="ui-flex-row" style="gap: .5rem;">
+        <UiButton Text="Précédent" Appearance="UiVariant.Outlined" Disabled="@(_current == 0)" OnClick="() => _current--" />
+        <UiButton Text="Suivant" Disabled="@(_current == _steps.Count - 1)" OnClick="() => _current++" />
+    </div>
+
+    <p class="text-secondary">Étape <strong>@(_current + 1)</strong> sur @_steps.Count : @_steps[_current].Title.</p>
+</div>
+
+@code {
+    private int _current = 1;
+
+    private readonly IReadOnlyList<UiStepItem> _steps = new[]
+    {
+        new UiStepItem("Panier", "Vérifier les articles", Completed: true),
+        new UiStepItem("Livraison", "Choisir l'adresse"),
+        new UiStepItem("Paiement", "Régler la commande"),
+        new UiStepItem("Confirmation", "Terminé", Disabled: true)
+    };
+}

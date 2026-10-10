@@ -105,9 +105,13 @@
     /// <summary>Affiche le bouton qui sélectionne la date du jour.</summary>
     [Parameter] public bool ShowToday { get; set; } = true;
 
+    /// <summary>Libellé du bouton qui revient à la date du jour.</summary>
     [Parameter] public string TodayText { get; set; } = "Aujourd'hui";
+    /// <summary>Nom accessible du bouton du mois précédent.</summary>
     [Parameter] public string PreviousLabel { get; set; } = "Précédent";
+    /// <summary>Nom accessible du bouton du mois suivant.</summary>
     [Parameter] public string NextLabel { get; set; } = "Suivant";
+    /// <summary>Nom accessible du calendrier.</summary>
     [Parameter] public string AriaLabel { get; set; } = "Calendrier";
 
     private ElementReference _rootRef;
@@ -343,10 +347,6 @@
     {
         if (!_jsReady) return;
 
-        try
-        {
-            await JS.InvokeVoidAsync("UiInterop.teardownCalendar", _rootRef);
-        }
-        catch (JSDisconnectedException) { }
+        await JS.TryTeardownAsync("UiInterop.teardownCalendar", _rootRef);
     }
 }

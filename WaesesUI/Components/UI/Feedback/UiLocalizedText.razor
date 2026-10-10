@@ -6,7 +6,9 @@
 <span class="@Class" style="@Style" @attributes="AdditionalAttributes">@Localization.Get(Key, Fallback)</span>
 
 @code {
+    /// <summary>Clé de la ressource à traduire.</summary>
     [Parameter] public string Key { get; set; } = string.Empty;
+    /// <summary>Texte affiché si la clé est introuvable dans la culture courante.</summary>
     [Parameter] public string Fallback { get; set; } = string.Empty;
 
     protected override void OnInitialized() => Localization.OnCultureChanged += HandleCultureChanged;
