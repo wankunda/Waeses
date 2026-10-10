@@ -21,12 +21,31 @@ public static class Snippets
         });
         """;
 
+    public const string StaticFonts = """
+        <!-- Optionnel, avant la feuille de style : Plus Jakarta Sans et JetBrains Mono (nécessite une connexion) -->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" />
+        <link rel="stylesheet" href="_content/WaesesUI/css/waeses.min.css" />
+        """;
+
+    public const string StylesMigration = """
+        <!-- Avant (1.1.x) -->
+        <link rel="stylesheet" href="_content/WaesesUI/css/theme.css" />
+        <link rel="stylesheet" href="_content/WaesesUI/css/components-extended.css" />
+
+        <!-- Après (1.2.0) -->
+        <link rel="stylesheet" href="_content/WaesesUI/css/waeses.min.css" />
+        """;
+
+    public const string BuildCss = """
+        python tools/build-css.py           # régénère WaesesUI/wwwroot/css/waeses.min.css
+        python tools/build-css.py --check   # échoue si le fichier versionné n'est pas à jour (CI)
+        """;
+
     public const string StaticAssetsWasm = """
         <!-- wwwroot/index.html (Blazor WebAssembly) ou Components/App.razor (Blazor Web App) -->
         <head>
             ...
-            <link rel="stylesheet" href="_content/WaesesUI/css/theme.css" />
-            <link rel="stylesheet" href="_content/WaesesUI/css/components-extended.css" />
+            <link rel="stylesheet" href="_content/WaesesUI/css/waeses.min.css" />
         </head>
         <body>
             ...

@@ -23,6 +23,13 @@ jobs:
             9.0.x
             10.0.x
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Feuille de style à jour
+        run: python tools/build-css.py --check
+
       - name: Restore
         run: dotnet restore Waeses.slnx
 

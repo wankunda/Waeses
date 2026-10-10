@@ -1,7 +1,7 @@
 @page "/guides/theme"
 
 <DocPage Href="guides/theme">
-    <DocSection Title="Comment ça marche" Description="Tout le thème repose sur des variables CSS (`--primary`, `--bg-surface`, `--radius-md`…) définies dans `theme.css`, avec une version sombre sous `[data-theme=&quot;dark&quot;]`. Les composants ne lisent que ces variables : changer une variable change tous les composants. `UiThemeProvider` choisit le mode (clair, sombre ou système) et la densité.">
+    <DocSection Title="Comment ça marche" Description="Tout le thème repose sur des variables CSS (`--primary`, `--bg-surface`, `--radius-md`…) définies dans `waeses.min.css`, avec une version sombre sous `[data-theme=&quot;dark&quot;]`. Les composants ne lisent que ces variables : changer une variable change tous les composants. `UiThemeProvider` choisit le mode (clair, sombre ou système) et la densité.">
         <UiCodeBlock Code="@Snippets.CssVariables" Language="css" />
     </DocSection>
 
@@ -19,8 +19,13 @@
         <p class="docs-text">Un contrôle automatique n'attrape qu'une partie des problèmes d'accessibilité : il ne remplace ni un test au clavier ni un test avec un lecteur d'écran.</p>
     </DocSection>
 
+    <DocSection Title="Contribuer aux styles" Description="`waeses.min.css` est généré : ne le modifiez pas à la main. Les sources sont dans `WaesesUI/Styles/` (`theme.css`, puis `components-extended.css` qui le surcharge). Une classe ne doit être définie qu'une fois : étendez la règle existante plutôt que d'en ajouter une seconde. Les tailles passent par les variables (`--control-height-*`, `--control-font-*`, `--density-factor`) pour rester cohérentes avec la densité.">
+        <UiCodeBlock Code="@Snippets.BuildCss" Language="powershell" />
+    </DocSection>
+
     <DocSection Title="Bon à savoir">
         <ul>
+            <li>Une seule feuille de style est livrée (<code>waeses.min.css</code>), minifiée et sans <code>@@import</code> : un seul téléchargement.</li>
             <li>Le thème global se fixe aussi avec <code>AddWaesesUIServices(o =&gt; o.Theme = ...)</code> ; le paramètre <code>Definition</code> du provider prend alors le dessus.</li>
             <li>Une définition remplace les paramètres <code>Primary</code>, <code>Secondary</code>… du provider, qui posaient des variables en ligne sur la racine.</li>
             <li>Les couleurs acceptent <code>#rgb</code>, <code>#rrggbb</code>, <code>rgb()</code>, <code>hsl()</code>, <code>var(--x)</code> ou un nom de couleur ; seul un hexadécimal produit des teintes dérivées.</li>

@@ -2,9 +2,8 @@
    MODERN MINIMALIST DESIGN SYSTEM - THEME CSS (LIGHT / DARK)
    ========================================================================== */
 
-/* Les polices Plus Jakarta Sans et JetBrains Mono ne sont plus téléchargées automatiquement (échec hors connexion,
-   requête externe non voulue). Pour les utiliser, ajoutez aussi css/fonts-google.css ; sinon les polices du système servent. */
-@import url('components-extended.css');
+/* Les polices Plus Jakarta Sans et JetBrains Mono ne sont pas téléchargées automatiquement (échec hors connexion,
+   requête externe non voulue) : sans elles, les polices du système servent. */
 
 :root {
     /* Color Palette - HSL Tailored Tokens (Light Mode default) */
@@ -769,10 +768,6 @@ a {
 }
 
 /* Sizes */
-.ui-btn-xs{
-    padding: .3rem .6rem;
-    height: 28px;
-}
 .ui-btn-sm {
     padding: 0.4rem 0.75rem;
     font-size: 0.8125rem;
@@ -891,7 +886,7 @@ a {
 .ui-form-group {
     display: flex;
     flex-direction: column;
-    gap: 0.35rem;
+    gap: 0.5rem;
     width: 100%;
 }
 
@@ -906,6 +901,7 @@ a {
 
 .ui-label-required {
     color: var(--danger);
+    margin-left: 2px;
 }
 
 .ui-input-wrapper {
@@ -918,12 +914,10 @@ a {
 .ui-input, .ui-select {
     width: 100%;
     font-family: var(--font-sans);
-    font-size: 0.9375rem;
     color: var(--text-main);
     background-color: var(--bg-surface);
     border: 1px solid var(--border-default);
     border-radius: var(--radius-md);
-    padding: 0.6rem 0.9rem;
     outline: none;
     transition: border-color var(--trans-fast), box-shadow var(--trans-fast), background-color var(--trans-fast);
 }
@@ -1112,12 +1106,12 @@ a {
 }
 
 .ui-helper-text {
-    font-size: 0.775rem;
+    font-size: 0.75rem;
     color: var(--text-muted);
 }
 
 .ui-error-text {
-    font-size: 0.775rem;
+    font-size: 0.75rem;
     color: var(--danger);
     font-weight: 500;
     display: flex;
@@ -1188,12 +1182,6 @@ a {
 
 .ui-menu { position: relative; display: inline-flex; }
 .ui-menu-trigger { display: inline-flex; align-items: center; gap: .4rem; border: 0; padding: 0; color: inherit; background: transparent; font: inherit; cursor: pointer; }
-.ui-menu-trigger:hover {
-    background-color: rgba(0, 0, 0, 0.22);
-    border-radius: 50%;
-    padding: var(--space-xs);
-    transition: var(--trans-smooth);
-}
 .ui-menu-trigger:focus-visible,
 .ui-menu-content :is(button, a, [tabindex]):focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
 .ui-menu-trigger:disabled { cursor: not-allowed; opacity: .55; }
@@ -1213,9 +1201,8 @@ a {
 
 .ui-drawer-backdrop { position: fixed; inset: 0; z-index: 9100; display: flex; background: var(--bg-backdrop); }
 .ui-drawer { display: flex; flex-direction: column; width: min(28rem, 92vw); height: 100%; color: var(--text-main); background: var(--bg-surface-elevated); box-shadow: var(--shadow-xl); animation: ui-drawer-in .25s var(--trans-smooth); }
-.ui-drawer-left { margin-right: auto; }
+.ui-drawer-left { margin-right: auto; animation-name: ui-drawer-in-left; }
 .ui-drawer-right { margin-left: auto; }
-.ui-drawer-left { animation-name: ui-drawer-in-left; }
 .ui-drawer-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-subtle); }
 .ui-drawer-header h2 { margin: 0; font-size: 1.15rem; }
 .ui-drawer-body { flex: 1; overflow-y: auto; padding: 1.5rem; }
@@ -1624,7 +1611,7 @@ a {
     z-index: 1000;
     background-color: #0f172a;
     color: #ffffff;
-    font-size: 0.775rem;
+    font-size: 0.75rem;
     font-weight: 500;
     padding: 0.4rem 0.75rem;
     border-radius: var(--radius-sm);
@@ -2042,7 +2029,6 @@ a {
     transition: color var(--trans-fast), transform var(--trans-fast);
 }
 
-.ui-icon-xs { width: 14px; height: 14px; }
 .ui-icon-sm { width: 18px; height: 18px; }
 .ui-icon-md { width: 24px; height: 24px; }
 .ui-icon-lg { width: 32px; height: 32px; }
@@ -2832,24 +2818,6 @@ main article{
    UI FILE UPLOAD COMPONENT STYLES
    ========================================================================== */
 
-.ui-form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    width: 100%;
-}
-
-.ui-label {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--text-main);
-}
-
-.ui-label-required {
-    color: var(--danger);
-    margin-left: 2px;
-}
-
 /* Zone d'interaction */
 .ui-fileupload-container {
     position: relative;
@@ -2997,37 +2965,11 @@ main article{
         background-color: var(--danger-light);
     }
 
-/* Textes d'aide et d'erreur */
-.ui-helper-text {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-}
-
-.ui-error-text {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    font-size: 0.75rem;
-    color: var(--danger);
-    font-weight: 500;
-}
-
 /* Conteneur du mode Bouton */
 .ui-fileupload-button-container {
     position: relative;
     display: inline-flex;
     align-items: center;
-}
-
-/* L'overlay transparent recouvre le bouton ou la zone entière */
-.ui-fileupload-overlay {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    cursor: pointer;
-    z-index: 10;
 }
 
 .ui-fileupload-button-container.is-disabled .ui-fileupload-overlay {

@@ -75,24 +75,23 @@ builder.Services.AddWaesesUIServices(o =>
 
 ### Assets statiques
 
-Dans `Components/App.razor`, ajoutez le theme et le script d'interoperabilite :
+Dans `Components/App.razor`, ajoutez la feuille de style et le script d'interoperabilite :
 
 ```razor
-<link rel="stylesheet" href="_content/WaesesUI/css/theme.css" />
-<link rel="stylesheet" href="_content/WaesesUI/css/components-extended.css" />
+<link rel="stylesheet" href="_content/WaesesUI/css/waeses.min.css" />
 <script src="_content/WaesesUI/js/ui-interop.js"></script>
 ```
 
-`theme.css` importe deja `components-extended.css`, mais ce `@import` force le navigateur a le telecharger *apres* `theme.css`. Le declarer avec son propre `<link>` permet de charger les deux en parallele (sans double telechargement : le second est servi depuis le cache).
+Une seule feuille de style est livree : `waeses.min.css` (theme, composants et variantes de densite, minifie). Ses sources sont dans `WaesesUI/Styles/` et se regenerent avec `python tools/build-css.py`.
 
 Le script doit etre charge apres le rendu Blazor, generalement juste avant `</body>`.
 
 ### Polices
 
-Le theme n'impose plus de telecharger des polices : il s'appuie sur les polices du systeme, ce qui fonctionne hors connexion (application mobile, intranet). Pour retrouver Plus Jakarta Sans et JetBrains Mono, ajoutez en plus du theme (necessite une connexion) :
+Le theme n'impose plus de telecharger des polices : il s'appuie sur les polices du systeme, ce qui fonctionne hors connexion (application mobile, intranet). Pour retrouver Plus Jakarta Sans et JetBrains Mono, ajoutez, avant la feuille de style (necessite une connexion) :
 
 ```razor
-<link rel="stylesheet" href="_content/WaesesUI/css/fonts-google.css" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" />
 ```
 
 ## Imports Razor

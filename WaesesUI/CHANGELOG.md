@@ -61,7 +61,8 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Les
 - Avec `UiThemeProvider.Definition` (ou `UiOptions.Theme`), les paramètres `Primary`, `Secondary`… ne sont plus appliqués : la définition les remplace.
 - Les colonnes triables côté serveur doivent fournir `SortKey` ; côté client, `SortBy`.
 - Ajouter `<UiDialogProvider />` et `<UiPopoverProvider />` au layout pour utiliser les dialogues et les popovers déportés. `UiPopover` garde son rendu en place sans provider.
-- Lier `css/components-extended.css` avec son propre `<link>` évite une cascade de requêtes.
+- Une seule feuille de style est livrée : remplacer les `<link>` vers `css/theme.css` et `css/components-extended.css` par `css/waeses.min.css`. `css/fonts-google.css` est supprimé : chargez les polices Google par votre propre `<link>` (voir README).
+- Doublons CSS supprimés (`.ui-form-group`, `.ui-label`, `.ui-helper-text`, `.ui-error-text`, `.ui-drawer-left`, `.ui-carousel-caption`, `.ui-fileupload-overlay`, déclarations de taille de `.ui-btn-xs`, `.ui-input`, `.ui-select`, `.ui-icon-xs` réparties dans deux fichiers) ; taille `0.775rem` ramenée à `0.75rem`.
 
 ## [1.1.6]
 - `UiMenu`, styles de menus, `UiAvatarMenu` et `UiDropdownMenu` améliorés.
