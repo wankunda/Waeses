@@ -2,6 +2,11 @@
 
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Les versions suivent [SemVer](https://semver.org/lang/fr/).
 
+## [Non publié]
+
+### Corrigé
+- `UiThemeProvider` : changer `Theme` (ou la densité, les palettes) pouvait ne jamais réappliquer le thème. L'indicateur « configuration changée » était recalculé à chaque `OnParametersSet` ; si le parent se re-rendait deux fois avant `OnAfterRenderAsync` (courant dans un BlazorWebView), le second appel l'écrasait. Le composant compare maintenant la configuration voulue à celle déjà appliquée.
+
 ## [1.2.0]
 
 ### Ajouté

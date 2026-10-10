@@ -10,8 +10,11 @@
 <span hidden aria-hidden="true"></span>
 
 @code {
-    private bool _configurationChanged = true;
-    private string? _lastConfiguration;
+    // Configuration voulue (mise à jour à chaque OnParametersSet) et configuration réellement appliquée côté navigateur.
+    // On compare les deux après le rendu : un booléen « changé » serait écrasé si le parent se re-rend deux fois
+    // avant OnAfterRenderAsync (typique d'un BlazorWebView), et le thème ne serait alors jamais appliqué.
+    private string? _wantedConfiguration;
+    private string? _appliedConfiguration;
     private string? _themeCss;
 
     /// <summary>Densité de l'interface : compacte, confortable ou spacieuse.</summary>
@@ -40,19 +43,17 @@
     protected override void OnParametersSet()
     {
         _themeCss = (Definition ?? Options.Theme)?.ToCss();
-        var configuration = $"{_themeCss}|{Theme}|{Density}|{Primary.Name}|{Secondary.Name}|{Success.Name}|{Danger.Name}|{Warning.Name}|{Info.Name}";
-        _configurationChanged = !string.Equals(configuration, _lastConfiguration, StringComparison.Ordinal);
-        _lastConfiguration = configuration;
+        _wantedConfiguration = $"{_themeCss}|{Theme}|{Density}|{Primary.Name}|{Secondary.Name}|{Success.Name}|{Danger.Name}|{Warning.Name}|{Info.Name}";
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!_configurationChanged)
+        if (string.Equals(_wantedConfiguration, _appliedConfiguration, StringComparison.Ordinal))
         {
             return;
         }
 
-        _configurationChanged = false;
+        _appliedConfiguration = _wantedConfiguration;
         try
         {
             await JS.InvokeVoidAsync("UiInterop.applyGlobalTheme", Theme.ToString().ToLowerInvariant(), Density.ToString().ToLowerInvariant(), GetPaletteTokens());
