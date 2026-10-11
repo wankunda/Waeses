@@ -2747,6 +2747,43 @@ main article{
     }
 }
 
+/* Barre de navigation horizontale (UiNavBar). Repliée par défaut : les liens sont dans un panneau sous la barre, ouvert par le bouton
+   hamburger. Au-delà du point de rupture choisi (CollapseBelow), ils s'alignent dans la barre et le bouton disparaît. */
+.ui-navbar { position: relative; z-index: 100; color: var(--text-main); background: var(--bg-surface); border-bottom: 1px solid var(--border-default); }
+.ui-navbar-sticky { position: sticky; top: 0; }
+.ui-navbar-inner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 3.75rem; padding: calc(.5rem + env(safe-area-inset-top, 0px)) calc(1.25rem + env(safe-area-inset-right, 0px)) .5rem calc(1.25rem + env(safe-area-inset-left, 0px)); }
+.ui-navbar-brand { display: inline-flex; align-items: center; gap: .5rem; color: var(--text-main); font-size: 1.25rem; font-weight: 800; letter-spacing: .02em; text-decoration: none; white-space: nowrap; }
+.ui-navbar-toggle { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 2.75rem; height: 2.5rem; padding: 0; color: var(--text-main); background: transparent; border: 1px solid var(--border-default); border-radius: var(--radius-md); cursor: pointer; }
+.ui-navbar-toggle:hover { background: var(--bg-surface-secondary); }
+.ui-navbar-toggle .ui-icon, .ui-navbar-link .ui-icon { width: 1.15rem; height: 1.15rem; color: currentColor; }
+.ui-navbar-menu { display: none; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; gap: .75rem; max-height: calc(100vh - 3.75rem); overflow-y: auto; padding: .75rem calc(1.25rem + env(safe-area-inset-right, 0px)) 1rem calc(1.25rem + env(safe-area-inset-left, 0px)); background: var(--bg-surface); border-bottom: 1px solid var(--border-default); box-shadow: var(--shadow-lg); }
+.ui-navbar-menu-open { display: flex; }
+.ui-navbar-links { display: flex; flex-direction: column; gap: .25rem; }
+.ui-navbar-link { display: flex; align-items: center; gap: .5rem; min-height: 2.5rem; padding: .5rem .85rem; color: var(--text-secondary); font-size: .9rem; font-weight: 500; text-decoration: none; white-space: nowrap; border-radius: var(--radius-md); transition: color var(--trans-fast), background-color var(--trans-fast); }
+.ui-navbar-link:hover { color: var(--text-main); background: var(--bg-surface-secondary); }
+.ui-navbar-link.active { color: var(--primary); background: var(--primary-light); font-weight: 600; }
+.ui-navbar-link-disabled, .ui-navbar-link-disabled:hover { color: var(--text-secondary); background: transparent; opacity: .5; cursor: not-allowed; }
+.ui-navbar-end { display: flex; align-items: center; gap: .5rem; }
+.ui-navbar-brand:focus-visible, .ui-navbar-toggle:focus-visible, .ui-navbar-link:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
+
+@media (min-width: 640px) {
+    .ui-navbar-collapse-sm .ui-navbar-toggle { display: none; }
+    .ui-navbar-collapse-sm .ui-navbar-menu { display: flex; position: static; flex: 1; flex-direction: row; align-items: center; justify-content: flex-end; gap: 1rem; min-width: 0; max-height: none; overflow: visible; padding: 0; background: transparent; border: 0; box-shadow: none; }
+    .ui-navbar-collapse-sm .ui-navbar-links { flex-direction: row; flex-wrap: wrap; justify-content: flex-end; }
+}
+
+@media (min-width: 768px) {
+    .ui-navbar-collapse-md .ui-navbar-toggle { display: none; }
+    .ui-navbar-collapse-md .ui-navbar-menu { display: flex; position: static; flex: 1; flex-direction: row; align-items: center; justify-content: flex-end; gap: 1rem; min-width: 0; max-height: none; overflow: visible; padding: 0; background: transparent; border: 0; box-shadow: none; }
+    .ui-navbar-collapse-md .ui-navbar-links { flex-direction: row; flex-wrap: wrap; justify-content: flex-end; }
+}
+
+@media (min-width: 1024px) {
+    .ui-navbar-collapse-lg .ui-navbar-toggle { display: none; }
+    .ui-navbar-collapse-lg .ui-navbar-menu { display: flex; position: static; flex: 1; flex-direction: row; align-items: center; justify-content: flex-end; gap: 1rem; min-width: 0; max-height: none; overflow: visible; padding: 0; background: transparent; border: 0; box-shadow: none; }
+    .ui-navbar-collapse-lg .ui-navbar-links { flex-direction: row; flex-wrap: wrap; justify-content: flex-end; }
+}
+
 /* ==========================================================================\n+   AUTHENTICATION\n+   ========================================================================== */
 
 .auth-layout { min-height: 100vh; }

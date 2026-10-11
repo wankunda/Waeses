@@ -107,7 +107,7 @@ Les composants sont organises par familles :
 | Famille | Composants |
 | --- | --- |
 | Actions | `UiButton`, `UiBadge` |
-| Layout et navigation | `UiLayout`, `UiSimpleLayout`, `UiNavMenu`, `UiNavMenuItem`, `UiBreadcrumbs`, `UiStepper` |
+| Layout et navigation | `UiLayout`, `UiSimpleLayout`, `UiNavMenu`, `UiNavMenuItem`, `UiNavBar`, `UiBreadcrumbs`, `UiStepper` |
 | Formulaires | `UiFormField`, `UiInput`, `UiTextArea`, `UiSelect`, `UiMultiSelect`, `UiCombobox`, `UiColorPicker`, `UiTimePicker`, `UiDateRangePicker`, `UiTagInput`, `UiLocaleSwitcher`, `UiAutocomplete`, `UiDateTimePicker`, `UiDatePicker`, `UiCalendar`, `UiCheckbox`, `UiSwitch`, `UiSlider`, `UiRadioGroup`, `UiRadioOption`, `UiInputFile` |
 | Contenu | `UiCard`, `UiList`, `UiListItem`, `UiChip`, `UiDivider`, `UiCodeBlock`, `UiCopyButton`, `UiImage`, `UiImageGallery`, `UiLightbox`, `UiCarousel`, `UiFilePreview`, `UiAvatar`, `UiAvatarGroup`, `UiAvatarMenu` |
 | Feedback | `UiAlert`, `UiCallout`, `UiTimeline`, `UiLocalizedText`, `UiSpinner`, `UiSkeleton`, `UiEmptyState`, `UiErrorState`, `UiLoadingOverlay`, `UiTooltip`, `UiAccordion`, `UiAccordionItem`, `UiToastContainer`, `UiMessageBoxProvider` |
@@ -158,6 +158,16 @@ Les boutons utilisent `Size`. Les champs natifs peuvent recevoir les classes `ui
         new() { Text = "Parametres", Href = "/parametres" }
     ];
 }
+```
+
+Pour un site a navigation horizontale, `UiNavBar` affiche le nom, les liens et une zone libre a droite. Sous `CollapseBelow` (768 px par defaut), les liens se replient derriere un bouton hamburger :
+
+```razor
+<UiNavBar BrandText="Mon application" BrandHref="/" NavigationItems="@Items" CollapseBelow="UiBreakpoint.Md">
+    <EndContent>
+        <UiButton Size="UiSize.Sm" Href="/connexion">Connexion</UiButton>
+    </EndContent>
+</UiNavBar>
 ```
 
 Pour un ecran autonome, comme une page de connexion, utilisez `UiSimpleLayout` avec le fragment `MainBody`.

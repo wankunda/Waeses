@@ -48,7 +48,7 @@ public static class DocsCatalog
         new("Images et médias", "composants/images", Display, "UiImage, UiImageGallery, UiCarousel, UiLightbox et UiFilePreview.", "image galerie carrousel lightbox fichier apercu"),
 
         new("Onglets et accordéon", "composants/onglets-et-accordeon", Navigation, "UiTabs, UiTabPanel, UiAccordion et UiAccordionItem : organiser le contenu en sections.", "onglets tabs accordeon accordion sections"),
-        new("Navigation", "composants/navigation", Navigation, "UiNavMenu, UiBreadcrumbs et UiStepper : menu latéral, fil d'Ariane et étapes.", "menu lateral navmenu breadcrumbs fil ariane stepper etapes"),
+        new("Navigation", "composants/navigation", Navigation, "UiNavMenu, UiNavBar, UiBreadcrumbs et UiStepper : menu latéral, barre de navigation, fil d'Ariane et étapes.", "menu lateral navmenu navbar barre entete header hamburger breadcrumbs fil ariane stepper etapes"),
         new("Mise en page", "composants/mise-en-page", Navigation, "UiLayout, UiSimpleLayout et UiThemeProvider : structure de l'application, mode clair/sombre et densité.", "layout simplelayout themeprovider structure entete pied densite"),
 
         new("Alertes et états", "composants/alertes-et-etats", Overlays, "UiAlert, UiCallout, UiEmptyState et UiErrorState.", "alerte alert callout encadre etat vide erreur"),
@@ -81,7 +81,7 @@ public static class DocsCatalog
         typeof(UiImage), typeof(UiImageGallery), typeof(UiCarousel), typeof(UiLightbox), typeof(UiFilePreview),
         // Navigation et mise en page
         typeof(UiTabs), typeof(UiTabPanel), typeof(UiAccordion), typeof(UiAccordionItem),
-        typeof(UiNavMenu), typeof(UiBreadcrumbs), typeof(UiStepper), typeof(UiLayout), typeof(UiSimpleLayout), typeof(UiThemeProvider),
+        typeof(UiNavMenu), typeof(UiNavBar), typeof(UiBreadcrumbs), typeof(UiStepper), typeof(UiLayout), typeof(UiSimpleLayout), typeof(UiThemeProvider),
         // Retours et superpositions
         typeof(UiAlert), typeof(UiCallout), typeof(UiEmptyState), typeof(UiErrorState),
         typeof(UiProgress), typeof(UiProgressCircle), typeof(UiSpinner), typeof(UiSkeleton), typeof(UiLoadingOverlay),

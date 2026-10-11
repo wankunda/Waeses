@@ -1,0 +1,23 @@
+@* La hauteur réserve la place du panneau déplié sur petit écran ; dans une application, il se superpose à la page. *@
+<div style="min-height: 20rem;">
+    <UiNavBar BrandText="Mon application"
+              NavigationItems="_items"
+              AriaLabel="Exemple de barre de navigation"
+              CollapseBelow="UiBreakpoint.Lg"
+              Sticky="false">
+        <EndContent>
+            <UiButton Size="UiSize.Sm" Icon="@Icons.Material.Filled.Login" Href="demarrer">Installation</UiButton>
+        </EndContent>
+    </UiNavBar>
+</div>
+
+@code {
+    // Sous 1024 px de large (CollapseBelow), les liens passent derrière le bouton hamburger.
+    private readonly IReadOnlyList<NavigationItem> _items = new[]
+    {
+        new NavigationItem { Text = "Introduction", Href = "", Icon = Icons.Material.Filled.Home, Match = NavLinkMatch.All },
+        new NavigationItem { Text = "Navigation", Href = "composants/navigation", Icon = Icons.Material.Filled.Menu },
+        new NavigationItem { Text = "Mise en page", Href = "composants/mise-en-page", Icon = Icons.Material.Filled.Article },
+        new NavigationItem { Text = "Archives", Href = "archives", Disabled = true }
+    };
+}

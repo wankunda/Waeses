@@ -5,6 +5,7 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Les
 ## [Non publié]
 
 ### Ajouté
+- `UiNavBar` : barre de navigation horizontale (nom ou logo, liens `NavigationItem`, zone `EndContent`). Sous la largeur `CollapseBelow` (`UiBreakpoint` : 640, 768 ou 1024 px ; 768 par défaut), les liens se replient derrière un bouton hamburger. Sans JavaScript.
 - `UiToastContainer.Position` : position par défaut des toasts qui n'en précisent pas une. Un toast affiché avec `position:` (ou `ToastModel.Position`) garde la sienne. Ordre de priorité : position du toast, puis `UiToastContainer.Position`, puis `UiOptions.ToastPosition`.
 
 ### Modifié

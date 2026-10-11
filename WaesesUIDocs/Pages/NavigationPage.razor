@@ -19,6 +19,10 @@
         </div>
     </DocSection>
 
+    <DocSection Title="Barre de navigation" Description="`UiNavBar` est une barre horizontale : le nom de l'application à gauche, les liens (`NavigationItem`) à droite, puis `EndContent` pour un bouton ou un menu de compte. Sous la largeur `CollapseBelow` (768 px par défaut), les liens se replient derrière un bouton hamburger ; le panneau se ferme au choix d'un lien ou avec `Échap`. `BrandContent` remplace le nom par un logo.">
+        <DocExample Example="typeof(NavBarExample)" />
+    </DocSection>
+
     <DocSection Title="Fil d'Ariane" Description="`UiBreadcrumbs` indique où l'on se trouve. Le dernier élément, sans adresse, est la page courante (`aria-current=&quot;page&quot;`).">
         <DocExample Example="typeof(BreadcrumbsExample)" />
     </DocSection>
@@ -29,6 +33,7 @@
 
     <DocSection Title="API">
         <ApiTable Component="typeof(UiNavMenu)" />
+        <ApiTable Component="typeof(UiNavBar)" />
         <ApiTable Component="typeof(UiBreadcrumbs)" />
         <ApiTable Component="typeof(UiStepper)" />
     </DocSection>

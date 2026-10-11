@@ -1,0 +1,121 @@
+@inject NavigationManager Navigation
+@implements IDisposable
+@namespace WaesesUI
+@inherits UiComponentBase
+
+<header class="@RootClass" style="@Style" @attributes="AdditionalAttributes" @onkeydown="OnKeyDown">
+    <div class="ui-navbar-inner">
+        <a class="ui-navbar-brand" href="@BrandHref">
+            @if (BrandContent != null)
+            {
+                @BrandContent
+            }
+            else
+            {
+                @BrandText
+            }
+        </a>
+
+        <button type="button"
+                class="ui-navbar-toggle"
+                aria-label="@(_isOpen ? "Fermer le menu de navigation" : "Ouvrir le menu de navigation")"
+                aria-expanded="@(_isOpen ? "true" : "false")"
+                aria-controls="@_menuId"
+                @ref="_toggleRef"
+                @onclick="Toggle">
+            <UiIcon Icon="@(_isOpen ? Icons.Material.Filled.Close : Icons.Material.Filled.Menu)" Size="UiSize.Sm" />
+        </button>
+
+        <div id="@_menuId" class="ui-navbar-menu @(_isOpen ? "ui-navbar-menu-open" : "")">
+            <nav class="ui-navbar-links" aria-label="@AriaLabel" @onclick="Close">
+                @foreach (var item in Items)
+                {
+                    @if (item.Disabled)
+                    {
+                        <span @key="item.Href" class="ui-navbar-link ui-navbar-link-disabled" aria-disabled="true">
+                            @if (!string.IsNullOrEmpty(item.Icon))
+                            {
+                                <UiIcon Icon="@item.Icon" Size="UiSize.Sm" />
+                            }
+                            <span>@item.Text</span>
+                        </span>
+                    }
+                    else
+                    {
+                        <NavLink @key="item.Href" class="ui-navbar-link" href="@item.Href" Match="@item.Match">
+                            @if (!string.IsNullOrEmpty(item.Icon))
+                            {
+                                <UiIcon Icon="@item.Icon" Size="UiSize.Sm" />
+                            }
+                            <span>@item.Text</span>
+                        </NavLink>
+                    }
+                }
+            </nav>
+
+            @if (EndContent != null)
+            {
+                <div class="ui-navbar-end">@EndContent</div>
+            }
+        </div>
+    </div>
+</header>
+
+@code {
+    /// <summary>Nom affiché à gauche de la barre.</summary>
+    [Parameter] public string BrandText { get; set; } = "Blazor UI";
+    /// <summary>Adresse du lien du nom (accueil de l'application).</summary>
+    [Parameter] public string BrandHref { get; set; } = string.Empty;
+    /// <summary>Contenu libre à la place de <see cref="BrandText"/> (logo, logo et nom…).</summary>
+    [Parameter] public RenderFragment? BrandContent { get; set; }
+    /// <summary>Liens de la barre. La propriété <c>Group</c> des éléments est ignorée.</summary>
+    [Parameter] public IEnumerable<NavigationItem>? NavigationItems { get; set; }
+    /// <summary>Contenu affiché après les liens (bouton, menu de compte, sélecteur de thème…).</summary>
+    [Parameter] public RenderFragment? EndContent { get; set; }
+    /// <summary>Nom accessible de la navigation.</summary>
+    [Parameter] public string AriaLabel { get; set; } = "Navigation principale";
+    /// <summary>Largeur d'écran sous laquelle les liens se replient derrière le bouton hamburger.</summary>
+    [Parameter] public UiBreakpoint CollapseBelow { get; set; } = UiBreakpoint.Md;
+    /// <summary>Garde la barre en haut de l'écran pendant le défilement. Vrai par défaut.</summary>
+    [Parameter] public bool Sticky { get; set; } = true;
+
+    private readonly string _menuId = $"ui-navbar-menu-{Guid.NewGuid():N}";
+    private IEnumerable<NavigationItem> Items => NavigationItems ?? Array.Empty<NavigationItem>();
+    private ElementReference _toggleRef;
+    private bool _isOpen;
+
+    private string RootClass => CssBuilder.Default("ui-navbar")
+        .Add($"ui-navbar-collapse-{CollapseBelow.ToString().ToLowerInvariant()}")
+        .AddIf("ui-navbar-sticky", Sticky)
+        .Add(Class)
+        .Build();
+
+    protected override void OnInitialized() => Navigation.LocationChanged += OnLocationChanged;
+
+    private void Toggle() => _isOpen = !_isOpen;
+
+    private void Close() => _isOpen = false;
+
+    private async Task OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key != "Escape" || !_isOpen)
+        {
+            return;
+        }
+
+        _isOpen = false;
+        await _toggleRef.FocusAsync();
+    }
+
+    // Un lien de EndContent, ou une navigation déclenchée par le code, referme aussi le menu.
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        if (_isOpen)
+        {
+            _isOpen = false;
+            _ = InvokeAsync(StateHasChanged);
+        }
+    }
+
+    public void Dispose() => Navigation.LocationChanged -= OnLocationChanged;
+}

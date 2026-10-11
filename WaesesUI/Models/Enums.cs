@@ -51,6 +51,19 @@ public enum UiDrawerPosition
     Right
 }
 
+/// <summary>Largeur d'écran de référence pour les composants qui changent de forme sur petit écran (<see cref="UiNavBar"/>).</summary>
+public enum UiBreakpoint
+{
+    /// <summary>640 px.</summary>
+    Sm,
+
+    /// <summary>768 px.</summary>
+    Md,
+
+    /// <summary>1024 px.</summary>
+    Lg
+}
+
 public enum UiMenuAlignment
 {
     Start,
