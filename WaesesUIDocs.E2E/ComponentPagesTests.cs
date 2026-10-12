@@ -286,7 +286,10 @@ public sealed class ComponentPagesTests(DocsSiteFixture site)
 
         var lightbox = session.Preview("Visionneuse");
         await lightbox.GetByRole(AriaRole.Button, Name("Agrandir l'image")).ClickAsync();
-        await Expect(session.Page.GetByRole(AriaRole.Dialog, PageName("Image en plein écran"))).ToBeVisibleAsync();
+        var dialog = session.Page.GetByRole(AriaRole.Dialog, PageName("Image en plein écran"));
+        await Expect(dialog).ToBeVisibleAsync();
+        // La touche Échap n'est écoutée qu'une fois la modale prête côté JS, qui y place alors le focus : on attend ce focus avant d'appuyer.
+        await Expect(dialog.GetByRole(AriaRole.Button, Name("Fermer"))).ToBeFocusedAsync();
         await session.Page.Keyboard.PressAsync("Escape");
         await Expect(session.Page.GetByRole(AriaRole.Dialog)).ToHaveCountAsync(0);
 
