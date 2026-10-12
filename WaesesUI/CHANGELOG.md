@@ -12,6 +12,7 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Les
 - `ToastModel.Position` est maintenant nullable (`ToastPosition?`, null par défaut) : `null` signifie « position par défaut du conteneur ». `IToastService.ShowToast` ne remplace plus un `position` absent par `UiOptions.ToastPosition` ; c'est le conteneur qui le fait à l'affichage. Le code qui lisait `toast.Position` doit gérer `null`.
 
 ### Corrigé
+- `ui-grid-cols-2`, `ui-grid-cols-3` et `ui-grid-cols-4` : sur un petit écran, la colonne gardait sa largeur minimale (320, 280 ou 220 px) même quand le conteneur était plus étroit. Les champs placés dans la grille, comme `UiDatePicker`, dépassaient alors de leur carte. La largeur minimale est maintenant plafonnée à celle du conteneur.
 - `UiThemeProvider` : changer `Theme` (ou la densité, les palettes) pouvait ne jamais réappliquer le thème. L'indicateur « configuration changée » était recalculé à chaque `OnParametersSet` ; si le parent se re-rendait deux fois avant `OnAfterRenderAsync` (courant dans un BlazorWebView), le second appel l'écrasait. Le composant compare maintenant la configuration voulue à celle déjà appliquée.
 
 ## [1.2.0]
