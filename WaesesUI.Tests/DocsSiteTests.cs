@@ -77,9 +77,21 @@ public sealed class DocsSiteTests : TestContext
         Assert.False(string.IsNullOrWhiteSpace(source), $"{example.Name} : source non embarquée.");
         Assert.DoesNotContain('\r', source);
 
+        if (IsDialogComponent(example))
+        {
+            // Un composant de dialogue (UiDialog) ne s'affiche que dans un dialogue : on l'ouvre par le service.
+            var provider = RenderComponent<UiDialogProvider>();
+            provider.InvokeAsync(() => Services.GetRequiredService<IUiDialogService>().ShowAsync(example, "Exemple"));
+            provider.WaitForAssertion(() => Assert.NotEmpty(provider.FindAll(".ui-modal-body")));
+            return;
+        }
+
         var cut = RenderComponent<DynamicComponent>(p => p.Add(c => c.Type, example));
         Assert.NotEmpty(cut.Markup);
     }
+
+    private static bool IsDialogComponent(Type type) => type.GetProperties()
+        .Any(p => typeof(IUiDialogInstance).IsAssignableFrom(p.PropertyType) && p.IsDefined(typeof(CascadingParameterAttribute), true));
 
     [Fact]
     public void DocExample_affiche_le_rendu_et_le_code_du_meme_fichier()

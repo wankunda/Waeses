@@ -1,0 +1,151 @@
+@namespace WaesesUI
+@inherits UiComponentBase
+@inject IUiDialogService DialogService
+@inject UiOptions UiOptions
+@implements IDisposable
+
+@* Deux usages, comme MudDialog :
+   1. dans un composant affiché par IUiDialogService : il dessine l'en-tête, le contenu et les actions ;
+   2. directement dans une page avec bind-Visible (« dialogue en ligne ») : il s'affiche lui-même par le service. *@
+@if (Instance is not null)
+{
+    var options = Instance.Options;
+    var title = Title ?? Instance.Title;
+    @if (options.NoHeader != true && (TitleContent is not null || !string.IsNullOrEmpty(title) || options.ShowCloseButton != false))
+    {
+        <div class="@CssBuilder.Default("ui-modal-header").Add(TitleClass).Build()">
+            <div id="@Instance.TitleId" class="ui-modal-title h6">
+                @if (TitleContent is not null)
+                {
+                    @TitleContent
+                }
+                else
+                {
+                    @title
+                }
+            </div>
+            @if (options.ShowCloseButton != false)
+            {
+                <button type="button" class="ui-modal-close-btn" aria-label="@UiOptions.CloseLabel" @onclick="() => Instance.Cancel()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            }
+        </div>
+    }
+
+    <div class="@ContentCss" style="@ContentStyle" @attributes="AdditionalAttributes">
+        @DialogContent
+    </div>
+
+    @if (DialogActions is not null)
+    {
+        <div class="@CssBuilder.Default("ui-modal-footer").Add(ActionsClass).Build()">
+            @DialogActions
+        </div>
+    }
+}
+
+@code {
+    private IUiDialogReference? _reference;
+    private UiInlineDialogHost? _host;
+
+    [CascadingParameter] private UiDialogInstance? Instance { get; set; }
+
+    /// <summary>Titre de l'en-tête. Par défaut, celui passé à <c>ShowAsync</c>.</summary>
+    [Parameter] public string? Title { get; set; }
+    /// <summary>En-tête personnalisé (remplace <c>Title</c>) : icône, texte mis en forme...</summary>
+    [Parameter] public RenderFragment? TitleContent { get; set; }
+    /// <summary>Contenu du dialogue.</summary>
+    [Parameter] public RenderFragment? DialogContent { get; set; }
+    /// <summary>Boutons d'action, affichés dans le pied du dialogue.</summary>
+    [Parameter] public RenderFragment? DialogActions { get; set; }
+    /// <summary>Options d'un dialogue en ligne (taille, position, plein écran...). Sans effet dans un composant affiché par le service : passez-les à <c>ShowAsync</c>.</summary>
+    [Parameter] public UiDialogOptions? Options { get; set; }
+    /// <summary>Dialogue en ligne : l'affiche ou le ferme (lié avec <c>bind-Visible</c>).</summary>
+    [Parameter] public bool Visible { get; set; }
+    /// <summary>Dialogue en ligne : appelé avec <c>false</c> quand le dialogue se ferme (Échap, fond, bouton de fermeture).</summary>
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+    /// <summary>Appelé au clic sur le fond assombri ; s'il est fourni, le dialogue ne se ferme plus tout seul.</summary>
+    [Parameter] public EventCallback OnBackdropClick { get; set; }
+    /// <summary>Classes CSS de la zone de contenu.</summary>
+    [Parameter] public string? ContentClass { get; set; }
+    /// <summary>Style inline de la zone de contenu.</summary>
+    [Parameter] public string? ContentStyle { get; set; }
+    /// <summary>Classes CSS du pied (zone des actions).</summary>
+    [Parameter] public string? ActionsClass { get; set; }
+    /// <summary>Classes CSS de l'en-tête.</summary>
+    [Parameter] public string? TitleClass { get; set; }
+    /// <summary>Marges intérieures de la zone de contenu ; <c>false</c> pour un contenu bord à bord (image, tableau).</summary>
+    [Parameter] public bool Gutters { get; set; } = true;
+
+    private string ContentCss => CssBuilder.Default("ui-modal-body")
+        .AddIf("ui-modal-body-flush", !Gutters)
+        .Add(ContentClass)
+        .Build();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Instance is not null)
+        {
+            Instance.Register(this);
+            return;
+        }
+
+        if (Visible && _reference is null)
+        {
+            await OpenAsync();
+        }
+        else if (!Visible && _reference is not null)
+        {
+            var reference = _reference;
+            _reference = null;
+            _host = null;
+            reference.Close();
+        }
+        else
+        {
+            _host?.Refresh();
+        }
+    }
+
+    /// <summary>Dialogue en ligne : ouvre le dialogue par le service ; son contenu reste celui de ce composant.</summary>
+    private async Task OpenAsync()
+    {
+        var parameters = new UiDialogParameters { [nameof(UiInlineDialogHost.Source)] = this };
+        var reference = await DialogService.ShowAsync<UiInlineDialogHost>(Title, parameters, Options);
+        _reference = reference;
+        _ = WatchAsync(reference);
+    }
+
+    private async Task WatchAsync(IUiDialogReference reference)
+    {
+        await reference.Result;
+        if (!ReferenceEquals(_reference, reference)) return; // fermé par la page (Visible = false)
+
+        _reference = null;
+        _host = null;
+        Visible = false;
+        await InvokeAsync(() => VisibleChanged.InvokeAsync(false));
+    }
+
+    internal void AttachHost(UiInlineDialogHost host) => _host = host;
+
+    /// <summary>Ferme le dialogue sans l'annuler (pour un dialogue en ligne, même effet que <c>Visible = false</c>).</summary>
+    public void Close()
+    {
+        if (Instance is not null) Instance.Close();
+        else _reference?.Close();
+    }
+
+    public void Dispose()
+    {
+        Instance?.Unregister(this);
+
+        var reference = _reference;
+        _reference = null;
+        reference?.Cancel();
+    }
+}

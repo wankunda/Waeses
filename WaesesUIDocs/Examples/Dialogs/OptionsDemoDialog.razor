@@ -1,0 +1,26 @@
+@* Le composant peut changer le titre et les options du dialogue pendant qu'il est ouvert. *@
+
+<UiDialog>
+    <DialogContent>
+        <p>Position : <strong>@Dialog.Options.Position</strong>, largeur : <strong>@Dialog.Options.Size</strong>.</p>
+        <p>Les boutons ci-dessous modifient le dialogue ouvert avec <code>SetOptions</code> et <code>SetTitle</code>.</p>
+    </DialogContent>
+    <DialogActions>
+        <UiButton Text="Agrandir" Appearance="UiVariant.Outlined" OnClick="Enlarge" />
+        <UiButton Text="Changer le titre" Appearance="UiVariant.Outlined" OnClick="@(() => Dialog.SetTitle("Titre modifié"))" />
+        <UiButton Text="Fermer" OnClick="() => Dialog.Close()" />
+    </DialogActions>
+</UiDialog>
+
+@code {
+    [CascadingParameter] public IUiDialogInstance Dialog { get; set; } = default!;
+
+    private void Enlarge() => Dialog.SetOptions(new UiDialogOptions
+    {
+        Position = Dialog.Options.Position,
+        Size = UiSize.Xl,
+        ShowCloseButton = Dialog.Options.ShowCloseButton,
+        CloseOnBackdropClick = Dialog.Options.CloseOnBackdropClick,
+        CloseOnEscape = Dialog.Options.CloseOnEscape
+    });
+}

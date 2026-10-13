@@ -11,10 +11,10 @@
 
     private async Task RenameAsync()
     {
-        var reference = await Dialogs.ShowAsync<EditNameDialog>(
-            "Renommer le projet",
-            new UiDialogParameters().With(nameof(EditNameDialog.Name), _name),
-            new UiDialogOptions { Size = UiSize.Sm });
+        // Paramètres typés : x => x.Name est vérifié à la compilation (une faute de frappe ne compile pas).
+        var parameters = new UiDialogParameters<EditNameDialog>().Add(x => x.Name, _name);
+
+        var reference = await Dialogs.ShowAsync<EditNameDialog>("Renommer le projet", parameters, new UiDialogOptions { Size = UiSize.Sm });
 
         var result = await reference.Result;
         if (result.Canceled)

@@ -346,7 +346,24 @@ Pour une confirmation, utilisez `ShowAsync` et verifiez la valeur booleenne reto
 }
 ```
 
-Le composant affiche recoit `[CascadingParameter] UiDialogInstance Dialog` et appelle `Dialog.Close(data)` ou `Dialog.Cancel()`.
+Le composant affiche recoit `[CascadingParameter] IUiDialogInstance Dialog` et appelle `Dialog.Close(data)` ou `Dialog.Cancel()`. Le service suit l'API de MudBlazor (`IDialogService`, `IMudDialogInstance`, `DialogOptions`...), avec des noms prefixes par `Ui` :
+
+```razor
+@* EditUserForm.razor : UiDialog dessine l'en-tete, le contenu et le pied *@
+<UiDialog>
+    <TitleContent>Modifier l'utilisateur @UserId</TitleContent>
+    <DialogContent>...</DialogContent>
+    <DialogActions>
+        <UiButton Text="Annuler" OnClick="() => Dialog.Cancel()" />
+        <UiButton Text="Enregistrer" OnClick="() => Dialog.Close(UiDialogResult.Ok(_user))" />
+    </DialogActions>
+</UiDialog>
+```
+
+- `UiDialogParameters<EditUserForm>().Add(x => x.UserId, 42)` : parametres verifies a la compilation ;
+- `UiDialogOptions` : `Position`, `Size`, `FullScreen`, `NoHeader`, `ShowCloseButton`, `CloseOnBackdropClick`, `CloseOnEscape`, `DefaultFocus`, `BackdropClass` ; une option vide prend la valeur reglee sur `<UiDialogProvider />` ;
+- `IUiDialogInstance` : `SetTitle`, `SetOptions`, `CancelAll` ; `IUiDialogService` : `ShowMessageBoxAsync` (oui / non / annuler), `Close`, `CancelAll` ;
+- `<UiDialog @bind-Visible="_visible">` declare un dialogue directement dans la page.
 
 ### Popovers
 

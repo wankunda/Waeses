@@ -1,29 +1,35 @@
 @namespace WaesesUI
 @inject IUiDialogService DialogService
 @inject IJSRuntime JS
-@inject UiOptions Options
+@inject UiOptions UiOptions
 @implements IAsyncDisposable
 
 @foreach (var dialog in _dialogs)
 {
-    <div class="ui-modal-backdrop"
+    var options = dialog.Instance.Options;
+    var fullScreen = options.FullScreen == true;
+    var size = options.Size ?? UiSize.Md;
+    var layout = dialog.Instance.Layout;
+    <div class="@UiDialogCss.BackdropClass(options.Position ?? UiDialogPosition.Center, fullScreen, options.BackdropClass)"
          @key="dialog.Info.Reference.Id"
-         @onclick="() => HandleBackdropClick(dialog)"
+         @onclick="() => HandleBackdropClickAsync(dialog)"
          @ref="dialog.BackdropRef">
-        <div class="@(CssBuilder.Default("ui-modal-box").Add(SizeClass(dialog.Info.Options.Size)).Add(dialog.Info.Options.Class).Build())"
-             style="@WidthStyle(dialog.Info.Options.Size)"
+        <div class="@UiDialogCss.BoxClass(size, fullScreen, CssBuilder.Default(options.Class).Add(layout?.Class).Build())"
+             style="@StyleBuilder.Default(UiDialogCss.WidthStyle(size, fullScreen)).Add(options.Style).Add(layout?.Style).Build()"
              @onclick:stopPropagation="true"
              tabindex="-1"
              role="dialog"
              aria-modal="true"
-             aria-labelledby="@dialog.TitleId">
-            @if (!string.IsNullOrEmpty(dialog.Instance.Title) || dialog.Info.Options.ShowCloseButton)
+             aria-labelledby="@dialog.Instance.TitleId">
+            @* Un composant qui utilise <UiDialog> dessine lui-même son en-tête (TitleContent). *@
+            @if (layout is null && options.NoHeader != true
+                 && (!string.IsNullOrEmpty(dialog.Instance.Title) || options.ShowCloseButton != false))
             {
                 <div class="ui-modal-header">
-                    <div id="@dialog.TitleId" class="ui-modal-title h6">@dialog.Instance.Title</div>
-                    @if (dialog.Info.Options.ShowCloseButton)
+                    <div id="@dialog.Instance.TitleId" class="ui-modal-title h6">@dialog.Instance.Title</div>
+                    @if (options.ShowCloseButton != false)
                     {
-                        <button type="button" class="ui-modal-close-btn" aria-label="@Options.CloseLabel" @onclick="() => dialog.Info.Reference.Cancel()">
+                        <button type="button" class="ui-modal-close-btn" aria-label="@UiOptions.CloseLabel" @onclick="() => dialog.Info.Reference.Cancel()">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
                                 <line x1="18" y1="6" x2="6" y2="18"></line>
                                 <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -33,7 +39,7 @@
                 </div>
             }
             <CascadingValue Value="dialog.Instance" IsFixed="true">
-                <DynamicComponent Type="dialog.Info.ComponentType" Parameters="dialog.Info.Parameters" />
+                <DynamicComponent Type="dialog.Info.ComponentType" Parameters="dialog.Info.Parameters" @ref="dialog.Component" />
             </CascadingValue>
         </div>
     </div>
@@ -42,38 +48,71 @@
 @code {
     private readonly List<OpenDialog> _dialogs = new();
 
+    /// <summary>Position par défaut des dialogues (<c>UiDialogOptions.Position</c> la remplace pour un dialogue).</summary>
+    [Parameter] public UiDialogPosition Position { get; set; } = UiDialogPosition.Center;
+    /// <summary>Largeur maximale par défaut des dialogues.</summary>
+    [Parameter] public UiSize Size { get; set; } = UiSize.Md;
+    /// <summary>Affiche les dialogues en plein écran par défaut.</summary>
+    [Parameter] public bool FullScreen { get; set; }
+    /// <summary>Masque l'en-tête (titre et bouton de fermeture) par défaut.</summary>
+    [Parameter] public bool NoHeader { get; set; }
+    /// <summary>Affiche le bouton de fermeture dans l'en-tête par défaut.</summary>
+    [Parameter] public bool ShowCloseButton { get; set; } = true;
+    /// <summary>Annule un dialogue au clic sur le fond assombri par défaut.</summary>
+    [Parameter] public bool CloseOnBackdropClick { get; set; } = true;
+    /// <summary>Annule un dialogue avec la touche Échap par défaut.</summary>
+    [Parameter] public bool CloseOnEscape { get; set; } = true;
+    /// <summary>Élément qui reçoit le focus à l'ouverture, par défaut.</summary>
+    [Parameter] public UiDefaultFocus DefaultFocus { get; set; } = UiDefaultFocus.FirstChild;
+    /// <summary>Classes CSS ajoutées par défaut au fond assombri.</summary>
+    [Parameter] public string? BackdropClass { get; set; }
+
     private sealed class OpenDialog
     {
         public required UiDialogInstanceInfo Info { get; init; }
         public required UiDialogInstance Instance { get; init; }
-        public string TitleId { get; } = $"dialog-title-{Guid.NewGuid():N}";
         public ElementReference BackdropRef { get; set; }
+        public DynamicComponent? Component { get; set; }
         public DotNetObjectReference<DialogCallbacks>? Callbacks { get; set; }
         public bool IsSetUp { get; set; }
     }
 
     /// <summary>Cible JS d'un dialogue : isole Échap par dialogue (le provider en gère plusieurs).</summary>
-    private sealed class DialogCallbacks(UiDialogReference reference, UiDialogOptions options)
+    private sealed class DialogCallbacks(UiDialogReference reference, UiDialogInstance instance)
     {
         [JSInvokable]
         public Task OnEscapePressed()
         {
-            if (options.CloseOnEscape) reference.Cancel();
+            if (instance.Options.CloseOnEscape != false) reference.Cancel();
             return Task.CompletedTask;
         }
     }
 
     protected override void OnInitialized() => DialogService.OnShow += Show;
 
+    /// <summary>Options d'un dialogue complétées par les valeurs par défaut de ce provider.</summary>
+    private UiDialogOptions Resolve(UiDialogOptions options) => options.MergeWith(new UiDialogOptions
+    {
+        Position = Position,
+        Size = Size,
+        FullScreen = FullScreen,
+        NoHeader = NoHeader,
+        ShowCloseButton = ShowCloseButton,
+        CloseOnBackdropClick = CloseOnBackdropClick,
+        CloseOnEscape = CloseOnEscape,
+        DefaultFocus = DefaultFocus,
+        BackdropClass = BackdropClass
+    });
+
     private void Show(UiDialogInstanceInfo info)
     {
         _ = InvokeAsync(() =>
         {
-            OpenDialog? dialog = null;
-            dialog = new OpenDialog
+            var dialog = new OpenDialog
             {
                 Info = info,
-                Instance = new UiDialogInstance(info.Reference, info.Title, () => _ = InvokeAsync(StateHasChanged))
+                Instance = new UiDialogInstance(info.Reference, info.Title, info.Options, Resolve,
+                    () => _ = InvokeAsync(StateHasChanged), DialogService.CancelAll)
             };
             info.Reference.CloseRequested += () => _ = InvokeAsync(() => RemoveAsync(dialog));
             _dialogs.Add(dialog);
@@ -86,19 +125,29 @@
         foreach (var dialog in _dialogs.Where(d => !d.IsSetUp).ToList())
         {
             dialog.IsSetUp = true;
+            dialog.Info.Reference.Dialog = dialog.Component?.Instance;
             try
             {
-                dialog.Callbacks = DotNetObjectReference.Create(new DialogCallbacks(dialog.Info.Reference, dialog.Info.Options));
-                await JS.InvokeVoidAsync("UiInterop.setupModal", dialog.BackdropRef, dialog.Callbacks);
+                dialog.Callbacks = DotNetObjectReference.Create(new DialogCallbacks(dialog.Info.Reference, dialog.Instance));
+                var focus = dialog.Instance.Options.DefaultFocus ?? UiDefaultFocus.FirstChild;
+                await JS.InvokeVoidAsync("UiInterop.setupModal", dialog.BackdropRef, dialog.Callbacks, UiDialogCss.JsOptions(focus));
                 await JS.InvokeVoidAsync("UiInterop.lockBodyScroll");
             }
             catch (JSDisconnectedException) { }
         }
     }
 
-    private void HandleBackdropClick(OpenDialog dialog)
+    private async Task HandleBackdropClickAsync(OpenDialog dialog)
     {
-        if (dialog.Info.Options.CloseOnBackdropClick) dialog.Info.Reference.Cancel();
+        // Comme MudDialog.OnBackdropClick : un gestionnaire fourni remplace la fermeture automatique.
+        var layout = dialog.Instance.Layout;
+        if (layout is not null && layout.OnBackdropClick.HasDelegate)
+        {
+            await layout.OnBackdropClick.InvokeAsync();
+            return;
+        }
+
+        if (dialog.Instance.Options.CloseOnBackdropClick != false) dialog.Info.Reference.Cancel();
     }
 
     private async Task RemoveAsync(OpenDialog dialog)
@@ -123,25 +172,6 @@
         dialog.Callbacks?.Dispose();
         dialog.Callbacks = null;
     }
-
-    private static string SizeClass(UiSize size) => size switch
-    {
-        UiSize.Xs => "ui-modal-xs",
-        UiSize.Sm => "ui-modal-sm",
-        UiSize.Lg => "ui-modal-lg",
-        UiSize.Xl => "ui-modal-xl",
-        UiSize.Max => "ui-modal-max",
-        _ => ""
-    };
-
-    private static string WidthStyle(UiSize size) => size switch
-    {
-        UiSize.Sm => "max-width: 400px;",
-        UiSize.Lg => "max-width: 800px;",
-        UiSize.Xl => "max-width: 1000px;",
-        UiSize.Max => "max-width: 100%;",
-        _ => "max-width: 540px;"
-    };
 
     public async ValueTask DisposeAsync()
     {

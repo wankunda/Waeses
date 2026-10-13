@@ -118,6 +118,17 @@
 .ui-spinner-xs { width: 12px; height: 12px; border-width: 1.5px; }
 .ui-modal-xs { max-width: 320px; }
 
+/* Dialogues : position (UiDialogPosition), plein écran et contenu bord à bord (UiDialog Gutters="false") */
+.ui-modal-pos-top { align-items: flex-start; }
+.ui-modal-pos-bottom { align-items: flex-end; }
+.ui-modal-pos-left { justify-content: flex-start; }
+.ui-modal-pos-right { justify-content: flex-end; }
+.ui-modal-backdrop-fullscreen { padding: 0; }
+.ui-modal-box.ui-modal-fullscreen { width: 100%; max-width: none; height: 100%; max-height: none; border: 0; border-radius: 0; }
+.ui-modal-fullscreen > .ui-modal-body { flex: 1 1 auto; }
+.ui-modal-body-flush { padding: 0; }
+.ui-message-box-dialog-text { margin: 0; white-space: pre-line; }
+
 .ui-color-picker { display: grid; grid-template-columns: 3.5rem minmax(0, 1fr); gap: .6rem; }
 .ui-color-swatch { width: 100%; height: var(--control-height-md); padding: .2rem; border: 1px solid var(--border-default); border-radius: var(--radius-md); background: var(--bg-surface); cursor: pointer; }
 .ui-date-range { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: .6rem; }

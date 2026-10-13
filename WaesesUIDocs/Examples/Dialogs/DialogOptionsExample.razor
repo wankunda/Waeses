@@ -1,0 +1,47 @@
+@inject IUiDialogService Dialogs
+
+<div class="ui-flex-col" style="gap: .75rem;">
+    <div class="ui-grid-cols-2" style="gap: .75rem;">
+        <UiSelect @bind-Value="_position" Label="Position" Items="Enum.GetValues<UiDialogPosition>()" />
+        <UiSelect @bind-Value="_size" Label="Largeur" Items="_sizes" />
+    </div>
+    <div class="ui-flex-row" style="flex-wrap: wrap; gap: 1rem;">
+        <UiSwitch @bind-Value="_fullScreen" Label="Plein écran" />
+        <UiSwitch @bind-Value="_noHeader" Label="Sans en-tête" />
+        <UiSwitch @bind-Value="_closeButton" Label="Bouton de fermeture" />
+        <UiSwitch @bind-Value="_backdropClick" Label="Fermer au clic sur le fond" />
+        <UiSwitch @bind-Value="_escape" Label="Fermer avec Échap" />
+    </div>
+    <div>
+        <UiButton Text="Ouvrir le dialogue" OnClick="OpenAsync" />
+    </div>
+</div>
+
+@code {
+    private static readonly UiSize[] _sizes = { UiSize.Xs, UiSize.Sm, UiSize.Md, UiSize.Lg, UiSize.Xl, UiSize.Max };
+
+    private UiDialogPosition _position = UiDialogPosition.Center;
+    private UiSize _size = UiSize.Md;
+    private bool _fullScreen;
+    private bool _noHeader;
+    private bool _closeButton = true;
+    private bool _backdropClick = true;
+    private bool _escape = true;
+
+    private async Task OpenAsync()
+    {
+        // Chaque option laissée vide prend la valeur réglée sur <UiDialogProvider />.
+        var options = new UiDialogOptions
+        {
+            Position = _position,
+            Size = _size,
+            FullScreen = _fullScreen,
+            NoHeader = _noHeader,
+            ShowCloseButton = _closeButton,
+            CloseOnBackdropClick = _backdropClick,
+            CloseOnEscape = _escape
+        };
+
+        await Dialogs.ShowAsync<OptionsDemoDialog>("Dialogue configurable", options: options);
+    }
+}

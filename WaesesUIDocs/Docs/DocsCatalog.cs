@@ -54,7 +54,7 @@ public static class DocsCatalog
         new("Alertes et états", "composants/alertes-et-etats", Overlays, "UiAlert, UiCallout, UiEmptyState et UiErrorState.", "alerte alert callout encadre etat vide erreur"),
         new("Progression et chargement", "composants/progression-et-chargement", Overlays, "UiProgress, UiProgressCircle, UiSpinner, UiSkeleton et UiLoadingOverlay.", "progression progress spinner skeleton chargement overlay"),
         new("Modale, tiroir et infobulle", "composants/modale-et-tiroir", Overlays, "UiModal, UiDrawer et UiTooltip.", "modale modal drawer tiroir tooltip infobulle"),
-        new("Dialogues et messages", "composants/dialogues", Overlays, "IUiDialogService, boîtes de message et notifications toast.", "dialog modal toast messagebox confirm snackbar"),
+        new("Dialogues et messages", "composants/dialogues", Overlays, "IUiDialogService, UiDialog, boîtes de message et notifications toast.", "dialog dialogue modal muddialog toast messagebox confirm snackbar"),
         new("Popover", "composants/popover", Overlays, "UiPopover, UiPopoverPanel et UiPopoverProvider : contenu ancré, jamais rogné.", "popover overlay menu ancre panel")
     };
 
@@ -87,7 +87,7 @@ public static class DocsCatalog
         typeof(UiProgress), typeof(UiProgressCircle), typeof(UiSpinner), typeof(UiSkeleton), typeof(UiLoadingOverlay),
         typeof(UiModal), typeof(UiDrawer), typeof(UiTooltip),
         typeof(UiPopover), typeof(UiPopoverPanel), typeof(UiPopoverProvider),
-        typeof(UiDialogProvider), typeof(UiToastContainer), typeof(UiMessageBoxProvider)
+        typeof(UiDialog), typeof(UiDialogProvider), typeof(UiToastContainer), typeof(UiMessageBoxProvider)
     };
 
     /// <summary>
@@ -100,7 +100,8 @@ public static class DocsCatalog
         [typeof(UiNavMenuItem)] = "Rendu par UiNavMenu pour chaque NavigationItem ; il n'est jamais utilisé directement.",
         [typeof(UiAuthorizeView)] = "Dédié à l'hébergement WinForms (modèle UserSession) : hors du périmètre Blazor documenté ici.",
         [typeof(UiAuthState)] = "Dédié à l'hébergement WinForms (modèle UserSession) : hors du périmètre Blazor documenté ici.",
-        [typeof(UiRedirectTo)] = "Compagnon de UiAuthorizeView, dédié à l'hébergement WinForms."
+        [typeof(UiRedirectTo)] = "Compagnon de UiAuthorizeView, dédié à l'hébergement WinForms.",
+        [typeof(UiMessageBoxDialog)] = "Affiché par IUiDialogService.ShowMessageBoxAsync ; il n'est jamais utilisé directement."
     };
 
     /// <summary>Entrées dont chaque mot de la requête figure (sans accent ni casse) dans le titre, la description ou les mots-clés.</summary>
