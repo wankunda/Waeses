@@ -282,6 +282,7 @@ public sealed class ComponentTests(DocsSiteFixture site)
         await example.GetByRole(AriaRole.Button, Name("Ouvrir le dialogue")).ClickAsync();
         var box = session.Page.Locator(".ui-modal-box");
         await Expect(box).ToHaveClassAsync(new Regex("ui-modal-fullscreen"));
+        await box.EvaluateAsync("el => Promise.all(el.getAnimations().map(a => a.finished))");   // l'apparition part d'une échelle de 0,92
         var size = await box.BoundingBoxAsync();
         Assert.Equal(1280, size!.Width, 1.0);
         Assert.Equal(900, size.Height, 1.0);
