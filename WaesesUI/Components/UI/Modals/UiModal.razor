@@ -5,11 +5,11 @@
 
 @if (IsOpen)
 {
-    <div class="ui-modal-backdrop"
+    <div class="@UiDialogCss.BackdropClass(Position, FullScreen, BackdropClass)"
          @onclick="HandleBackdropClick"
          @ref="_backdropRef">
-        <div class="ui-modal-box @SizeClass @Class"
-             style="@StyleBuilder.Default(GetModalWidthStyle()).Add(Style).Build()"
+        <div class="@UiDialogCss.BoxClass(Size, FullScreen, Class)"
+             style="@StyleBuilder.Default(UiDialogCss.WidthStyle(Size, FullScreen)).Add(Style).Build()"
              @onclick:stopPropagation="true"
              @ref="_modalRef"
              tabindex="-1"
@@ -90,18 +90,16 @@
     [Parameter] public bool LockScroll { get; set; } = true;
     /// <summary>Affiche le bouton de fermeture dans l'en-tête.</summary>
     [Parameter] public bool ShowCloseButton { get; set; } = true;
+    /// <summary>Position de la modale dans la fenêtre.</summary>
+    [Parameter] public UiDialogPosition Position { get; set; } = UiDialogPosition.Center;
+    /// <summary>Occupe tout l'écran, sans marge ni coins arrondis.</summary>
+    [Parameter] public bool FullScreen { get; set; }
+    /// <summary>Classes CSS ajoutées au fond assombri.</summary>
+    [Parameter] public string? BackdropClass { get; set; }
+    /// <summary>Élément qui reçoit le focus à l'ouverture.</summary>
+    [Parameter] public UiDefaultFocus DefaultFocus { get; set; } = UiDefaultFocus.FirstChild;
     /// <summary>Appelé après la fermeture de la modale.</summary>
     [Parameter] public EventCallback OnClosed { get; set; }
-
-    private string SizeClass => Size switch
-    {
-        UiSize.Xs => "ui-modal-xs",
-        UiSize.Sm => "ui-modal-sm",
-        UiSize.Lg => "ui-modal-lg",
-        UiSize.Xl => "ui-modal-xl",
-        UiSize.Max => "ui-modal-max",
-        _ => ""
-    };
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -114,7 +112,7 @@
             {
                 if (FocusTrap || CloseOnEscape)
                 {
-                    await JS.InvokeVoidAsync("UiInterop.setupModal", _backdropRef, _dotNetRef);
+                    await JS.InvokeVoidAsync("UiInterop.setupModal", _backdropRef, _dotNetRef, UiDialogCss.JsOptions(DefaultFocus));
                 }
                 if (LockScroll)
                 {
@@ -172,15 +170,6 @@
         _dotNetRef?.Dispose();
         _dotNetRef = null;
     }
-
-    private string GetModalWidthStyle() => Size switch
-    {
-        UiSize.Sm => "max-width: 400px;",
-        UiSize.Lg => "max-width: 800px;",
-        UiSize.Xl => "max-width: 1000px;",
-        UiSize.Max => "max-width: 100%;",
-        _ => "max-width: 540px;"
-    };
 
     public async ValueTask DisposeAsync()
     {

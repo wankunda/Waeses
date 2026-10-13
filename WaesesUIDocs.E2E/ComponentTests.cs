@@ -229,6 +229,66 @@ public sealed class ComponentTests(DocsSiteFixture site)
     }
 
     [Fact]
+    public async Task Le_dialogue_en_ligne_s_ouvre_avec_son_titre_riche_et_se_ferme_par_ses_actions()
+    {
+        await using var session = await DocsSession.OpenAsync(site, "composants/dialogues");
+        var example = session.Preview("Dialogue en ligne");
+
+        await example.GetByRole(AriaRole.Button, Name("Voir les conditions")).ClickAsync();
+        var dialog = session.Page.GetByRole(AriaRole.Dialog, PageName("Conditions d'utilisation"));
+        await Expect(dialog).ToBeVisibleAsync();
+
+        await dialog.GetByRole(AriaRole.Button, Name("Accepter")).ClickAsync();
+
+        await Expect(dialog).ToHaveCountAsync(0);
+        await Expect(example.Locator("p")).ToContainTextAsync("acceptées");
+        Assert.Empty(session.Problems);
+    }
+
+    [Fact]
+    public async Task La_boite_de_message_a_trois_reponses_renvoie_null_avec_Echap()
+    {
+        await using var session = await DocsSession.OpenAsync(site, "composants/dialogues");
+        var example = session.Preview("Boîte de message à trois réponses");
+
+        await example.GetByRole(AriaRole.Button, Name("Quitter l'éditeur")).ClickAsync();
+        var dialog = session.Page.GetByRole(AriaRole.Dialog, PageName("Modifications non enregistrées"));
+        await dialog.GetByRole(AriaRole.Button, Name("Ne pas enregistrer")).ClickAsync();
+        await Expect(example.Locator("p")).ToContainTextAsync("quitter sans enregistrer");
+
+        await example.GetByRole(AriaRole.Button, Name("Quitter l'éditeur")).ClickAsync();
+        await Expect(dialog).ToBeVisibleAsync();
+        await session.Page.Keyboard.PressAsync("Escape");
+        await Expect(dialog).ToHaveCountAsync(0);
+        await Expect(example.Locator("p")).ToContainTextAsync("rester dans l'éditeur");
+        Assert.Empty(session.Problems);
+    }
+
+    [Fact]
+    public async Task Les_options_placent_le_dialogue_en_plein_ecran_et_SetOptions_l_agrandit()
+    {
+        await using var session = await DocsSession.OpenAsync(site, "composants/dialogues");
+        var example = session.Preview("Options d'un dialogue");
+
+        await example.GetByRole(AriaRole.Button, Name("Ouvrir le dialogue")).ClickAsync();
+        var dialog = session.Page.GetByRole(AriaRole.Dialog, PageName("Dialogue configurable"));
+        await Expect(dialog).ToBeVisibleAsync();
+        await dialog.GetByRole(AriaRole.Button, Name("Agrandir")).ClickAsync();
+        await Expect(dialog).ToHaveClassAsync(new Regex("ui-modal-xl"));
+        await dialog.GetByRole(AriaRole.Button, Name("Fermer")).First.ClickAsync();
+        await Expect(dialog).ToHaveCountAsync(0);
+
+        await example.GetByText("Plein écran").ClickAsync();
+        await example.GetByRole(AriaRole.Button, Name("Ouvrir le dialogue")).ClickAsync();
+        var box = session.Page.Locator(".ui-modal-box");
+        await Expect(box).ToHaveClassAsync(new Regex("ui-modal-fullscreen"));
+        var size = await box.BoundingBoxAsync();
+        Assert.Equal(1280, size!.Width, 1.0);
+        Assert.Equal(900, size.Height, 1.0);
+        Assert.Empty(session.Problems);
+    }
+
+    [Fact]
     public async Task La_confirmation_renvoie_vrai_ou_faux_et_la_notification_apparait()
     {
         await using var session = await DocsSession.OpenAsync(site, "composants/dialogues");

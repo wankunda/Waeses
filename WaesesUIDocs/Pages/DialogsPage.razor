@@ -4,8 +4,42 @@
     <DocSection Title="Providers" Description="Dialogues, boîtes de message et notifications sont affichés par des composants à placer une seule fois dans le layout (voir l'installation) : `UiDialogProvider`, `UiMessageBoxProvider` et `UiToastContainer`.">
     </DocSection>
 
-    <DocSection Title="Dialogue avec un composant" Description="`IUiDialogService.ShowAsync&lt;T&gt;` affiche n'importe quel composant dans une modale. Le composant reçoit `UiDialogInstance` en cascade et se ferme avec `Close(donnée)` ou `Cancel()` ; l'appelant attend `reference.Result`. Plusieurs dialogues peuvent être empilés.">
+    <DocSection Title="Dialogue avec un composant" Description="`IUiDialogService.ShowAsync&lt;T&gt;` affiche n'importe quel composant dans un dialogue, comme `IDialogService` de MudBlazor. Dans ce composant, `UiDialog` dessine l'en-tête (`TitleContent`), le contenu (`DialogContent`) et le pied (`DialogActions`). `IUiDialogInstance`, reçu en cascade, ferme le dialogue avec `Close(UiDialogResult.Ok(donnée))` ou `Cancel()` ; l'appelant attend `reference.Result`. `UiDialogParameters&lt;T&gt;` passe les paramètres avec `Add(x =&gt; x.Name, valeur)`, vérifié à la compilation. Plusieurs dialogues peuvent être empilés.">
         <DocExample Example="typeof(DialogServiceExample)" Companions="new[] { typeof(EditNameDialog) }" />
+    </DocSection>
+
+    <DocSection Title="Options d'un dialogue" Description="`UiDialogOptions` règle la position (`Position`), la largeur (`Size`), le plein écran (`FullScreen`), l'en-tête (`NoHeader`, `ShowCloseButton`), la fermeture (`CloseOnBackdropClick`, `CloseOnEscape`), le focus initial (`DefaultFocus`) et des classes (`Class`, `BackdropClass`). Une option laissée vide prend la valeur réglée sur `UiDialogProvider` : `&lt;UiDialogProvider Position=&quot;UiDialogPosition.TopCenter&quot; /&gt;` s'applique à tous les dialogues. Pendant qu'il est ouvert, le composant peut appeler `SetOptions` et `SetTitle`.">
+        <DocExample Example="typeof(DialogOptionsExample)" Companions="new[] { typeof(OptionsDemoDialog) }" />
+    </DocSection>
+
+    <DocSection Title="Dialogue en ligne" Description="`UiDialog` peut aussi être déclaré directement dans la page et ouvert avec `&#64;bind-Visible`, sans écrire de composant séparé. Il passe quand même par `UiDialogProvider` (empilement, focus, Échap) et se met à jour quand la page se redessine. `OnBackdropClick` remplace la fermeture automatique au clic sur le fond.">
+        <DocExample Example="typeof(InlineDialogExample)" />
+    </DocSection>
+
+    <DocSection Title="Boîte de message à trois réponses" Description="`IUiDialogService.ShowMessageBoxAsync` renvoie `true` (Oui), `false` (Non) ou `null` (Annuler, Échap, clic sur le fond), comme `ShowMessageBox` de MudBlazor. Un texte laissé vide masque son bouton.">
+        <DocExample Example="typeof(MessageBoxDialogExample)" />
+    </DocSection>
+
+    <DocSection Title="Correspondance avec MudBlazor" Description="Les noms suivent ceux de MudBlazor, préfixés par `Ui`. Une page écrite pour `MudDialog` se transpose ligne par ligne.">
+        <div class="api-table-wrap">
+            <table class="ui-table ui-table-compact">
+                <caption class="api-caption">MudBlazor et WaesesUI</caption>
+                <thead><tr><th scope="col">MudBlazor</th><th scope="col">WaesesUI</th></tr></thead>
+                <tbody>
+                    <tr><td><code>IDialogService.ShowAsync&lt;T&gt;</code></td><td><code>IUiDialogService.ShowAsync&lt;T&gt;</code> (et <code>ShowAsync(Type, ...)</code>)</td></tr>
+                    <tr><td><code>IDialogService.ShowMessageBox</code></td><td><code>IUiDialogService.ShowMessageBoxAsync</code></td></tr>
+                    <tr><td><code>IDialogReference</code></td><td><code>IUiDialogReference</code> : <code>Result</code>, <code>Dialog</code>, <code>Close</code>, <code>GetReturnValueAsync&lt;T&gt;</code></td></tr>
+                    <tr><td><code>IMudDialogInstance</code></td><td><code>IUiDialogInstance</code> : <code>Close</code>, <code>Cancel</code>, <code>CancelAll</code>, <code>SetTitle</code>, <code>SetOptions</code>, <code>StateHasChanged</code></td></tr>
+                    <tr><td><code>MudDialog</code> (<code>TitleContent</code>, <code>DialogContent</code>, <code>DialogActions</code>)</td><td><code>UiDialog</code>, mêmes noms</td></tr>
+                    <tr><td><code>MudDialogProvider</code></td><td><code>UiDialogProvider</code> : mêmes réglages par défaut</td></tr>
+                    <tr><td><code>DialogOptions</code></td><td><code>UiDialogOptions</code> ; <code>MaxWidth</code> devient <code>Size</code>, <code>CloseButton</code> devient <code>ShowCloseButton</code>, <code>BackdropClick</code> devient <code>CloseOnBackdropClick</code>, <code>CloseOnEscapeKey</code> devient <code>CloseOnEscape</code>, <code>BackgroundClass</code> devient <code>BackdropClass</code></td></tr>
+                    <tr><td><code>DialogOptions.FullWidth</code></td><td>Inutile : la boîte prend toujours toute la largeur permise par <code>Size</code></td></tr>
+                    <tr><td><code>DialogParameters&lt;T&gt;</code></td><td><code>UiDialogParameters&lt;T&gt;</code></td></tr>
+                    <tr><td><code>DialogResult</code></td><td><code>UiDialogResult</code> : <code>Ok</code>, <code>Cancel</code>, <code>Data</code>, <code>DataType</code>, <code>Canceled</code></td></tr>
+                    <tr><td><code>DialogPosition</code>, <code>DefaultFocus</code></td><td><code>UiDialogPosition</code>, <code>UiDefaultFocus</code></td></tr>
+                </tbody>
+            </table>
+        </div>
     </DocSection>
 
     <DocSection Title="Confirmations et alertes" Description="`IMessageBoxService.ShowAsync` renvoie `true` si l'utilisateur confirme et `false` s'il annule ou ferme la boîte.">
@@ -17,7 +51,8 @@
     </DocSection>
 
     <DocSection Title="API">
-        <ApiTable Component="typeof(UiDialogProvider)" Note="Il ne se configure pas : les options de chaque dialogue se passent à `ShowAsync` avec `UiDialogOptions`." />
+        <ApiTable Component="typeof(UiDialog)" />
+        <ApiTable Component="typeof(UiDialogProvider)" Note="Ses paramètres sont les valeurs par défaut de tous les dialogues ; `UiDialogOptions`, passé à `ShowAsync`, les remplace pour un dialogue." />
         <ApiTable Component="typeof(UiToastContainer)" Note="`Position` : position des toasts qui n'en demandent pas une (sinon `UiOptions.ToastPosition`). Durée et nombre maximal : `UiOptions`." />
         <ApiTable Component="typeof(UiMessageBoxProvider)" Note="Les libellés par défaut (Confirmer, Annuler, OK) se règlent avec `UiOptions`." />
     </DocSection>

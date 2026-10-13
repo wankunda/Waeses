@@ -1,0 +1,35 @@
+<div class="ui-flex-col" style="gap: .75rem;">
+    <div>
+        <UiButton Text="Voir les conditions" Appearance="UiVariant.Outlined" OnClick="() => _visible = true" />
+    </div>
+    <p class="text-secondary">Conditions : <strong>@(_accepted ? "acceptées" : "non acceptées")</strong></p>
+</div>
+
+@* Dialogue « en ligne » : déclaré dans la page et ouvert avec bind-Visible, sans écrire de composant séparé. *@
+<UiDialog @bind-Visible="_visible" Options="_options">
+    <TitleContent>
+        <span class="ui-flex-row" style="gap: .5rem; align-items: center;">
+            <UiIcon Icon="@Icons.Material.Filled.Info" Color="UiColor.Info" aria-hidden="true" />
+            Conditions d'utilisation
+        </span>
+    </TitleContent>
+    <DialogContent>
+        <p>En continuant, vous acceptez que vos projets soient enregistrés sur ce serveur.</p>
+    </DialogContent>
+    <DialogActions>
+        <UiButton Text="Refuser" Appearance="UiVariant.Text" Color="UiColor.Neutral" OnClick="() => Answer(false)" />
+        <UiButton Text="Accepter" OnClick="() => Answer(true)" />
+    </DialogActions>
+</UiDialog>
+
+@code {
+    private readonly UiDialogOptions _options = new() { Size = UiSize.Sm, Position = UiDialogPosition.TopCenter };
+    private bool _visible;
+    private bool _accepted;
+
+    private void Answer(bool accepted)
+    {
+        _accepted = accepted;
+        _visible = false;
+    }
+}

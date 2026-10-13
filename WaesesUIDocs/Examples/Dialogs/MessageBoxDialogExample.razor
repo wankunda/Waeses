@@ -1,0 +1,28 @@
+@inject IUiDialogService Dialogs
+
+<div class="ui-flex-col" style="gap: .75rem;">
+    <div>
+        <UiButton Text="Quitter l'éditeur" OnClick="AskAsync" />
+    </div>
+    <p class="text-secondary">Réponse : <strong>@_answer</strong></p>
+</div>
+
+@code {
+    private string _answer = "aucune";
+
+    private async Task AskAsync()
+    {
+        // true = Oui, false = Non, null = Annuler (ou Échap, ou clic sur le fond).
+        bool? save = await Dialogs.ShowMessageBoxAsync(
+            "Modifications non enregistrées",
+            "Voulez-vous enregistrer avant de quitter ?",
+            yesText: "Enregistrer", noText: "Ne pas enregistrer", cancelText: "Annuler");
+
+        _answer = save switch
+        {
+            true => "enregistrer puis quitter",
+            false => "quitter sans enregistrer",
+            null => "rester dans l'éditeur"
+        };
+    }
+}

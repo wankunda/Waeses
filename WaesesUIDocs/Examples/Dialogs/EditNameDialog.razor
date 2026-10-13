@@ -1,16 +1,18 @@
-@* Composant affiché dans un dialogue : il reçoit l'instance du dialogue en cascade et le ferme avec un résultat. *@
+@* Composant affiché dans un dialogue. UiDialog dessine l'en-tête, le contenu et le pied (comme MudDialog) ;
+   IUiDialogInstance, reçu en cascade, ferme le dialogue avec un résultat. *@
 
-<div class="ui-modal-body">
-    <UiInput @bind-Value="_name" Label="Nom du projet" Validation="@(value => string.IsNullOrWhiteSpace(value) ? "Le nom est obligatoire." : null)" />
-</div>
-
-<div class="ui-modal-footer">
-    <UiButton Text="Annuler" Appearance="UiVariant.Text" Color="UiColor.Neutral" OnClick="() => Dialog.Cancel()" />
-    <UiButton Text="Enregistrer" Disabled="@string.IsNullOrWhiteSpace(_name)" OnClick="() => Dialog.Close(_name)" />
-</div>
+<UiDialog>
+    <DialogContent>
+        <UiInput @bind-Value="_name" Label="Nom du projet" Validation="@(value => string.IsNullOrWhiteSpace(value) ? "Le nom est obligatoire." : null)" />
+    </DialogContent>
+    <DialogActions>
+        <UiButton Text="Annuler" Appearance="UiVariant.Text" Color="UiColor.Neutral" OnClick="() => Dialog.Cancel()" />
+        <UiButton Text="Enregistrer" Disabled="@string.IsNullOrWhiteSpace(_name)" OnClick="() => Dialog.Close(UiDialogResult.Ok(_name))" />
+    </DialogActions>
+</UiDialog>
 
 @code {
-    [CascadingParameter] public UiDialogInstance Dialog { get; set; } = default!;
+    [CascadingParameter] public IUiDialogInstance Dialog { get; set; } = default!;
 
     /// <summary>Nom initial, passé par UiDialogParameters.</summary>
     [Parameter] public string Name { get; set; } = string.Empty;

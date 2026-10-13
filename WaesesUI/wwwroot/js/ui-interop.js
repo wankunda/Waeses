@@ -339,7 +339,8 @@ window.UiInterop = {
     },
 
     // Set up focus trap and Escape handler for a modal element
-    setupModal: function (modalEl, dotNetRef) {
+    // options.defaultFocus : 'firstChild' (défaut), 'lastChild', 'element' (la boîte role="dialog") ou 'none'.
+    setupModal: function (modalEl, dotNetRef, options) {
         if (!modalEl) return;
 
         modalEl._uiHandleKeyDown = function (e) {
@@ -377,12 +378,17 @@ window.UiInterop = {
         window.UiInterop._modalStack.push(modalEl);
 
         // Focus the first focusable element (or the modal box itself)
+        const defaultFocus = (options && options.defaultFocus) || 'firstChild';
+        if (defaultFocus === 'none') return;
         requestAnimationFrame(function () {
+            const box = modalEl.querySelector('[role="dialog"]') || modalEl;
             const focusable = window.UiInterop._getFocusableElements(modalEl);
-            if (focusable.length > 0) {
-                focusable[0].focus();
+            if (defaultFocus === 'element' || focusable.length === 0) {
+                box.focus();
+            } else if (defaultFocus === 'lastChild') {
+                focusable[focusable.length - 1].focus();
             } else {
-                modalEl.focus();
+                focusable[0].focus();
             }
         });
     },

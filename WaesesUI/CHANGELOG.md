@@ -5,13 +5,25 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Les
 ## [Non publié]
 
 ### Ajouté
+- Dialogues façon MudBlazor (`IDialogService`, `IMudDialogInstance`, `DialogOptions`...), avec des noms préfixés par `Ui` :
+  - `UiDialog` (équivalent de `MudDialog`) : `TitleContent`, `DialogContent`, `DialogActions`, `ContentClass`, `ActionsClass`, `TitleClass`, `Gutters`, `OnBackdropClick`. Dans un composant affiché par `IUiDialogService`, il dessine l'en-tête, le contenu et le pied. Déclaré dans une page avec `@bind-Visible`, il ouvre un dialogue « en ligne » qui suit les rendus de la page.
+  - `IUiDialogInstance` (équivalent de `IMudDialogInstance`), reçu en cascade : `Close(UiDialogResult)`, `Cancel()`, `CancelAll()`, `SetTitle()`, `SetOptions()`, `StateHasChanged()`, `Options`. `UiDialogInstance` l'implémente : les composants existants continuent de fonctionner.
+  - `UiDialogOptions` : `Position` (`UiDialogPosition`, neuf positions), `FullScreen`, `NoHeader`, `DefaultFocus` (`UiDefaultFocus`), `BackdropClass`, `Style`, `MergeWith()`.
+  - `UiDialogProvider` : paramètres `Position`, `Size`, `FullScreen`, `NoHeader`, `ShowCloseButton`, `CloseOnBackdropClick`, `CloseOnEscape`, `DefaultFocus` et `BackdropClass`, valeurs par défaut de tous les dialogues.
+  - `IUiDialogService` : `ShowAsync(Type, ...)`, `ShowMessageBoxAsync` (oui → `true`, non → `false`, annuler ou fermeture → `null`), `Close(reference, résultat)` et `CancelAll()`.
+  - `IUiDialogReference` : `Dialog` (instance du composant affiché), `Close(UiDialogResult)` et `GetReturnValueAsync<T>()`.
+  - `UiDialogParameters<TComponent>` : `Add(x => x.Param, valeur)`, nom vérifié à la compilation ; `UiDialogParameters.Get<T>()`.
+  - `UiDialogResult.Ok<T>()` et `DataType`.
+- `UiModal` : `Position`, `FullScreen`, `DefaultFocus` et `BackdropClass`, comme les dialogues.
 - `UiNavBar` : barre de navigation horizontale (nom ou logo, liens `NavigationItem`, zone `EndContent`). Sous la largeur `CollapseBelow` (`UiBreakpoint` : 640, 768 ou 1024 px ; 768 par défaut), les liens se replient derrière un bouton hamburger. Sans JavaScript.
 - `UiToastContainer.Position` : position par défaut des toasts qui n'en précisent pas une. Un toast affiché avec `position:` (ou `ToastModel.Position`) garde la sienne. Ordre de priorité : position du toast, puis `UiToastContainer.Position`, puis `UiOptions.ToastPosition`.
 
 ### Modifié
+- Les propriétés de `UiDialogOptions` sont nullables (`UiSize?`, `bool?`) : `null` signifie « valeur du `UiDialogProvider` ». Écrire une option ne change pas ; le code qui lisait une option doit gérer `null`.
 - `ToastModel.Position` est maintenant nullable (`ToastPosition?`, null par défaut) : `null` signifie « position par défaut du conteneur ». `IToastService.ShowToast` ne remplace plus un `position` absent par `UiOptions.ToastPosition` ; c'est le conteneur qui le fait à l'affichage. Le code qui lisait `toast.Position` doit gérer `null`.
 
 ### Corrigé
+- `UiModal` et les dialogues en taille `Xs` gardaient la largeur `Md` (540 px) : le style inline écrasait la classe `ui-modal-xs`. Ils mesurent maintenant 320 px.
 - `ui-grid-cols-2`, `ui-grid-cols-3` et `ui-grid-cols-4` : sur un petit écran, la colonne gardait sa largeur minimale (320, 280 ou 220 px) même quand le conteneur était plus étroit. Les champs placés dans la grille, comme `UiDatePicker`, dépassaient alors de leur carte. La largeur minimale est maintenant plafonnée à celle du conteneur.
 - `UiThemeProvider` : changer `Theme` (ou la densité, les palettes) pouvait ne jamais réappliquer le thème. L'indicateur « configuration changée » était recalculé à chaque `OnParametersSet` ; si le parent se re-rendait deux fois avant `OnAfterRenderAsync` (courant dans un BlazorWebView), le second appel l'écrasait. Le composant compare maintenant la configuration voulue à celle déjà appliquée.
 

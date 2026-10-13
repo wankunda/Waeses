@@ -1,0 +1,32 @@
+@namespace WaesesUI
+
+@* Affiché par IUiDialogService.ShowMessageBoxAsync : Oui → true, Non → false, Annuler ou fermeture → résultat annulé (null). *@
+<UiDialog>
+    <DialogContent>
+        <p class="ui-message-box-dialog-text">@Message</p>
+    </DialogContent>
+    <DialogActions>
+        @if (!string.IsNullOrEmpty(CancelText))
+        {
+            <UiButton Text="@CancelText" Appearance="UiVariant.Text" Color="UiColor.Neutral" OnClick="() => Dialog.Cancel()" />
+        }
+        @if (!string.IsNullOrEmpty(NoText))
+        {
+            <UiButton Text="@NoText" Appearance="UiVariant.Outlined" Color="UiColor.Neutral" OnClick="() => Dialog.Close(UiDialogResult.Ok(false))" />
+        }
+        <UiButton Text="@YesText" OnClick="() => Dialog.Close(UiDialogResult.Ok(true))" />
+    </DialogActions>
+</UiDialog>
+
+@code {
+    [CascadingParameter] private UiDialogInstance Dialog { get; set; } = default!;
+
+    /// <summary>Texte du message.</summary>
+    [Parameter] public string Message { get; set; } = string.Empty;
+    /// <summary>Texte du bouton de confirmation (résultat <c>true</c>).</summary>
+    [Parameter] public string YesText { get; set; } = "OK";
+    /// <summary>Texte du bouton de refus (résultat <c>false</c>) ; masqué s'il est vide.</summary>
+    [Parameter] public string? NoText { get; set; }
+    /// <summary>Texte du bouton d'annulation (résultat <c>null</c>) ; masqué s'il est vide.</summary>
+    [Parameter] public string? CancelText { get; set; }
+}
