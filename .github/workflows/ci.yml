@@ -49,7 +49,8 @@ jobs:
 
   # Site de documentation dans un vrai navigateur (publication Release trimmée, Chromium, axe-core).
   docs-e2e:
-    runs-on: ubuntu-latest
+    # Playwright 1.52 ne sait pas installer Chromium sur Ubuntu 26.04 (nouvelle image ubuntu-latest) : image fixée.
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
