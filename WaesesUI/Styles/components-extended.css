@@ -56,6 +56,7 @@
     --text-secondary: #475569;
     --text-muted: #94a3b8;
     --text-inverse: #ffffff;
+    --ui-callout-tint: 8%;
     --border-subtle: #f1f5f9;
     --border-default: #e2e8f0;
     --border-strong: #cbd5e1;
@@ -101,6 +102,7 @@
     --text-secondary: #94a3b8;
     --text-muted: #64748b;
     --text-inverse: #0f172a;
+    --ui-callout-tint: 15%;
     --border-subtle: #1a2436;
     --border-default: #26334d;
     --border-strong: #3b4d70;
@@ -345,13 +347,14 @@ button.ui-accordion-header { width: 100%; border: 0; font: inherit; text-align: 
 :is(.ui-alert, .ui-callout).ui-v-filled :is(strong, .ui-alert-title, .ui-alert-content, div div),
 :is(.ui-alert, .ui-callout).ui-v-filled .ui-alert-close { color: inherit; }
 .ui-alert.ui-v-text, .ui-alert.ui-v-outlined { border-color: var(--ui-c); }
+.ui-callout.ui-v-text { background: color-mix(in srgb, var(--ui-c) var(--ui-callout-tint), var(--bg-surface)); }
 
 /* Couleurs absentes du rendu historique (aucune règle pour ces combinaisons). */
 .ui-chip-secondary { color: var(--secondary); background: var(--secondary-light); }
 .ui-chip-warning { color: var(--warning); background: var(--warning-light); }
 .ui-chip-info { color: var(--info); background: var(--info-light); }
-.ui-callout-primary { color: var(--primary); background: var(--primary-light); }
-.ui-callout-secondary { color: var(--secondary); background: var(--secondary-light); }
+.ui-callout-primary { color: var(--primary); }
+.ui-callout-secondary { color: var(--secondary); }
 .ui-callout-neutral { color: var(--text-secondary); background: var(--bg-surface-secondary); }
 
 /* Progression et timeline : toutes les couleurs, via les variables communes. */
