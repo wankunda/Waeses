@@ -80,6 +80,8 @@
     --space-sm: 1rem;
     --space-md: 1.5rem;
     --space-lg: 3rem;
+    /* Part de la couleur dans le fond des encadrés (UiCallout). */
+    --ui-callout-tint: 8%;
 }
 
 /* ==========================================================================
@@ -132,6 +134,7 @@
     --text-main: #f1f5f9;
     --text-secondary: #94a3b8;
     --text-muted: #8b9ab3;
+    --ui-callout-tint: 15%;
     --text-inverse: #0f172a;
 
     /* Borders */
@@ -1244,10 +1247,12 @@ a {
 .ui-divider::before, .ui-divider::after { content: ''; height: 1px; flex: 1; background: var(--border-default); }
 .ui-divider-vertical { width: 1px; min-height: 1.5rem; margin: 0 1rem; background: var(--border-default); }
 .ui-divider-vertical::before, .ui-divider-vertical::after { display: none; }
-.ui-callout { display: flex; align-items: flex-start; gap: .75rem; padding: 1rem; border: 1px solid currentColor; border-radius: var(--radius-md); color: var(--info); background: var(--info-light); }
-.ui-callout-success { color: var(--success); background: var(--success-light); }
-.ui-callout-warning { color: var(--warning); background: var(--warning-light); }
-.ui-callout-danger { color: var(--danger); background: var(--danger-light); }
+/* Fond = couleur de l'encadré (currentColor) mélangée à la surface : il suit toujours le même thème que le texte
+   (--bg-surface et --text-main), même si une application redéfinit les teintes claires (--info-light...) sans leur version sombre. */
+.ui-callout { display: flex; align-items: flex-start; gap: .75rem; padding: 1rem; border: 1px solid currentColor; border-radius: var(--radius-md); color: var(--info); background: color-mix(in srgb, currentColor var(--ui-callout-tint), var(--bg-surface)); }
+.ui-callout-success { color: var(--success); }
+.ui-callout-warning { color: var(--warning); }
+.ui-callout-danger { color: var(--danger); }
 .ui-callout strong { display: block; margin-bottom: .2rem; color: var(--text-main); }
 .ui-callout div div { color: var(--text-secondary); font-size: .9rem; }
 .ui-code-block { overflow: hidden; border: 1px solid var(--border-default); border-radius: var(--radius-md); background: #0f172a; color: #e2e8f0; }
