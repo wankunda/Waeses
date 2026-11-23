@@ -49,7 +49,7 @@ public sealed class AriaBooleanTests : TestContext
         var cut = RenderComponent<UiNavMenu>(p => p.Add(c => c.NavigationItems, new[] { new NavigationItem { Text = "A", Href = "a" } }));
 
         var toggler = cut.Find("button.navbar-toggler");
-        Assert.Contains(toggler.GetAttribute("aria-expanded"), new[] { "true", "false" });
+        Assert.Equal("false", toggler.GetAttribute("aria-expanded"));
     }
 
     [Fact]

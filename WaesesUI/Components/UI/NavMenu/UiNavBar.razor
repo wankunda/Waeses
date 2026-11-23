@@ -90,7 +90,8 @@
         .Add(Class)
         .Build();
 
-    protected override void OnInitialized() => Navigation.LocationChanged += OnLocationChanged;
+    protected override void OnInitialized() =>
+        Navigation.LocationChanged += OnLocationChanged;
 
     private void Toggle() => _isOpen = !_isOpen;
 
