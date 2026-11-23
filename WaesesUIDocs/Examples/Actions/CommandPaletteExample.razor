@@ -1,0 +1,35 @@
+<div class="d-flex align-center gap-sm">
+    <button type="button" class="ui-btn ui-btn-primary" @onclick="() => _isOpen = true">
+        Ouvrir la palette
+    </button>
+    <span class="ui-text-secondary">ou utilisez Ctrl+K</span>
+</div>
+@if (_lastCommand is not null)
+{
+    <p role="status" class="mt-sm">Action exécutée : @_lastCommand</p>
+}
+
+<UiCommandPalette @bind-IsOpen="_isOpen"
+                  Commands="_commands"
+                  AriaLabel="Commandes de démonstration"
+                  SearchLabel="Rechercher une action"
+                  SearchPlaceholder="Rechercher une action…"
+                  EmptyText="Aucune action correspondante." />
+
+@code {
+    private bool _isOpen;
+    private string? _lastCommand;
+
+    private IReadOnlyList<UiCommand> _commands =>
+    [
+        new() { Label = "Créer un document", Description = "Démarrer un nouveau document", Group = "Documents", Shortcut = "Ctrl+N", Execute = () => SetLastCommandAsync("Créer un document") },
+        new() { Label = "Ouvrir les préférences", Description = "Personnaliser l'application", Group = "Application", Execute = () => SetLastCommandAsync("Ouvrir les préférences") },
+        new() { Label = "Action indisponible", Group = "Application", Disabled = true, Execute = () => Task.CompletedTask }
+    ];
+
+    private Task SetLastCommandAsync(string command)
+    {
+        _lastCommand = command;
+        return Task.CompletedTask;
+    }
+}

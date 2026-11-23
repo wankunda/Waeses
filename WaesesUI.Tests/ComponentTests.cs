@@ -189,6 +189,12 @@ public sealed class ComponentTests : TestContext
         var parDefaut = RenderComponent<UiSimpleLayout>();
         Assert.Contains($"© {DateTime.Now.Year} Waeses", parDefaut.Find("footer").TextContent);
 
+        var personnalise = RenderComponent<UiSimpleLayout>(p => p
+            .Add(c => c.Class, "layout-custom")
+            .Add(c => c.Style, "color: red;"));
+        Assert.Contains("layout-custom", personnalise.Find("main").ClassList);
+        Assert.Contains("color: red", personnalise.Find("main").GetAttribute("style"));
+
         var perso = RenderComponent<UiSimpleLayout>(p => p.Add(c => c.FooterText, "MonBudget 1.0"));
         Assert.Contains("MonBudget 1.0", perso.Find("footer").TextContent);
         Assert.DoesNotContain("Waeses", perso.Find("footer").TextContent);
@@ -203,6 +209,12 @@ public sealed class ComponentTests : TestContext
     [Fact]
     public void UiLayout_peut_masquer_ou_personnaliser_le_pied_de_page()
     {
+        var personnalise = RenderComponent<UiLayout>(p => p
+            .Add(c => c.Class, "page-custom")
+            .Add(c => c.Style, "color: red;"));
+        Assert.Contains("page-custom", personnalise.Find("div.page").ClassList);
+        Assert.Contains("color: red", personnalise.Find("div.page").GetAttribute("style"));
+
         var perso = RenderComponent<UiLayout>(p => p.Add(c => c.FooterText, "MonBudget 1.0"));
         Assert.Contains("MonBudget 1.0", perso.Find("footer").TextContent);
 

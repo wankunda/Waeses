@@ -60,7 +60,7 @@ using WaesesUI;
 builder.Services.AddWaesesUIServices();
 ```
 
-Cette extension enregistre `IToastService`, `IMessageBoxService`, `IUiDialogService` et `IThemeService` avec leurs implementations respectives.
+Cette extension enregistre les services de notifications, dialogues, popovers, thème, localisation et palette de commandes (`IUiCommandPaletteService`).
 
 Les valeurs par defaut globales se configurent via `UiOptions` :
 
@@ -106,10 +106,10 @@ Les composants sont organises par familles :
 
 | Famille | Composants |
 | --- | --- |
-| Actions | `UiButton`, `UiBadge` |
+| Actions | `UiButton`, `UiBadge`, `UiCommandPalette` |
 | Layout et navigation | `UiLayout`, `UiSimpleLayout`, `UiNavMenu`, `UiNavMenuItem`, `UiNavBar`, `UiBreadcrumbs`, `UiStepper` |
 | Formulaires | `UiFormField`, `UiInput`, `UiTextArea`, `UiSelect`, `UiMultiSelect`, `UiCombobox`, `UiColorPicker`, `UiTimePicker`, `UiDateRangePicker`, `UiTagInput`, `UiLocaleSwitcher`, `UiAutocomplete`, `UiDateTimePicker`, `UiDatePicker`, `UiCalendar`, `UiCheckbox`, `UiSwitch`, `UiSlider`, `UiRadioGroup`, `UiRadioOption`, `UiInputFile` |
-| Contenu | `UiCard`, `UiList`, `UiListItem`, `UiChip`, `UiDivider`, `UiCodeBlock`, `UiCopyButton`, `UiImage`, `UiImageGallery`, `UiLightbox`, `UiCarousel`, `UiFilePreview`, `UiAvatar`, `UiAvatarGroup`, `UiAvatarMenu` |
+| Contenu | `UiCard`, `UiList`, `UiListItem`, `UiTreeView`, `UiChip`, `UiDivider`, `UiCodeBlock`, `UiCopyButton`, `UiImage`, `UiImageGallery`, `UiLightbox`, `UiCarousel`, `UiFilePreview`, `UiAvatar`, `UiAvatarGroup`, `UiAvatarMenu` |
 | Feedback | `UiAlert`, `UiCallout`, `UiTimeline`, `UiLocalizedText`, `UiSpinner`, `UiSkeleton`, `UiEmptyState`, `UiErrorState`, `UiLoadingOverlay`, `UiTooltip`, `UiAccordion`, `UiAccordionItem`, `UiToastContainer`, `UiMessageBoxProvider` |
 | Overlays | `UiModal`, `UiPopover`, `UiMenu`, `UiDropdownMenu`, `UiDrawer` |
 | Donnees | `UiTable`, `UiTh`, `UiPagination`, `UiProgress`, `UiProgressCircle` |
@@ -163,12 +163,18 @@ Les boutons utilisent `Size`. Les champs natifs peuvent recevoir les classes `ui
 Pour un site a navigation horizontale, `UiNavBar` affiche le nom, les liens et une zone libre a droite. Sous `CollapseBelow` (768 px par defaut), les liens se replient derriere un bouton hamburger :
 
 ```razor
-<UiNavBar BrandText="Mon application" BrandHref="/" NavigationItems="@Items" CollapseBelow="UiBreakpoint.Md">
+<UiNavBar BrandText="Mon application" BrandHref="/" NavigationItems="@Items" CollapseBelow="UiBreakpoint.Md" @bind-IsOpen="_menuOpen">
     <EndContent>
         <UiButton Size="UiSize.Sm" Href="/connexion">Connexion</UiButton>
     </EndContent>
 </UiNavBar>
+
+@code {
+    private bool _menuOpen;
+}
 ```
+
+`UiNavMenu` et `UiNavBar` acceptent aussi `IsOpen` et `IsOpenChanged` pour ouvrir ou fermer leur menu depuis le parent. Sans liaison, ils gèrent leur état localement. Le drawer du `UiNavMenu` démarre fermé sur mobile et se referme au changement de breakpoint.
 
 Pour un ecran autonome, comme une page de connexion, utilisez `UiSimpleLayout` avec le fragment `MainBody`.
 
@@ -194,6 +200,31 @@ Le pied de page de `UiLayout` et de `UiSimpleLayout` se configure : `ShowFooter=
 L'etat peut etre controle avec `@bind-IsOpen`. `UiDropdownMenu` reste disponible comme alias retrocompatible de `UiMenu`.
 
 `UiAvatarMenu` utilise ce meme comportement avec un avatar comme declencheur. Il conserve les parametres de `UiAvatar` (`Src`, `Alt`, `Initials`, `Size`, `Shape`, `Status`, `BackgroundColor`) et permet de controler le menu avec `@bind-IsOpen`, `Disabled`, `Alignment`, `Dense` et `MenuAriaLabel`.
+
+## Palette de commandes et arborescence
+
+`UiCommandPalette` permet de rechercher puis lancer des actions avec `Ctrl+K`. Elle regroupe les commandes et prend en charge les flèches, Entrée et Échap :
+
+```razor
+<button @onclick="() => _commandsOpen = true">Commandes</button>
+<UiCommandPalette @bind-IsOpen="_commandsOpen"
+                  Commands="_commands"
+                  SearchPlaceholder="Rechercher une action…" />
+
+@code {
+    private bool _commandsOpen;
+    private IReadOnlyList<UiCommand> _commands =
+    [
+        new() { Label = "Créer un rapport", Group = "Rapports", Shortcut = "Ctrl+N", Execute = CreateReportAsync }
+    ];
+
+    private Task CreateReportAsync() => Task.CompletedTask;
+}
+```
+
+Pour ouvrir la palette depuis un autre composant, injectez `IUiCommandPaletteService` et appelez `OpenAsync(commands)`. Rendez une instance de `UiCommandPalette` dans le layout pour écouter ces demandes.
+
+`UiTreeView<TItem>` représente une hiérarchie avec `UiTreeNode<TItem>`. `@bind-SelectedNode` suit la sélection ; les nœuds acceptent des enfants, peuvent être désactivés et peuvent être développés initialement. Les touches Haut/Bas, Début/Fin, Gauche/Droite et Entrée/Espace sont prises en charge.
 
 ## Formulaires
 
