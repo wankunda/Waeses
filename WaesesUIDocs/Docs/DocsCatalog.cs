@@ -28,6 +28,7 @@ public static class DocsCatalog
         new("Formulaires et validation", "guides/formulaires", Guides, "UiForm, DataAnnotations et règles de validation personnalisées sur chaque champ.", "validation editform dataannotations erreur soumission"),
 
         new("Menus", "composants/menus", Actions, "UiMenu, UiDropdownMenu, UiAvatarMenu et UiCopyButton : menus d'actions et copie dans le presse-papiers.", "menu dropdown avatar copier presse-papiers clipboard actions"),
+        new("Palette de commandes", "composants/palette-de-commandes", Actions, "UiCommandPalette : rechercher et lancer rapidement des actions au clavier, avec Ctrl+K.", "command palette recherche commandes raccourci clavier"),
         new("Boutons", "composants/boutons", Actions, "UiButton et UiButtonIcon : couleur, apparence, tailles, icônes, chargement et liens.", "button bouton icone fab lien href loading"),
 
         new("Champ de saisie", "composants/champ-de-saisie", Fields, "UiInput : texte, nombres, mots de passe, validation, saisie différée et apparences.", "input texte nombre password debounce variant filled"),
@@ -45,6 +46,7 @@ public static class DocsCatalog
 
         new("Avatars, badges et puces", "composants/avatars-badges-puces", Display, "UiAvatar, UiAvatarGroup, UiBadge, UiChip et UiIcon.", "avatar badge chip puce icone statut"),
         new("Cartes et listes", "composants/cartes-et-listes", Display, "UiCard, UiList, UiListItem, UiDivider, UiTimeline et UiCodeBlock.", "carte card liste separateur chronologie timeline code"),
+        new("Arborescence", "composants/arborescence", Display, "UiTreeView : naviguer dans des données hiérarchiques avec souris et clavier.", "tree treeview arbre hierarchie nœud navigation clavier"),
         new("Images et médias", "composants/images", Display, "UiImage, UiImageGallery, UiCarousel, UiLightbox et UiFilePreview.", "image galerie carrousel lightbox fichier apercu"),
 
         new("Onglets et accordéon", "composants/onglets-et-accordeon", Navigation, "UiTabs, UiTabPanel, UiAccordion et UiAccordionItem : organiser le contenu en sections.", "onglets tabs accordeon accordion sections"),
@@ -65,7 +67,7 @@ public static class DocsCatalog
     public static IReadOnlyList<Type> ApiComponents { get; } = new[]
     {
         // Actions
-        typeof(UiButton), typeof(UiButtonIcon), typeof(UiMenu), typeof(UiDropdownMenu), typeof(UiAvatarMenu), typeof(UiCopyButton),
+        typeof(UiButton), typeof(UiButtonIcon), typeof(UiMenu), typeof(UiDropdownMenu), typeof(UiAvatarMenu), typeof(UiCopyButton), typeof(UiCommandPalette),
         // Champs
         typeof(UiInput<>), typeof(UiTextArea<>), typeof(UiSelect<>), typeof(UiSelectOption<>), typeof(UiForm),
         typeof(UiCheckbox), typeof(UiSwitch), typeof(UiRadioGroup<>), typeof(UiRadioOption<>), typeof(UiSlider),
@@ -77,7 +79,7 @@ public static class DocsCatalog
         typeof(UiBarChart), typeof(UiLineChart), typeof(UiPieChart), typeof(UiDonutChart),
         // Affichage
         typeof(UiAvatar), typeof(UiAvatarGroup), typeof(UiBadge), typeof(UiChip), typeof(UiIcon),
-        typeof(UiCard), typeof(UiList<>), typeof(UiListItem), typeof(UiDivider), typeof(UiTimeline), typeof(UiCodeBlock),
+        typeof(UiCard), typeof(UiList<>), typeof(UiListItem), typeof(UiDivider), typeof(UiTimeline), typeof(UiCodeBlock), typeof(UiTreeView<>),
         typeof(UiImage), typeof(UiImageGallery), typeof(UiCarousel), typeof(UiLightbox), typeof(UiFilePreview),
         // Navigation et mise en page
         typeof(UiTabs), typeof(UiTabPanel), typeof(UiAccordion), typeof(UiAccordionItem),

@@ -17,6 +17,7 @@ namespace WaesesUI
             services.AddScoped<IMessageBoxService, MessageBoxService>();
             services.AddScoped<IUiDialogService, UiDialogService>();
             services.AddScoped<IUiPopoverService, UiPopoverService>();
+            services.AddScoped<IUiCommandPaletteService, UiCommandPaletteService>();
             services.AddScoped<IThemeService, ThemeService>();
             services.AddScoped<IUiLocalizationService, UiLocalizationService>();
             return services;

@@ -5,6 +5,9 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Les
 ## [Non publié]
 
 ### Ajouté
+- `UiCommandPalette` : recherche d'actions groupées, raccourci global (`Ctrl+K` par défaut), navigation clavier et commandes asynchrones. `IUiCommandPaletteService.OpenAsync` permet de l'ouvrir depuis n'importe quel composant.
+- `UiTreeView<TItem>` / `UiTreeNode<TItem>` : arborescence hiérarchique avec sélection liée, modèles de rendu, états désactivés, expansion et navigation clavier accessible.
+- `IsOpen` / `IsOpenChanged` sur `UiNavMenu` et `UiNavBar` pour gérer leur état d'ouverture depuis le parent (`@bind-IsOpen`).
 - Dialogues façon MudBlazor (`IDialogService`, `IMudDialogInstance`, `DialogOptions`...), avec des noms préfixés par `Ui` :
   - `UiDialog` (équivalent de `MudDialog`) : `TitleContent`, `DialogContent`, `DialogActions`, `ContentClass`, `ActionsClass`, `TitleClass`, `Gutters`, `OnBackdropClick`. Dans un composant affiché par `IUiDialogService`, il dessine l'en-tête, le contenu et le pied. Déclaré dans une page avec `@bind-Visible`, il ouvre un dialogue « en ligne » qui suit les rendus de la page.
   - `IUiDialogInstance` (équivalent de `IMudDialogInstance`), reçu en cascade : `Close(UiDialogResult)`, `Cancel()`, `CancelAll()`, `SetTitle()`, `SetOptions()`, `StateHasChanged()`, `Options`. `UiDialogInstance` l'implémente : les composants existants continuent de fonctionner.
@@ -19,6 +22,10 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Les
 - `UiToastContainer.Position` : position par défaut des toasts qui n'en précisent pas une. Un toast affiché avec `position:` (ou `ToastModel.Position`) garde la sienne. Ordre de priorité : position du toast, puis `UiToastContainer.Position`, puis `UiOptions.ToastPosition`.
 
 ### Modifié
+- `UiNavMenu` démarre fermé sur mobile ; le drawer reste visible sur grand écran selon le comportement responsive existant.
+- `UiNavBar` ferme son menu replié lors d'un changement de point de rupture.
+- Le pipeline client de `UiDataGrid` est extrait dans `UiGridViewProcessor` pour séparer filtre/recherche/tri du rendu.
+- `UiNavMenu`, `UiLayout` et `UiSimpleLayout` utilisent `UiComponentBase` pour fusionner `Class`, `Style` et les attributs HTML libres.
 - Les propriétés de `UiDialogOptions` sont nullables (`UiSize?`, `bool?`) : `null` signifie « valeur du `UiDialogProvider` ». Écrire une option ne change pas ; le code qui lisait une option doit gérer `null`.
 - `ToastModel.Position` est maintenant nullable (`ToastPosition?`, null par défaut) : `null` signifie « position par défaut du conteneur ». `IToastService.ShowToast` ne remplace plus un `position` absent par `UiOptions.ToastPosition` ; c'est le conteneur qui le fait à l'affichage. Le code qui lisait `toast.Position` doit gérer `null`.
 

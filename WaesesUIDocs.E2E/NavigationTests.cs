@@ -130,4 +130,54 @@ public sealed class NavigationTests(DocsSiteFixture site)
         var overflow = await session.Page.EvaluateAsync<int>("document.documentElement.scrollWidth - window.innerWidth");
         Assert.True(overflow <= 1, $"/{href} déborde de {overflow}px sur 390px de large.");
     }
+
+    [Fact]
+    public async Task Le_drawer_mobile_demarre_ferme_et_gere_Echap_et_le_focus()
+    {
+        await using var session = await DocsSession.OpenAsync(site, "composants/navigation", width: 390, height: 844);
+        var toggle = session.Page.Locator("button.navbar-toggler");
+        var drawer = session.Page.Locator("aside.nav-drawer");
+
+        await Expect(toggle).ToHaveAttributeAsync("aria-expanded", "false");
+        await Expect(drawer).ToHaveAttributeAsync("aria-hidden", "true");
+        Assert.NotNull(await drawer.GetAttributeAsync("inert"));
+
+        await toggle.ClickAsync();
+        await Expect(toggle).ToHaveAttributeAsync("aria-expanded", "true");
+        await Expect(drawer).ToHaveAttributeAsync("aria-hidden", "false");
+        Assert.Null(await drawer.GetAttributeAsync("inert"));
+
+        await session.Page.Keyboard.PressAsync("Escape");
+        await Expect(toggle).ToHaveAttributeAsync("aria-expanded", "false");
+        await Expect(drawer).ToHaveAttributeAsync("aria-hidden", "true");
+        await Expect(toggle).ToBeFocusedAsync();
+
+        await toggle.ClickAsync();
+        await Expect(toggle).ToHaveAttributeAsync("aria-expanded", "true");
+        await session.Page.SetViewportSizeAsync(1280, 900);
+        await Expect(toggle).ToHaveAttributeAsync("aria-expanded", "false");
+        await session.Page.SetViewportSizeAsync(390, 844);
+        await Expect(drawer).ToHaveAttributeAsync("aria-hidden", "true");
+        Assert.NotNull(await drawer.GetAttributeAsync("inert"));
+        Assert.Empty(session.Problems);
+    }
+
+    [Fact]
+    public async Task La_barre_horizontale_se_replie_a_nouveau_apres_un_changement_de_breakpoint()
+    {
+        await using var session = await DocsSession.OpenAsync(site, "composants/navigation", width: 390, height: 844);
+        var toggle = session.Page.Locator(".ui-navbar-toggle");
+        var menu = session.Page.Locator(".ui-navbar-menu");
+
+        await toggle.ClickAsync();
+        await Expect(menu).ToHaveClassAsync(new System.Text.RegularExpressions.Regex("ui-navbar-menu-open"));
+
+        await session.Page.SetViewportSizeAsync(1280, 900);
+        await Expect(menu).Not.ToHaveClassAsync(new System.Text.RegularExpressions.Regex("ui-navbar-menu-open"));
+
+        await session.Page.SetViewportSizeAsync(390, 844);
+        await Expect(toggle).ToBeVisibleAsync();
+        await Expect(menu).Not.ToHaveClassAsync(new System.Text.RegularExpressions.Regex("ui-navbar-menu-open"));
+        Assert.Empty(session.Problems);
+    }
 }

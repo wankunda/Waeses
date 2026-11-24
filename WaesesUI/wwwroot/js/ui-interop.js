@@ -69,6 +69,22 @@ window.UiInterop = {
         };
 
         document.addEventListener('keydown', drawerEl._uiHandleEscape);
+
+        const mobile = window.matchMedia('(max-width: 640.98px)');
+        drawerEl._uiHandleDrawerBreakpoint = function (event) {
+            if (event.matches !== drawerEl._uiDrawerIsMobile) {
+                drawerEl._uiDrawerIsMobile = event.matches;
+                const isOpen = !!drawerEl._uiDrawerOpen;
+                drawerEl.inert = event.matches && !isOpen;
+                drawerEl.setAttribute('aria-hidden', String(event.matches && !isOpen));
+                if (drawerEl._uiDrawerOpen) {
+                    dotNetRef.invokeMethodAsync('CloseDrawerAsync');
+                }
+            }
+        };
+        drawerEl._uiDrawerIsMobile = mobile.matches;
+        mobile.addEventListener('change', drawerEl._uiHandleDrawerBreakpoint);
+        drawerEl._uiDrawerMediaQuery = mobile;
     },
 
     updateDrawer: function (drawerEl, toggleEl, closeEl, isOpen) {
@@ -80,7 +96,7 @@ window.UiInterop = {
         drawerEl.setAttribute('aria-hidden', String(isMobile && !isOpen));
         drawerEl._uiDrawerOpen = isOpen;
 
-        if (!isMobile || wasOpen === isOpen) return;
+        if (!isMobile || wasOpen === isOpen || (wasOpen === undefined && !isOpen)) return;
 
         if (isOpen) {
             drawerEl._uiPreviousFocus = document.activeElement;
@@ -96,9 +112,71 @@ window.UiInterop = {
     },
 
     teardownDrawer: function (drawerEl) {
-        if (!drawerEl || !drawerEl._uiHandleEscape) return;
-        document.removeEventListener('keydown', drawerEl._uiHandleEscape);
-        delete drawerEl._uiHandleEscape;
+        if (!drawerEl) return;
+        if (drawerEl._uiHandleEscape) {
+            document.removeEventListener('keydown', drawerEl._uiHandleEscape);
+            delete drawerEl._uiHandleEscape;
+        }
+        if (drawerEl._uiHandleDrawerBreakpoint && drawerEl._uiDrawerMediaQuery) {
+            drawerEl._uiDrawerMediaQuery.removeEventListener('change', drawerEl._uiHandleDrawerBreakpoint);
+            delete drawerEl._uiHandleDrawerBreakpoint;
+            delete drawerEl._uiDrawerMediaQuery;
+            delete drawerEl._uiDrawerIsMobile;
+        }
+    },
+
+    setupNavBarResize: function (rootEl, dotNetRef, breakpoint) {
+        if (!rootEl) return;
+
+        const media = window.matchMedia('(min-width: ' + breakpoint + 'px)');
+        let wasExpanded = media.matches;
+        rootEl._uiNavBarResizeListener = function (event) {
+            if (event.matches !== wasExpanded) {
+                wasExpanded = event.matches;
+                dotNetRef.invokeMethodAsync('CloseNavBarOnBreakpointChanged');
+            }
+        };
+        media.addEventListener('change', rootEl._uiNavBarResizeListener);
+        rootEl._uiNavBarMediaQuery = media;
+    },
+
+    teardownNavBarResize: function (rootEl) {
+        if (!rootEl || !rootEl._uiNavBarResizeListener) return;
+        rootEl._uiNavBarMediaQuery.removeEventListener('change', rootEl._uiNavBarResizeListener);
+        delete rootEl._uiNavBarResizeListener;
+        delete rootEl._uiNavBarMediaQuery;
+    },
+
+    setupCommandPalette: function (dotNetRef, shortcut) {
+        if (!dotNetRef || dotNetRef._uiCommandPaletteKeydown) return;
+
+        const parts = (shortcut || 'Ctrl+K').toLowerCase().split('+').map(function (part) { return part.trim(); });
+        const key = parts[parts.length - 1];
+        const wantsControl = parts.includes('ctrl') || parts.includes('control');
+        const wantsMeta = parts.includes('meta') || parts.includes('cmd') || parts.includes('command');
+        const wantsAlt = parts.includes('alt') || parts.includes('option');
+        const wantsShift = parts.includes('shift');
+
+        dotNetRef._uiCommandPaletteKeydown = function (event) {
+            const controlPressed = event.ctrlKey || event.metaKey;
+            if (event.repeat ||
+                event.key.toLowerCase() !== key ||
+                controlPressed !== (wantsControl || wantsMeta) ||
+                event.altKey !== wantsAlt ||
+                event.shiftKey !== wantsShift) {
+                return;
+            }
+
+            event.preventDefault();
+            dotNetRef.invokeMethodAsync('OpenFromShortcut');
+        };
+        document.addEventListener('keydown', dotNetRef._uiCommandPaletteKeydown);
+    },
+
+    teardownCommandPalette: function (dotNetRef) {
+        if (!dotNetRef || !dotNetRef._uiCommandPaletteKeydown) return;
+        document.removeEventListener('keydown', dotNetRef._uiCommandPaletteKeydown);
+        delete dotNetRef._uiCommandPaletteKeydown;
     },
 
     setupAutocomplete: function (rootEl, dotNetRef) {

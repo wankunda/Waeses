@@ -1,0 +1,26 @@
+@page "/composants/palette-de-commandes"
+
+<DocPage Href="composants/palette-de-commandes">
+    <DocSection Title="Palette de commandes" Description="`UiCommandPalette` présente des actions recherchables et groupées dans une modale accessible. Ouvrez-la avec le bouton de l'exemple ou `Ctrl+K`, recherchez par nom, description ou groupe, puis naviguez avec les flèches et validez avec Entrée. Échap ferme la palette.">
+        <DocExample Example="typeof(CommandPaletteExample)" />
+    </DocSection>
+
+    <DocSection Title="Utilisation">
+        <UiCodeBlock Language="razor" Code="@Snippet" />
+        <p>Pour l'ouvrir depuis une autre partie de l'application, injectez <code>IUiCommandPaletteService</code>, appelez <code>OpenAsync(commands)</code> et rendez une instance de <code>UiCommandPalette</code> dans le layout.</p>
+    </DocSection>
+
+    <DocSection Title="API">
+        <ApiTable Component="typeof(UiCommandPalette)" />
+        <p><code>UiCommand</code> définit <code>Label</code>, <code>Description</code>, <code>Group</code>, <code>Icon</code>, <code>Shortcut</code>, <code>Disabled</code> et l'action asynchrone <code>Execute</code>.</p>
+    </DocSection>
+</DocPage>
+
+@code {
+    private const string Snippet = """
+        <UiCommandPalette @bind-IsOpen="_commandsOpen"
+                          Commands="_commands"
+                          Shortcut="Ctrl+K"
+                          SearchPlaceholder="Rechercher une commande…" />
+        """;
+}
