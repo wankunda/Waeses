@@ -121,6 +121,22 @@ public sealed class AccessibilityFixesTests : TestContext
     }
 
     [Fact]
+    public void Le_tiroir_de_navigation_peut_etre_controle_par_IsOpen()
+    {
+        var isOpen = false;
+        var cut = RenderComponent<UiNavMenu>(p => p
+            .Add(c => c.Class, "navigation-custom")
+            .Add(c => c.IsOpen, isOpen)
+            .Add(c => c.IsOpenChanged, EventCallback.Factory.Create<bool>(this, value => isOpen = value)));
+
+        Assert.Contains("navigation-custom", cut.Find(".nav-menu-shell").ClassList);
+        cut.Find(".navbar-toggler").Click();
+
+        Assert.True(isOpen);
+        Assert.Contains("nav-drawer-open", cut.Find(".nav-drawer").ClassList);
+    }
+
+    [Fact]
     public void Le_bouton_de_fermeture_d_une_alerte_est_nomme_en_francais_et_personnalisable()
     {
         var alert = RenderComponent<UiAlert>(p => p.Add(c => c.Dismissible, true).Add(c => c.Message, "x"));

@@ -1,5 +1,6 @@
 using Bunit;
 using Bunit.TestDoubles;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.DependencyInjection;
@@ -65,6 +66,20 @@ public sealed class NavBarTests : TestContext
         cut.Find(".ui-navbar-toggle").Click();
 
         Assert.Equal("false", cut.Find(".ui-navbar-toggle").GetAttribute("aria-expanded"));
+    }
+
+    [Fact]
+    public void Le_menu_peut_etre_controle_par_IsOpen_et_notifie_ses_changements()
+    {
+        var isOpen = false;
+        var cut = RenderComponent<UiNavBar>(p => p
+            .Add(c => c.IsOpen, isOpen)
+            .Add(c => c.IsOpenChanged, EventCallback.Factory.Create<bool>(this, value => isOpen = value)));
+
+        cut.Find(".ui-navbar-toggle").Click();
+
+        Assert.True(isOpen);
+        Assert.Equal("true", cut.Find(".ui-navbar-toggle").GetAttribute("aria-expanded"));
     }
 
     [Fact]

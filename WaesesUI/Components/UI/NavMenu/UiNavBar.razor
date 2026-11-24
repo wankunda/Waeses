@@ -1,9 +1,10 @@
 @inject NavigationManager Navigation
-@implements IDisposable
+@inject IJSRuntime JS
+@implements IAsyncDisposable
 @namespace WaesesUI
 @inherits UiComponentBase
 
-<header class="@RootClass" style="@Style" @attributes="AdditionalAttributes" @onkeydown="OnKeyDown">
+<header @ref="_rootRef" class="@RootClass" style="@Style" @attributes="AdditionalAttributes" @onkeydown="OnKeyDown">
     <div class="ui-navbar-inner">
         <a class="ui-navbar-brand" href="@BrandHref">
             @if (BrandContent != null)
@@ -74,6 +75,10 @@
     [Parameter] public RenderFragment? EndContent { get; set; }
     /// <summary>Nom accessible de la navigation.</summary>
     [Parameter] public string AriaLabel { get; set; } = "Navigation principale";
+    /// <summary>Indique si le menu replié est ouvert. Peut être lié avec <c>bind-IsOpen</c>.</summary>
+    [Parameter] public bool IsOpen { get; set; }
+    /// <summary>Appelé lorsque le menu replié s'ouvre ou se ferme.</summary>
+    [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
     /// <summary>Largeur d'écran sous laquelle les liens se replient derrière le bouton hamburger.</summary>
     [Parameter] public UiBreakpoint CollapseBelow { get; set; } = UiBreakpoint.Md;
     /// <summary>Garde la barre en haut de l'écran pendant le défilement. Vrai par défaut.</summary>
@@ -81,8 +86,11 @@
 
     private readonly string _menuId = $"ui-navbar-menu-{Guid.NewGuid():N}";
     private IEnumerable<NavigationItem> Items => NavigationItems ?? Array.Empty<NavigationItem>();
+    private ElementReference _rootRef;
     private ElementReference _toggleRef;
+    private DotNetObjectReference<UiNavBar>? _dotNetRef;
     private bool _isOpen;
+    private bool _initialized;
 
     private string RootClass => CssBuilder.Default("ui-navbar")
         .Add($"ui-navbar-collapse-{CollapseBelow.ToString().ToLowerInvariant()}")
@@ -93,9 +101,48 @@
     protected override void OnInitialized() =>
         Navigation.LocationChanged += OnLocationChanged;
 
-    private void Toggle() => _isOpen = !_isOpen;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
 
-    private void Close() => _isOpen = false;
+        _dotNetRef = DotNetObjectReference.Create(this);
+        await JS.InvokeVoidAsync("UiInterop.setupNavBarResize", _rootRef, _dotNetRef, BreakpointPixels);
+    }
+
+    private int BreakpointPixels => CollapseBelow switch
+    {
+        UiBreakpoint.Sm => 640,
+        UiBreakpoint.Md => 768,
+        UiBreakpoint.Lg => 1024,
+        _ => throw new ArgumentOutOfRangeException(nameof(CollapseBelow), CollapseBelow, "Point de rupture non pris en charge.")
+    };
+
+    protected override void OnParametersSet()
+    {
+        if (!_initialized || IsOpenChanged.HasDelegate)
+        {
+            _isOpen = IsOpen;
+            _initialized = true;
+        }
+    }
+
+    private Task Toggle() => SetOpenAsync(!_isOpen);
+
+    private Task Close() => SetOpenAsync(false);
+
+    private async Task SetOpenAsync(bool isOpen)
+    {
+        if (_isOpen == isOpen)
+        {
+            return;
+        }
+
+        _isOpen = isOpen;
+        await IsOpenChanged.InvokeAsync(isOpen);
+    }
 
     private async Task OnKeyDown(KeyboardEventArgs e)
     {
@@ -104,8 +151,20 @@
             return;
         }
 
-        _isOpen = false;
+        await SetOpenAsync(false);
         await _toggleRef.FocusAsync();
+    }
+
+    [JSInvokable]
+    public async Task CloseNavBarOnBreakpointChanged()
+    {
+        if (!_isOpen)
+        {
+            return;
+        }
+
+        await SetOpenAsync(false);
+        await InvokeAsync(StateHasChanged);
     }
 
     // Un lien de EndContent, ou une navigation déclenchée par le code, referme aussi le menu.
@@ -113,10 +172,33 @@
     {
         if (_isOpen)
         {
-            _isOpen = false;
-            _ = InvokeAsync(StateHasChanged);
+            _ = InvokeAsync(async () =>
+            {
+                await SetOpenAsync(false);
+                StateHasChanged();
+            });
         }
     }
 
-    public void Dispose() => Navigation.LocationChanged -= OnLocationChanged;
+    public async ValueTask DisposeAsync()
+    {
+        Navigation.LocationChanged -= OnLocationChanged;
+        if (_dotNetRef is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await JS.InvokeVoidAsync("UiInterop.teardownNavBarResize", _rootRef);
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+        finally
+        {
+            _dotNetRef.Dispose();
+            _dotNetRef = null;
+        }
+    }
 }

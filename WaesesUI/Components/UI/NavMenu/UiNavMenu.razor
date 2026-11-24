@@ -1,8 +1,9 @@
 @inject IJSRuntime JS
 @implements IAsyncDisposable
 @namespace WaesesUI
+@inherits UiComponentBase
 
-<div class="nav-menu-shell">
+<div class="@CssBuilder.Default("nav-menu-shell").Add(Class).Build()" style="@Style" @attributes="AdditionalAttributes">
     <button type="button"
             class="navbar-toggler @(_isOpen ? "navbar-toggler-hidden" : "")"
             aria-label="@(_isOpen ? "Fermer le menu de navigation" : "Ouvrir le menu de navigation")"
@@ -63,6 +64,10 @@
     [Parameter] public string DrawerId { get; set; } = "main-navigation-drawer";
     /// <summary>Nom accessible de la navigation.</summary>
     [Parameter] public string AriaLabel { get; set; } = "Navigation principale";
+    /// <summary>Indique si le tiroir est ouvert. Peut être lié avec <c>bind-IsOpen</c>.</summary>
+    [Parameter] public bool IsOpen { get; set; }
+    /// <summary>Appelé lorsque le tiroir s'ouvre ou se ferme.</summary>
+    [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
     /// <summary>Liens du menu. Les éléments d'un même <c>Group</c> doivent se suivre.</summary>
     [Parameter] public IEnumerable<NavigationItem>? NavigationItems { get; set; }
 
@@ -75,6 +80,16 @@
     private ElementReference _closeRef;
     private DotNetObjectReference<UiNavMenu>? _dotNetRef;
     private bool _isOpen;
+    private bool _initialized;
+
+    protected override void OnParametersSet()
+    {
+        if (!_initialized || IsOpenChanged.HasDelegate)
+        {
+            _isOpen = IsOpen;
+            _initialized = true;
+        }
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -87,16 +102,27 @@
         await JS.InvokeVoidAsync("UiInterop.updateDrawer", _drawerRef, _toggleRef, _closeRef, _isOpen);
     }
 
-    private void ToggleDrawer() => _isOpen = !_isOpen;
+    private Task ToggleDrawer() => SetOpenAsync(!_isOpen);
 
-    private void CloseDrawer() => _isOpen = false;
+    private Task CloseDrawer() => SetOpenAsync(false);
+
+    private async Task SetOpenAsync(bool isOpen)
+    {
+        if (_isOpen == isOpen)
+        {
+            return;
+        }
+
+        _isOpen = isOpen;
+        await IsOpenChanged.InvokeAsync(isOpen);
+    }
 
     [JSInvokable]
-    public Task CloseDrawerAsync()
+    public Task CloseDrawerAsync() => InvokeAsync(async () =>
     {
-        _isOpen = false;
-        return InvokeAsync(StateHasChanged);
-    }
+        await SetOpenAsync(false);
+        StateHasChanged();
+    });
 
     public async ValueTask DisposeAsync()
 {

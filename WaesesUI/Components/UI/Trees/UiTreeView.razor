@@ -1,0 +1,320 @@
+@typeparam TItem
+@namespace WaesesUI
+@inherits UiComponentBase
+
+<div @attributes="AdditionalAttributes"
+     id="@TreeId"
+     class="ui-treeview @Class"
+     style="@RootStyle"
+     role="tree"
+     tabindex="0"
+     aria-label="@AriaLabel"
+     aria-activedescendant="@ActiveDescendantId"
+     @onkeydown="HandleKeyDown">
+    @RenderNodes(Nodes, string.Empty, 1)
+</div>
+
+@code {
+    private readonly HashSet<UiTreeNode<TItem>> _expandedNodes = new(ReferenceEqualityComparer.Instance);
+    private readonly HashSet<UiTreeNode<TItem>> _initializedNodes = new(ReferenceEqualityComparer.Instance);
+    private readonly string _generatedId = $"ui-tree-{Guid.NewGuid():N}";
+    private UiTreeNode<TItem>? _activeNode;
+    private UiTreeNode<TItem>? _selectedNode;
+    private UiTreeNode<TItem>? _lastSelectedParameter;
+
+    /// <summary>Les nœuds racine de l'arborescence.</summary>
+    [Parameter, EditorRequired] public IReadOnlyList<UiTreeNode<TItem>> Nodes { get; set; } = Array.Empty<UiTreeNode<TItem>>();
+
+    /// <summary>Gabarit facultatif du contenu affiché pour un nœud.</summary>
+    [Parameter] public RenderFragment<UiTreeNode<TItem>>? NodeTemplate { get; set; }
+
+    /// <summary>Nœud sélectionné ; peut être lié avec <c>@bind-SelectedNode</c>.</summary>
+    [Parameter] public UiTreeNode<TItem>? SelectedNode { get; set; }
+
+    /// <summary>Appelé à chaque changement de sélection.</summary>
+    [Parameter] public EventCallback<UiTreeNode<TItem>?> SelectedNodeChanged { get; set; }
+
+    /// <summary>Appelé lorsqu'un nœud est développé.</summary>
+    [Parameter] public EventCallback<UiTreeNode<TItem>> NodeExpanded { get; set; }
+
+    /// <summary>Appelé lorsqu'un nœud est réduit.</summary>
+    [Parameter] public EventCallback<UiTreeNode<TItem>> NodeCollapsed { get; set; }
+
+    /// <summary>Identifiant HTML de l'arborescence ; généré automatiquement si absent.</summary>
+    [Parameter] public string? Id { get; set; }
+
+    /// <summary>Nom accessible de l'arborescence.</summary>
+    [Parameter] public string AriaLabel { get; set; } = "Arborescence";
+
+    private string TreeId => string.IsNullOrWhiteSpace(Id) ? _generatedId : Id;
+    private string? ActiveDescendantId
+    {
+        get
+        {
+            if (_activeNode is null)
+                return null;
+
+            var active = GetVisibleNodes().FirstOrDefault(entry => ReferenceEquals(entry.Node, _activeNode));
+            return active is null ? null : NodeId(active.Path);
+        }
+    }
+
+    private string RootStyle => string.IsNullOrWhiteSpace(Style)
+        ? "color:var(--text-main)"
+        : $"color:var(--text-main);{Style}";
+
+    protected override void OnParametersSet()
+    {
+        var allNodes = GetAllNodes();
+        var currentNodes = new HashSet<UiTreeNode<TItem>>(allNodes.Select(entry => entry.Node), ReferenceEqualityComparer.Instance);
+        _expandedNodes.RemoveWhere(node => !currentNodes.Contains(node));
+        _initializedNodes.RemoveWhere(node => !currentNodes.Contains(node));
+
+        foreach (var entry in allNodes)
+        {
+            if (_initializedNodes.Add(entry.Node) && entry.Node.InitiallyExpanded && entry.Node.Children.Count > 0)
+                _expandedNodes.Add(entry.Node);
+        }
+
+        if (SelectedNodeChanged.HasDelegate || !ReferenceEquals(SelectedNode, _lastSelectedParameter))
+        {
+            _selectedNode = SelectedNode is { IsDisabled: false } ? SelectedNode : null;
+            _lastSelectedParameter = SelectedNode;
+        }
+
+        var visibleNodes = GetVisibleNodes();
+        if (_activeNode is null || !visibleNodes.Any(entry => ReferenceEquals(entry.Node, _activeNode) && !entry.Node.IsDisabled))
+        {
+            _activeNode = visibleNodes.FirstOrDefault(entry => !entry.Node.IsDisabled)?.Node;
+        }
+    }
+
+    private RenderFragment RenderNodes(IReadOnlyList<UiTreeNode<TItem>> nodes, string parentPath, int level) => builder =>
+    {
+        var sequence = 0;
+        builder.OpenElement(sequence++, "ul");
+        builder.AddAttribute(sequence++, "role", "group");
+        builder.AddAttribute(sequence++, "class", "ui-treeview-group");
+        builder.AddAttribute(sequence++, "style", parentPath.Length == 0
+            ? "list-style:none;margin:0;padding:0"
+            : "list-style:none;margin:0;padding-inline-start:1.25rem");
+
+        for (var index = 0; index < nodes.Count; index++)
+        {
+            var node = nodes[index];
+            var path = parentPath.Length == 0 ? index.ToString() : $"{parentPath}/{index}";
+            var hasChildren = node.Children.Count > 0;
+            var expanded = hasChildren && _expandedNodes.Contains(node);
+            var selected = ReferenceEquals(_selectedNode, node);
+
+            builder.OpenElement(sequence++, "li");
+            builder.SetKey(node);
+            builder.AddAttribute(sequence++, "id", NodeId(path));
+            builder.AddAttribute(sequence++, "role", "treeitem");
+            builder.AddAttribute(sequence++, "class", $"ui-treeview-item{(selected ? " ui-treeview-item-selected" : string.Empty)}{(node.IsDisabled ? " ui-treeview-item-disabled" : string.Empty)}");
+            builder.AddAttribute(sequence++, "aria-level", level);
+            builder.AddAttribute(sequence++, "aria-posinset", index + 1);
+            builder.AddAttribute(sequence++, "aria-setsize", nodes.Count);
+            builder.AddAttribute(sequence++, "aria-selected", selected ? "true" : "false");
+            if (hasChildren)
+                builder.AddAttribute(sequence++, "aria-expanded", expanded ? "true" : "false");
+            if (node.IsDisabled)
+                builder.AddAttribute(sequence++, "aria-disabled", "true");
+            builder.AddAttribute(sequence++, "onclick", EventCallback.Factory.Create<MouseEventArgs>(this, () => SelectNodeAsync(node)));
+            builder.AddEventStopPropagationAttribute(sequence++, "onclick", true);
+
+            builder.OpenElement(sequence++, "div");
+            builder.AddAttribute(sequence++, "role", "presentation");
+            builder.AddAttribute(sequence++, "class", "ui-treeview-row");
+            builder.AddAttribute(sequence++, "style", RowStyle(selected, node.IsDisabled));
+
+            if (hasChildren)
+            {
+                builder.OpenElement(sequence++, "button");
+                builder.AddAttribute(sequence++, "type", "button");
+                builder.AddAttribute(sequence++, "class", "ui-treeview-toggle");
+                builder.AddAttribute(sequence++, "tabindex", "-1");
+                builder.AddAttribute(sequence++, "disabled", node.IsDisabled);
+                builder.AddAttribute(sequence++, "aria-label", $"{(expanded ? "Réduire" : "Développer")} {node.Label}");
+                builder.AddAttribute(sequence++, "onclick", EventCallback.Factory.Create<MouseEventArgs>(this, () => ToggleExpansionAsync(node)));
+                builder.AddEventStopPropagationAttribute(sequence++, "onclick", true);
+                builder.AddAttribute(sequence++, "style", "width:1.5rem;height:1.5rem;padding:0;border:0;border-radius:var(--radius-sm);background:transparent;color:inherit;font:inherit;cursor:pointer");
+                builder.AddContent(sequence++, expanded ? "⌄" : "›");
+                builder.CloseElement();
+            }
+            else
+            {
+                builder.OpenElement(sequence++, "span");
+                builder.AddAttribute(sequence++, "class", "ui-treeview-toggle-placeholder");
+                builder.AddAttribute(sequence++, "aria-hidden", "true");
+                builder.AddAttribute(sequence++, "style", "display:inline-block;width:1.5rem");
+                builder.CloseElement();
+            }
+
+            if (NodeTemplate is null)
+                builder.AddContent(sequence++, node.Label);
+            else
+                builder.AddContent(sequence++, NodeTemplate(node));
+
+            builder.CloseElement();
+
+            if (expanded)
+                builder.AddContent(sequence++, RenderNodes(node.Children, path, level + 1));
+
+            builder.CloseElement();
+        }
+
+        builder.CloseElement();
+    };
+
+    private static string RowStyle(bool selected, bool disabled) =>
+        $"display:flex;align-items:center;gap:.35rem;min-height:2rem;padding:.15rem .35rem;border-radius:var(--radius-sm);cursor:{(disabled ? "default" : "pointer")};{(selected ? "background:var(--primary-light);" : string.Empty)}{(disabled ? "opacity:.6;" : string.Empty)}";
+
+    private string NodeId(string path) => $"{TreeId}-node-{path.Replace('/', '-')}";
+
+    private async Task SelectNodeAsync(UiTreeNode<TItem> node)
+    {
+        if (node.IsDisabled)
+            return;
+
+        _activeNode = node;
+        _selectedNode = node;
+        await SelectedNodeChanged.InvokeAsync(node);
+    }
+
+    private async Task ToggleExpansionAsync(UiTreeNode<TItem> node)
+    {
+        if (node.IsDisabled || node.Children.Count == 0)
+            return;
+
+        if (_expandedNodes.Remove(node))
+            await NodeCollapsed.InvokeAsync(node);
+        else
+        {
+            _expandedNodes.Add(node);
+            await NodeExpanded.InvokeAsync(node);
+        }
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs args)
+    {
+        var visibleNodes = GetVisibleNodes();
+        if (visibleNodes.Count == 0)
+            return;
+
+        var currentIndex = visibleNodes.FindIndex(entry => ReferenceEquals(entry.Node, _activeNode));
+        switch (args.Key)
+        {
+            case "ArrowDown":
+                SetActiveAt(visibleNodes, FindEnabledIndex(visibleNodes, Math.Max(-1, currentIndex) + 1, 1));
+                break;
+            case "ArrowUp":
+                SetActiveAt(visibleNodes, FindEnabledIndex(visibleNodes, currentIndex < 0 ? visibleNodes.Count : currentIndex - 1, -1));
+                break;
+            case "Home":
+                SetActiveAt(visibleNodes, FindEnabledIndex(visibleNodes, 0, 1));
+                break;
+            case "End":
+                SetActiveAt(visibleNodes, FindEnabledIndex(visibleNodes, visibleNodes.Count - 1, -1));
+                break;
+            case "ArrowRight":
+                if (currentIndex < 0)
+                    break;
+                var current = visibleNodes[currentIndex];
+                if (current.Node.Children.Count == 0)
+                    break;
+                if (!_expandedNodes.Contains(current.Node))
+                    await ToggleExpansionAsync(current.Node);
+                else
+                {
+                    var child = visibleNodes.FirstOrDefault(entry => ReferenceEquals(entry.Parent, current.Node) && !entry.Node.IsDisabled);
+                    if (child is not null)
+                        _activeNode = child.Node;
+                }
+                break;
+            case "ArrowLeft":
+                if (currentIndex < 0)
+                    break;
+                var currentEntry = visibleNodes[currentIndex];
+                if (_expandedNodes.Contains(currentEntry.Node))
+                    await ToggleExpansionAsync(currentEntry.Node);
+                else if (currentEntry.Parent is { IsDisabled: false } parent)
+                    _activeNode = parent;
+                break;
+            case "Enter":
+            case " ":
+                if (currentIndex >= 0)
+                    await SelectNodeAsync(visibleNodes[currentIndex].Node);
+                break;
+        }
+    }
+
+    private static int FindEnabledIndex(IReadOnlyList<VisibleNode> nodes, int start, int direction)
+    {
+        for (var index = start; index >= 0 && index < nodes.Count; index += direction)
+        {
+            if (!nodes[index].Node.IsDisabled)
+                return index;
+        }
+
+        return -1;
+    }
+
+    private void SetActiveAt(IReadOnlyList<VisibleNode> nodes, int index)
+    {
+        if (index >= 0 && index < nodes.Count)
+            _activeNode = nodes[index].Node;
+    }
+
+    private List<VisibleNode> GetVisibleNodes()
+    {
+        var visibleNodes = new List<VisibleNode>();
+        AddVisibleNodes(Nodes, string.Empty, null, visibleNodes);
+        return visibleNodes;
+    }
+
+    private List<VisibleNode> GetAllNodes()
+    {
+        var allNodes = new List<VisibleNode>();
+        var seenNodes = new HashSet<UiTreeNode<TItem>>(ReferenceEqualityComparer.Instance);
+        AddAllNodes(Nodes, string.Empty, null, allNodes, seenNodes);
+        return allNodes;
+    }
+
+    private void AddVisibleNodes(
+        IReadOnlyList<UiTreeNode<TItem>> nodes,
+        string parentPath,
+        UiTreeNode<TItem>? parent,
+        List<VisibleNode> result)
+    {
+        for (var index = 0; index < nodes.Count; index++)
+        {
+            var node = nodes[index];
+            var path = parentPath.Length == 0 ? index.ToString() : $"{parentPath}/{index}";
+            result.Add(new VisibleNode(node, path, parent));
+            if (_expandedNodes.Contains(node) && node.Children.Count > 0)
+                AddVisibleNodes(node.Children, path, node, result);
+        }
+    }
+
+    private static void AddAllNodes(
+        IReadOnlyList<UiTreeNode<TItem>> nodes,
+        string parentPath,
+        UiTreeNode<TItem>? parent,
+        List<VisibleNode> result,
+        HashSet<UiTreeNode<TItem>> seenNodes)
+    {
+        for (var index = 0; index < nodes.Count; index++)
+        {
+            var node = nodes[index] ?? throw new InvalidOperationException("Un nœud de l'arborescence ne peut pas être null.");
+            if (!seenNodes.Add(node))
+                throw new InvalidOperationException("Chaque nœud doit apparaître une seule fois dans l'arborescence, sans cycle.");
+
+            var path = parentPath.Length == 0 ? index.ToString() : $"{parentPath}/{index}";
+            result.Add(new VisibleNode(node, path, parent));
+            AddAllNodes(node.Children, path, node, result, seenNodes);
+        }
+    }
+
+    private sealed record VisibleNode(UiTreeNode<TItem> Node, string Path, UiTreeNode<TItem>? Parent);
+}

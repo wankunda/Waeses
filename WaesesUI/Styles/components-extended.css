@@ -418,3 +418,27 @@ button.ui-accordion-header { width: 100%; border: 0; font: inherit; text-align: 
 .ui-form-group[class*="ui-color-"] .ui-multiselect-trigger:focus-within { border-color: var(--ui-c); box-shadow: 0 0 0 3px var(--ui-c-light); }
 .ui-field-filled .ui-multiselect-trigger:focus-within { background: var(--bg-surface-tertiary); border-bottom-color: var(--ui-c, var(--primary)); box-shadow: none; }
 .ui-field-text .ui-multiselect-trigger:focus-within { border-bottom-color: var(--ui-c, var(--primary)); box-shadow: none; }
+
+.ui-command-palette-backdrop { z-index: 9100; }
+.ui-command-palette { width: min(100%, 42rem); max-width: 42rem; max-height: min(80vh, 42rem); padding: 0; color: var(--text-main); }
+.ui-command-palette > .ui-modal-body { padding: 0; overflow: hidden; }
+.ui-command-palette-content { display: flex; flex-direction: column; max-height: min(80vh, 42rem); overflow: hidden; }
+.ui-command-palette-search { display: flex; align-items: center; gap: .75rem; padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-default); }
+.ui-command-palette-input { flex: 1; min-width: 0; border: 0; background: transparent; box-shadow: none; }
+.ui-command-palette-input:focus { box-shadow: none; }
+.ui-command-palette-input:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; border-radius: var(--radius-sm); }
+.ui-command-palette-shortcut, .ui-command-palette-option-shortcut { color: var(--text-muted); font-size: .75rem; white-space: nowrap; }
+.ui-command-palette-list { max-height: min(65vh, 34rem); overflow-y: auto; padding: .5rem; }
+.ui-command-palette-group { padding: .6rem .75rem .3rem; color: var(--text-muted); font-size: .7rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.ui-command-palette-option { display: flex; align-items: center; gap: .75rem; width: 100%; padding: .7rem .75rem; border: 0; border-radius: var(--radius-md); color: var(--text-main); background: transparent; font: inherit; text-align: left; cursor: pointer; }
+.ui-command-palette-option:hover:not(:disabled), .ui-command-palette-option-selected { background: var(--bg-surface-secondary); }
+.ui-command-palette-option:focus-visible { outline: 2px solid var(--border-focus); outline-offset: -2px; }
+.ui-command-palette-option:disabled { opacity: .5; cursor: not-allowed; }
+.ui-command-palette-option-content { display: flex; flex: 1; flex-direction: column; min-width: 0; }
+.ui-command-palette-description { color: var(--text-secondary); font-size: .8rem; }
+.ui-command-palette-empty { padding: 1.5rem .75rem; color: var(--text-secondary); text-align: center; }
+
+@media (max-width: 560px) {
+    .ui-command-palette-backdrop { padding: .75rem; }
+    .ui-command-palette, .ui-command-palette-content { max-height: 85vh; }
+}
