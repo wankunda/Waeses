@@ -1,7 +1,7 @@
 @page "/composants/navigation"
 
 <DocPage Href="composants/navigation">
-    <DocSection Title="Menu latéral" Description="`UiNavMenu` est le menu de l'application (celui de cette documentation). Il se règle avec une liste de `NavigationItem`, se replie en tiroir sur petit écran et accepte `HeaderContent` pour une recherche. Il occupe le bord de l'écran : il est donc présenté en code plutôt qu'en exemple vivant.">
+    <DocSection Title="Menu latéral" Description="`UiNavMenu` est le menu de l'application (celui de cette documentation). Il se règle avec une liste de `NavigationItem`, se replie en tiroir sur petit écran et accepte `HeaderContent` pour une recherche. Son état est local par défaut ou contrôlable avec `@@bind-IsOpen`. Il démarre fermé sur mobile et reste visible sur grand écran. Il occupe le bord de l'écran : il est donc présenté en code plutôt qu'en exemple vivant.">
         <UiCodeBlock Code="@Snippets.NavMenuUsage" Language="razor" />
         <div class="api-table-wrap">
             <table class="ui-table ui-table-compact">
@@ -19,7 +19,7 @@
         </div>
     </DocSection>
 
-    <DocSection Title="Barre de navigation" Description="`UiNavBar` est une barre horizontale : le nom de l'application à gauche, les liens (`NavigationItem`) à droite, puis `EndContent` pour un bouton ou un menu de compte. Sous la largeur `CollapseBelow` (768 px par défaut), les liens se replient derrière un bouton hamburger ; le panneau se ferme au choix d'un lien ou avec `Échap`. `BrandContent` remplace le nom par un logo.">
+    <DocSection Title="Barre de navigation" Description="`UiNavBar` est une barre horizontale : le nom de l'application à gauche, les liens (`NavigationItem`) à droite, puis `EndContent` pour un bouton ou un menu de compte. Sous la largeur `CollapseBelow` (768 px par défaut), les liens se replient derrière un bouton hamburger ; le panneau se ferme au choix d'un lien, avec `Échap` ou lors d'un changement de breakpoint. `IsOpen` / `IsOpenChanged` permettent de contrôler son état depuis le parent. `BrandContent` remplace le nom par un logo.">
         <DocExample Example="typeof(NavBarExample)" />
     </DocSection>
 

@@ -1,8 +1,9 @@
 @inject IThemeService ThemeService
 @implements IDisposable
 @namespace WaesesUI
+@inherits UiComponentBase
 
-<div class="page">
+<div class="@CssBuilder.Default("page").Add(Class).Build()" style="@Style" @attributes="AdditionalAttributes">
     @NavMenu
     <main class="min-h-100 d-flex flex-column">
         <header class="d-flex justify-space-between align-center position-sticky"

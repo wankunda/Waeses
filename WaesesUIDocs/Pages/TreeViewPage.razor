@@ -1,0 +1,25 @@
+@page "/composants/arborescence"
+
+<DocPage Href="composants/arborescence">
+    <DocSection Title="Arborescence" Description="`UiTreeView<TItem>` affiche des données hiérarchiques. Les nœuds peuvent être développés ou réduits avec les boutons ou les flèches gauche/droite ; Haut, Bas, Début et Fin déplacent le nœud actif. Entrée ou Espace sélectionne le nœud.">
+        <DocExample Example="typeof(TreeViewExample)" />
+    </DocSection>
+
+    <DocSection Title="Utilisation">
+        <UiCodeBlock Language="razor" Code="@Snippet" />
+    </DocSection>
+
+    <DocSection Title="API">
+        <ApiTable Component="typeof(UiTreeView<>)" />
+        <p>Chaque <code>UiTreeNode&lt;TItem&gt;</code> contient une donnée, un libellé, des enfants optionnels, ainsi que les options <code>isDisabled</code> et <code>initiallyExpanded</code>.</p>
+    </DocSection>
+</DocPage>
+
+@code {
+    private const string Snippet = """
+        <UiTreeView TItem="string"
+                    Nodes="_nodes"
+                    @bind-SelectedNode="_selectedNode"
+                    AriaLabel="Dossiers" />
+        """;
+}

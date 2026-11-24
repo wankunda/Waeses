@@ -1,7 +1,8 @@
 @inject IThemeService ThemeService
 @namespace WaesesUI
+@inherits UiComponentBase
 
-<main class="auth-layout">
+<main class="@CssBuilder.Default("auth-layout").Add(Class).Build()" style="@Style" @attributes="AdditionalAttributes">
     <header class="d-flex justify-space-between align-center position-sticky"
             style="background: var(--bg-surface); border-bottom: 1px solid var(--border-default); padding: calc(0.85rem + env(safe-area-inset-top, 0px)) calc(1.5rem + env(safe-area-inset-right, 0px)) 0.85rem calc(1.5rem + env(safe-area-inset-left, 0px)); top: 0; z-index: 100; backdrop-filter: blur(10px);">
         <div class="d-flex align-center justify-center gap-sm">

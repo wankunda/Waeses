@@ -275,12 +275,10 @@
 </CascadingValue>
 
 @code {
-    private sealed record SortEntry(string Key, bool Descending);
-
     private static readonly UiFilterOperator[] Operators = Enum.GetValues<UiFilterOperator>();
 
     private readonly List<UiColumn<TItem>> _columns = new();
-    private readonly List<SortEntry> _sorts = new();
+    private readonly List<UiSortDefinition> _sorts = new();
     private readonly Dictionary<string, (UiFilterOperator Operator, string? Value)> _filters = new();
     private readonly HashSet<TItem> _expanded = new();
     private readonly HashSet<string> _collapsedGroups = new();
@@ -518,37 +516,15 @@
         if (IsServerMode) return _serverItems;
         if (Items == null) return new List<TItem>();
 
-        IEnumerable<TItem> list = Items;
-
-        if (ShowSearch && !string.IsNullOrWhiteSpace(_searchQuery))
-        {
-            list = FilterPredicate != null
-                ? list.Where(item => FilterPredicate(item, _searchQuery))
-                : list.Where(item => VisibleColumns.Any(col => col.GetText(item).Contains(_searchQuery, StringComparison.CurrentCultureIgnoreCase)));
-        }
-
-        foreach (var (key, (op, value)) in _filters)
-        {
-            if (!IsActive(op, value)) continue;
-            var col = _columns.FirstOrDefault(c => c.EffectiveKey == key);
-            if (col?.Field == null) continue;
-            list = list.Where(item => UiFilterEvaluator.Matches(col.GetValue(item), op, value));
-        }
-
-        IOrderedEnumerable<TItem>? ordered = null;
-        foreach (var sort in _sorts)
-        {
-            var col = _columns.FirstOrDefault(c => c.EffectiveKey == sort.Key);
-            if (col?.Field == null) continue;
-            var selector = col.Field;
-            ordered = ordered switch
-            {
-                null => sort.Descending ? list.OrderByDescending(selector) : list.OrderBy(selector),
-                _ => sort.Descending ? ordered.ThenByDescending(selector) : ordered.ThenBy(selector)
-            };
-        }
-
-        return (ordered ?? list).ToList();
+        return UiGridViewProcessor.Build(
+            Items,
+            _columns,
+            VisibleColumns.ToList(),
+            ShowSearch,
+            _searchQuery,
+            FilterPredicate,
+            _filters,
+            _sorts);
     }
 
     private int TotalCount => IsServerMode ? _serverTotal : View.Count;
@@ -685,7 +661,7 @@
         else
         {
             if (!additive || !MultiSort) _sorts.Clear();
-            _sorts.Add(new SortEntry(key, false));
+            _sorts.Add(new UiSortDefinition(key, false));
         }
 
         await AfterQueryChangedAsync();

@@ -1,0 +1,25 @@
+<UiTreeView TItem="string"
+            Nodes="_nodes"
+            @bind-SelectedNode="_selectedNode"
+            AriaLabel="Dossiers du projet" />
+
+@if (_selectedNode is not null)
+{
+    <p class="mt-sm">Élément sélectionné : @_selectedNode.Label</p>
+}
+
+@code {
+    private UiTreeNode<string>? _selectedNode;
+    private readonly IReadOnlyList<UiTreeNode<string>> _nodes =
+    [
+        new("src", "src", [
+            new("components", "Composants", [
+                new("button", "UiButton.razor"),
+                new("tree", "UiTreeView.razor")
+            ], initiallyExpanded: true),
+            new("services", "Services")
+        ], initiallyExpanded: true),
+        new("tests", "Tests", [new("unit", "Tests unitaires")]),
+        new("readme", "README.md")
+    ];
+}

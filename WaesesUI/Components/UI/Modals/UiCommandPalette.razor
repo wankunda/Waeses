@@ -1,0 +1,330 @@
+@namespace WaesesUI
+@inherits UiComponentBase
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+@inject IUiCommandPaletteService CommandPaletteService
+
+<UiModal IsOpen="_isOpen"
+         IsOpenChanged="HandleModalOpenChanged"
+         CloseOnBackdropClick="true"
+         CloseOnEscape="false"
+         FocusTrap="true"
+         LockScroll="true"
+         ShowCloseButton="false"
+         Class="@CssBuilder.Default("ui-command-palette").Add(Class).Build()"
+         Style="@Style"
+         BackdropClass="ui-command-palette-backdrop"
+         @attributes="AdditionalAttributes"
+         aria-labelledby="@_dialogTitleId">
+    <ChildContent>
+        <div class="ui-command-palette-content" @onkeydown="HandleKeyDown">
+            <span id="@_dialogTitleId" class="ui-sr-only">@AriaLabel</span>
+            <div class="ui-command-palette-search">
+                <input class="ui-input ui-command-palette-input"
+                       type="search"
+                       role="combobox"
+                       aria-label="@SearchLabel"
+                       aria-autocomplete="list"
+                       aria-expanded="true"
+                       aria-controls="@_listId"
+                       aria-activedescendant="@ActiveOptionId"
+                       placeholder="@SearchPlaceholder"
+                       value="@_searchText"
+                       @oninput="HandleSearchInput" />
+                <span class="ui-command-palette-shortcut" aria-hidden="true">@Shortcut</span>
+            </div>
+
+            <div id="@_listId" class="ui-command-palette-list" role="listbox" aria-label="@AriaLabel">
+                @if (FilteredCommands.Count == 0)
+                {
+                    <div class="ui-command-palette-empty" role="status">@EmptyText</div>
+                }
+                else
+                {
+                    var optionIndex = 0;
+                    @foreach (var group in GroupedCommands)
+                    {
+                        @if (!string.IsNullOrWhiteSpace(group.Key))
+                        {
+                            <div class="ui-command-palette-group" role="presentation">@group.Key</div>
+                        }
+
+                        @foreach (var command in group)
+                        {
+                            var currentIndex = optionIndex++;
+                            var selected = currentIndex == _selectedIndex;
+                            <button id="@OptionId(currentIndex)"
+                                    type="button"
+                                    tabindex="-1"
+                                    class="ui-command-palette-option @(selected ? "ui-command-palette-option-selected" : null)"
+                                    role="option"
+                                    aria-selected="@(selected ? "true" : "false")"
+                                    aria-disabled="@(command.Disabled ? "true" : "false")"
+                                    disabled="@command.Disabled"
+                                    @onclick="() => ExecuteCommandAsync(command)">
+                                @if (!string.IsNullOrWhiteSpace(command.Icon))
+                                {
+                                    <span class="ui-command-palette-icon" aria-hidden="true">@command.Icon</span>
+                                }
+                                <span class="ui-command-palette-option-content">
+                                    <span class="ui-command-palette-label">@command.Label</span>
+                                    @if (!string.IsNullOrWhiteSpace(command.Description))
+                                    {
+                                        <span class="ui-command-palette-description">@command.Description</span>
+                                    }
+                                </span>
+                                @if (!string.IsNullOrWhiteSpace(command.Shortcut))
+                                {
+                                    <span class="ui-command-palette-option-shortcut">@command.Shortcut</span>
+                                }
+                            </button>
+                        }
+                    }
+                }
+            </div>
+        </div>
+    </ChildContent>
+</UiModal>
+
+@code {
+    private readonly string _instanceId = $"ui-command-palette-{Guid.NewGuid():N}";
+    private readonly string _dialogTitleId = $"ui-command-palette-title-{Guid.NewGuid():N}";
+    private string _searchText = string.Empty;
+    private int _selectedIndex = -1;
+    private bool _isOpen;
+    private bool _initialized;
+    private bool _shortcutSetUp;
+    private string? _registeredShortcut;
+    private IReadOnlyList<UiCommand>? _serviceCommands;
+    private DotNetObjectReference<UiCommandPalette>? _dotNetRef;
+
+    private string _listId => $"{_instanceId}-list";
+    private IReadOnlyList<UiCommand> ActiveCommands => _serviceCommands ?? Commands;
+    private string? ActiveOptionId =>
+        _selectedIndex >= 0 && _selectedIndex < FilteredCommands.Count
+            ? OptionId(_selectedIndex)
+            : null;
+
+    /// <summary>Commandes proposées dans la palette.</summary>
+    [Parameter] public IReadOnlyList<UiCommand> Commands { get; set; } = Array.Empty<UiCommand>();
+
+    /// <summary>Indique si la palette est ouverte ; prend en charge la liaison bidirectionnelle.</summary>
+    [Parameter] public bool IsOpen { get; set; }
+
+    /// <summary>Appelé lorsque l'état d'ouverture de la palette change.</summary>
+    [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
+
+    /// <summary>Texte indicatif du champ de recherche.</summary>
+    [Parameter] public string SearchPlaceholder { get; set; } = "Rechercher une commande…";
+
+    /// <summary>Nom accessible du champ de recherche.</summary>
+    [Parameter] public string SearchLabel { get; set; } = "Rechercher une commande";
+
+    /// <summary>Nom accessible de la boîte de dialogue et de la liste de commandes.</summary>
+    [Parameter] public string AriaLabel { get; set; } = "Palette de commandes";
+
+    /// <summary>Texte du raccourci et combinaison enregistrée par l'interopérabilité JavaScript.</summary>
+    [Parameter] public string Shortcut { get; set; } = "Ctrl+K";
+
+    /// <summary>Texte affiché lorsqu'aucune commande ne correspond à la recherche.</summary>
+    [Parameter] public string EmptyText { get; set; } = "Aucune commande trouvée.";
+
+    private List<UiCommand> FilteredCommands
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(_searchText))
+            {
+                return ActiveCommands.ToList();
+            }
+
+            return ActiveCommands
+                .Where(command =>
+                    command.Label.Contains(_searchText, StringComparison.OrdinalIgnoreCase) ||
+                    (command.Description?.Contains(_searchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    (command.Group?.Contains(_searchText, StringComparison.OrdinalIgnoreCase) ?? false))
+                .ToList();
+        }
+    }
+
+    private IEnumerable<IGrouping<string?, UiCommand>> GroupedCommands =>
+        FilteredCommands.GroupBy(command => string.IsNullOrWhiteSpace(command.Group) ? null : command.Group);
+
+    protected override void OnParametersSet()
+    {
+        if (!_initialized || IsOpenChanged.HasDelegate)
+        {
+            var wasOpen = _isOpen;
+            _isOpen = IsOpen;
+            if (_isOpen && !wasOpen)
+            {
+                ResetSearchAndSelection();
+            }
+            _initialized = true;
+        }
+
+        EnsureValidSelection();
+    }
+
+    protected override void OnInitialized()
+    {
+        CommandPaletteService.OpenRequested += OpenFromServiceAsync;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_shortcutSetUp && string.Equals(_registeredShortcut, Shortcut, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        _dotNetRef ??= DotNetObjectReference.Create(this);
+        if (_shortcutSetUp)
+        {
+            await JS.InvokeVoidAsync("UiInterop.teardownCommandPalette", _dotNetRef);
+        }
+
+        await JS.InvokeVoidAsync("UiInterop.setupCommandPalette", _dotNetRef, Shortcut);
+        _registeredShortcut = Shortcut;
+        _shortcutSetUp = true;
+    }
+
+    private string OptionId(int index) => $"{_instanceId}-option-{index}";
+
+    private void HandleSearchInput(ChangeEventArgs args)
+    {
+        _searchText = args.Value?.ToString() ?? string.Empty;
+        SelectFirstEnabledCommand();
+    }
+
+    private Task HandleModalOpenChanged(bool open) => SetOpenAsync(open);
+
+    private Task OpenFromServiceAsync(IReadOnlyList<UiCommand> commands) => InvokeAsync(async () =>
+    {
+        _serviceCommands = commands;
+        ResetSearchAndSelection();
+        await SetOpenAsync(true);
+        StateHasChanged();
+    });
+
+    private async Task HandleKeyDown(KeyboardEventArgs args)
+    {
+        switch (args.Key)
+        {
+            case "ArrowDown":
+                MoveSelection(1);
+                break;
+            case "ArrowUp":
+                MoveSelection(-1);
+                break;
+            case "Enter":
+                if (_selectedIndex >= 0 && _selectedIndex < FilteredCommands.Count)
+                {
+                    await ExecuteCommandAsync(FilteredCommands[_selectedIndex]);
+                }
+                break;
+            case "Escape":
+                await CloseAsync();
+                break;
+        }
+    }
+
+    private void MoveSelection(int direction)
+    {
+        var commands = FilteredCommands;
+        if (commands.Count == 0 || !commands.Any(command => !command.Disabled))
+        {
+            _selectedIndex = -1;
+            return;
+        }
+
+        var index = _selectedIndex;
+        for (var attempt = 0; attempt < commands.Count; attempt++)
+        {
+            index = (index + direction + commands.Count) % commands.Count;
+            if (!commands[index].Disabled)
+            {
+                _selectedIndex = index;
+                return;
+            }
+        }
+    }
+
+    private async Task ExecuteCommandAsync(UiCommand command)
+    {
+        if (command.Disabled)
+        {
+            return;
+        }
+
+        await command.Execute();
+        await SetOpenAsync(false);
+    }
+
+    private async Task CloseAsync() => await SetOpenAsync(false);
+
+    private async Task SetOpenAsync(bool value)
+    {
+        if (_isOpen == value)
+        {
+            return;
+        }
+
+        _isOpen = value;
+        if (value)
+        {
+            ResetSearchAndSelection();
+        }
+
+        await IsOpenChanged.InvokeAsync(value);
+    }
+
+    private void ResetSearchAndSelection()
+    {
+        _searchText = string.Empty;
+        SelectFirstEnabledCommand();
+    }
+
+    private void SelectFirstEnabledCommand()
+    {
+        _selectedIndex = FilteredCommands.FindIndex(command => !command.Disabled);
+    }
+
+    private void EnsureValidSelection()
+    {
+        var commands = FilteredCommands;
+        if (_selectedIndex < 0 || _selectedIndex >= commands.Count || commands[_selectedIndex].Disabled)
+        {
+            SelectFirstEnabledCommand();
+        }
+    }
+
+    [JSInvokable]
+    public async Task OpenFromShortcut()
+    {
+        await SetOpenAsync(true);
+        StateHasChanged();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        try
+        {
+            CommandPaletteService.OpenRequested -= OpenFromServiceAsync;
+            if (_shortcutSetUp && _dotNetRef is not null)
+            {
+                await JS.InvokeVoidAsync("UiInterop.teardownCommandPalette", _dotNetRef);
+            }
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+        finally
+        {
+            _dotNetRef?.Dispose();
+            _dotNetRef = null;
+            _shortcutSetUp = false;
+            _registeredShortcut = null;
+        }
+    }
+}
