@@ -1,7 +1,5 @@
-@inject IThemeService ThemeService
-@implements IDisposable
 @namespace WaesesUI
-@inherits UiComponentBase
+@inherits UiLayoutBase
 
 <div class="@CssBuilder.Default("page").Add(Class).Build()" style="@Style" @attributes="AdditionalAttributes">
     @NavMenu
@@ -50,7 +48,7 @@
         @if (FooterText != string.Empty)
         {
             <span style="font-size: 0.85rem; color: var(--text-secondary);">
-                @(FooterText ?? $"© {DateTime.Now.Year} Waeses. All rights reserved.")
+                @FooterLabel
             </span>
         }
         @Footer
@@ -58,64 +56,8 @@
 }
 
 @code {
-    /// <summary>Nom de l'application, affiché dans l'en-tête.</summary>
-    [Parameter] public string BrandText { get; set; } = "Waeses UI";
-    /// <summary>Icône ou emoji devant le nom.</summary>
-    [Parameter] public string? BrandIcon { get; set; } = "⚡";
     /// <summary>Texte du badge de version dans l'en-tête. Vide ou <c>null</c> : aucun badge.</summary>
     [Parameter] public string? VersionText { get; set; } = "1.0";
-    /// <summary>Affiche le bouton clair/sombre dans l'en-tête.</summary>
-    [Parameter] public bool ShowThemeToggle { get; set; } = true;
-    /// <summary>Indique si le mode sombre est actif.</summary>
-    [Parameter] public bool IsDarkMode { get; set; }
-    /// <summary>Appelé quand l'utilisateur change de mode.</summary>
-    [Parameter] public EventCallback<bool> IsDarkModeChanged { get; set; }
-        /// <summary>Indique si le texte (label) mode sombre est affiché.</summary>
-    [Parameter] public bool IsShowTextMode { get; set; }
-    string ModeText => IsDarkMode ? "Mode Clair" : "Mode Sombre";
-    string ModeIcon => IsDarkMode ? "☀️" : "🌙";
-    /// <summary>Contenu de la page (le <c>Body</c> du layout Blazor).</summary>
-    [Parameter] public RenderFragment? MainBody { get; set; }
-    /// <summary>Contenu supplémentaire du pied de page.</summary>
-    [Parameter] public RenderFragment? Footer { get; set; }
-
-    /// <summary>Affiche le pied de page (texte et fragment <see cref="Footer"/>). Vrai par défaut.</summary>
-    [Parameter] public bool ShowFooter { get; set; } = true;
-
-    /// <summary>Texte du pied de page. Null : « © année Waeses. All rights reserved. » ; chaîne vide : aucun texte.</summary>
-    [Parameter] public string? FooterText { get; set; }
     /// <summary>Menu de navigation latéral, généralement un <c>UiNavMenu</c>.</summary>
     [Parameter] public RenderFragment? NavMenu { get; set; }
-
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await ThemeService.InitializeThemeAsync();
-            IsDarkMode = ThemeService.IsDarkMode;
-            await IsDarkModeChanged.InvokeAsync(IsDarkMode);
-            ThemeService.OnThemeChanged += HandleThemeChanged;
-            StateHasChanged();
-        }
-    }
-
-    private async Task ToggleTheme()
-    {
-        await ThemeService.ToggleThemeAsync();
-        IsDarkMode = ThemeService.IsDarkMode;
-        await IsDarkModeChanged.InvokeAsync(IsDarkMode);
-    }
-
-    private async void HandleThemeChanged()
-    {
-        IsDarkMode = ThemeService.IsDarkMode;
-        await IsDarkModeChanged.InvokeAsync(IsDarkMode);
-        await InvokeAsync(StateHasChanged);
-    }
-
-    public void Dispose()
-    {
-        ThemeService.OnThemeChanged -= HandleThemeChanged;
-    }
 }

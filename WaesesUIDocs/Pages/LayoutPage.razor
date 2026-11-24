@@ -1,7 +1,7 @@
 @page "/composants/mise-en-page"
 
 <DocPage Href="composants/mise-en-page">
-    <DocSection Title="Structure de l'application" Description="`UiLayout` assemble l'en-tête (nom, version, bouton clair/sombre), le menu latéral et le contenu : c'est la structure de ce site. `UiSimpleLayout` fait de même sans menu, pour les pages de connexion ou plein cadre. Un layout occupe toute la page : il est présenté en code.">
+    <DocSection Title="Structure de l'application" Description="`UiLayout` assemble l'en-tête (nom, version, bouton clair/sombre), le menu latéral et le contenu : c'est la structure de ce site. `UiSimpleLayout` fait de même sans menu, pour les pages de connexion ou plein cadre. Les trois layouts héritent de `UiLayoutBase`, qui regroupe leurs paramètres communs (nom, bouton clair/sombre, `MainBody`, pied de page) : un layout personnalisé peut en hériter aussi. Un layout occupe toute la page : il est présenté en code.">
         <UiCodeBlock Code="@Snippets.LayoutUsage" Language="razor" />
         <UiCodeBlock Code="@Snippets.SimpleLayoutUsage" Language="razor" />
     </DocSection>

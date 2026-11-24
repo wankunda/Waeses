@@ -19,6 +19,8 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Les
   - `UiDialogResult.Ok<T>()` et `DataType`.
 - `UiModal` : `Position`, `FullScreen`, `DefaultFocus` et `BackdropClass`, comme les dialogues.
 - `UiTabLayout` : layout à onglets, sur le modèle de `UiLayout` et `UiSimpleLayout` (en-tête avec nom et bouton clair/sombre, `MainBody`, pied de page optionnel). La navigation est une barre d'onglets `NavigationItem` (icône et libellé, onglet actif en couleur primaire), placée en bas de l'écran ou sous l'en-tête avec `TabsPosition` (`UiTabBarPosition.Bottom` par défaut, ou `Top`). Sans JavaScript.
+- `UiLayoutBase` : classe de base des layouts (`UiLayout`, `UiSimpleLayout`, `UiTabLayout`). Elle regroupe les paramètres communs (`BrandText`, `BrandIcon`, `ShowThemeToggle`, `IsShowTextMode`, `IsDarkMode`, `IsDarkModeChanged`, `MainBody`, `Footer`, `ShowFooter`, `FooterText`) et la gestion du mode clair/sombre. Un layout personnalisé peut en hériter (`@inherits UiLayoutBase`).
+- `UiSimpleLayout.IsShowTextMode` (vrai par défaut, comme avant) : `false` n'affiche que l'emoji du bouton clair/sombre.
 - `UiNavBar` : barre de navigation horizontale (nom ou logo, liens `NavigationItem`, zone `EndContent`). Sous la largeur `CollapseBelow` (`UiBreakpoint` : 640, 768 ou 1024 px ; 768 par défaut), les liens se replient derrière un bouton hamburger. Sans JavaScript.
 - `UiToastContainer.Position` : position par défaut des toasts qui n'en précisent pas une. Un toast affiché avec `position:` (ou `ToastModel.Position`) garde la sienne. Ordre de priorité : position du toast, puis `UiToastContainer.Position`, puis `UiOptions.ToastPosition`.
 
@@ -31,6 +33,7 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Les
 - `ToastModel.Position` est maintenant nullable (`ToastPosition?`, null par défaut) : `null` signifie « position par défaut du conteneur ». `IToastService.ShowToast` ne remplace plus un `position` absent par `UiOptions.ToastPosition` ; c'est le conteneur qui le fait à l'affichage. Le code qui lisait `toast.Position` doit gérer `null`.
 
 ### Corrigé
+- `UiSimpleLayout` ne se désabonnait pas du service du thème à sa destruction (il n'implémentait pas `IDisposable`). C'est maintenant fait par `UiLayoutBase`.
 - Bouton clair/sombre de `UiLayout` : sans texte visible (`IsShowTextMode="false"`, par défaut), il n'avait pour nom accessible que l'emoji. Il porte maintenant `aria-label` « Mode Sombre » ou « Mode Clair », et l'emoji est masqué aux lecteurs d'écran.
 - `UiModal` et les dialogues en taille `Xs` gardaient la largeur `Md` (540 px) : le style inline écrasait la classe `ui-modal-xs`. Ils mesurent maintenant 320 px.
 - `ui-grid-cols-2`, `ui-grid-cols-3` et `ui-grid-cols-4` : sur un petit écran, la colonne gardait sa largeur minimale (320, 280 ou 220 px) même quand le conteneur était plus étroit. Les champs placés dans la grille, comme `UiDatePicker`, dépassaient alors de leur carte. La largeur minimale est maintenant plafonnée à celle du conteneur.

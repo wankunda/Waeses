@@ -107,4 +107,28 @@ public sealed class TabLayoutTests : TestContext
         Assert.Equal("Mode Sombre", layout.GetAttribute("aria-label"));
         Assert.Equal("true", layout.QuerySelector("span")!.GetAttribute("aria-hidden"));
     }
+
+    [Fact]
+    public void Les_trois_layouts_partagent_la_base_commune()
+    {
+        Assert.True(typeof(UiLayoutBase).IsAssignableFrom(typeof(UiLayout)));
+        Assert.True(typeof(UiLayoutBase).IsAssignableFrom(typeof(UiSimpleLayout)));
+        Assert.True(typeof(UiLayoutBase).IsAssignableFrom(typeof(UiTabLayout)));
+
+        // Valeurs par défaut propres à chaque layout, posées par leur constructeur.
+        Assert.True(new UiLayout().ShowFooter);
+        Assert.False(new UiTabLayout().ShowFooter);
+        Assert.False(new UiLayout().IsShowTextMode);
+        Assert.True(new UiSimpleLayout().IsShowTextMode);
+    }
+
+    [Fact]
+    public void UiSimpleLayout_affiche_le_libelle_du_bouton_de_theme_sauf_si_on_le_masque()
+    {
+        Assert.Equal("Mode Sombre", RenderComponent<UiSimpleLayout>().Find("header button .mode-theme-text").TextContent);
+
+        var sansTexte = RenderComponent<UiSimpleLayout>(p => p.Add(c => c.IsShowTextMode, false)).Find("header button");
+        Assert.Equal("", sansTexte.QuerySelector(".mode-theme-text")!.TextContent);
+        Assert.Equal("Mode Sombre", sansTexte.GetAttribute("aria-label"));
+    }
 }
