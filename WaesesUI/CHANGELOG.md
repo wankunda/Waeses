@@ -18,6 +18,8 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Les
   - `UiDialogParameters<TComponent>` : `Add(x => x.Param, valeur)`, nom vérifié à la compilation ; `UiDialogParameters.Get<T>()`.
   - `UiDialogResult.Ok<T>()` et `DataType`.
 - `UiModal` : `Position`, `FullScreen`, `DefaultFocus` et `BackdropClass`, comme les dialogues.
+- `UiLayoutBase` : classe de base des layouts (`UiLayout`, `UiSimpleLayout`, `UiTabLayout`). Elle regroupe les paramètres communs (`BrandText`, `BrandIcon`, `ShowThemeToggle`, `IsDarkMode`, `IsDarkModeChanged`, `MainBody`, `Footer`, `ShowFooter`, `FooterText`) et la gestion du mode clair/sombre. Un layout personnalisé peut en hériter (`@inherits UiLayoutBase`).
+- `UiTabLayout` accepte `Class`, `Style` et les attributs HTML libres, comme les autres layouts.
 - `UiTabLayout` : layout à onglets, sur le modèle de `UiLayout` et `UiSimpleLayout` (en-tête avec nom et bouton clair/sombre, `MainBody`, pied de page optionnel). La navigation est une barre d'onglets `NavigationItem` (icône et libellé, onglet actif en couleur primaire), placée en bas de l'écran ou sous l'en-tête avec `TabsPosition` (`UiTabBarPosition.Bottom` par défaut, ou `Top`). Sans JavaScript.
 - `UiNavBar` : barre de navigation horizontale (nom ou logo, liens `NavigationItem`, zone `EndContent`). Sous la largeur `CollapseBelow` (`UiBreakpoint` : 640, 768 ou 1024 px ; 768 par défaut), les liens se replient derrière un bouton hamburger. Sans JavaScript.
 - `UiToastContainer.Position` : position par défaut des toasts qui n'en précisent pas une. Un toast affiché avec `position:` (ou `ToastModel.Position`) garde la sienne. Ordre de priorité : position du toast, puis `UiToastContainer.Position`, puis `UiOptions.ToastPosition`.
@@ -31,6 +33,8 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Les
 - `ToastModel.Position` est maintenant nullable (`ToastPosition?`, null par défaut) : `null` signifie « position par défaut du conteneur ». `IToastService.ShowToast` ne remplace plus un `position` absent par `UiOptions.ToastPosition` ; c'est le conteneur qui le fait à l'affichage. Le code qui lisait `toast.Position` doit gérer `null`.
 
 ### Corrigé
+- `UiSimpleLayout` ne se désabonnait pas du service du thème à sa destruction (il n'implémentait pas `IDisposable`). C'est maintenant fait par `UiLayoutBase`.
+- `waeses.min.css` n'était plus à jour depuis la fusion de `UiTabLayout` (deux versions du fichier s'y suivaient) : il est régénéré.
 - `UiModal` et les dialogues en taille `Xs` gardaient la largeur `Md` (540 px) : le style inline écrasait la classe `ui-modal-xs`. Ils mesurent maintenant 320 px.
 - `ui-grid-cols-2`, `ui-grid-cols-3` et `ui-grid-cols-4` : sur un petit écran, la colonne gardait sa largeur minimale (320, 280 ou 220 px) même quand le conteneur était plus étroit. Les champs placés dans la grille, comme `UiDatePicker`, dépassaient alors de leur carte. La largeur minimale est maintenant plafonnée à celle du conteneur.
 - `UiThemeProvider` : changer `Theme` (ou la densité, les palettes) pouvait ne jamais réappliquer le thème. L'indicateur « configuration changée » était recalculé à chaque `OnParametersSet` ; si le parent se re-rendait deux fois avant `OnAfterRenderAsync` (courant dans un BlazorWebView), le second appel l'écrasait. Le composant compare maintenant la configuration voulue à celle déjà appliquée.
