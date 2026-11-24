@@ -421,14 +421,16 @@ window.UiInterop = {
     setupModal: function (modalEl, dotNetRef, options) {
         if (!modalEl) return;
 
-        modalEl._uiHandleKeyDown = function (e) {
-            // Escape key
-            if (e.key === 'Escape') {
-                e.preventDefault();
-                dotNetRef.invokeMethodAsync('OnEscapePressed');
-                return;
-            }
+        // Échap s'écoute sur tout le document, et non sur la modale seule : juste après l'ouverture, le focus
+        // est encore sur le bouton déclencheur (il n'entre dans la modale qu'à l'image suivante), et la touche
+        // n'atteindrait pas la modale. Seule la modale du dessus de la pile se ferme.
+        modalEl._uiHandleEscape = function (e) {
+            if (e.key !== 'Escape' || window.UiInterop._topModal() !== modalEl) return;
+            e.preventDefault();
+            dotNetRef.invokeMethodAsync('OnEscapePressed');
+        };
 
+        modalEl._uiHandleKeyDown = function (e) {
             // Focus trap on Tab
             if (e.key === 'Tab') {
                 const focusable = window.UiInterop._getFocusableElements(modalEl);
@@ -452,6 +454,7 @@ window.UiInterop = {
         };
 
         modalEl.addEventListener('keydown', modalEl._uiHandleKeyDown);
+        document.addEventListener('keydown', modalEl._uiHandleEscape);
         modalEl._uiPreviousFocus = document.activeElement;
         window.UiInterop._modalStack.push(modalEl);
 
@@ -474,6 +477,15 @@ window.UiInterop = {
     // Modales ouvertes, de la plus ancienne à la plus récente.
     _modalStack: [],
 
+    // Modale ouverte la plus récente encore présente dans la page.
+    _topModal: function () {
+        const stack = window.UiInterop._modalStack;
+        for (let i = stack.length - 1; i >= 0; i--) {
+            if (stack[i].isConnected) return stack[i];
+        }
+        return null;
+    },
+
     // Tear down focus trap
     teardownModal: function (modalEl) {
         const stack = window.UiInterop._modalStack;
@@ -494,6 +506,10 @@ window.UiInterop = {
         if (target._uiHandleKeyDown) {
             target.removeEventListener('keydown', target._uiHandleKeyDown);
             delete target._uiHandleKeyDown;
+        }
+        if (target._uiHandleEscape) {
+            document.removeEventListener('keydown', target._uiHandleEscape);
+            delete target._uiHandleEscape;
         }
 
         // Rend le focus à l'élément qui a ouvert la modale
