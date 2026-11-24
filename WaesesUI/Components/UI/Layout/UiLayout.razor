@@ -30,7 +30,7 @@
                     <button type="button" class="ui-btn ui-btn-secondary ui-btn-sm"
                             style="border-radius: var(--radius-full); padding: 0.4rem 0.85rem;" @onclick="ToggleTheme">
                         <span>@ModeIcon</span>
-                            <span class="mode-theme-text">@ModeText</span>
+                            <span class="mode-theme-text">@(IsShowTextMode ? ModeText : string.Empty)</span>
                     </button>
                 </UiTooltip>
             </div>
@@ -69,6 +69,8 @@
     [Parameter] public bool IsDarkMode { get; set; }
     /// <summary>Appelé quand l'utilisateur change de mode.</summary>
     [Parameter] public EventCallback<bool> IsDarkModeChanged { get; set; }
+        /// <summary>Indique si le texte (label) mode sombre est affiché.</summary>
+    [Parameter] public bool IsShowTextMode { get; set; }
     string ModeText => IsDarkMode ? "Mode Clair" : "Mode Sombre";
     string ModeIcon => IsDarkMode ? "☀️" : "🌙";
     /// <summary>Contenu de la page (le <c>Body</c> du layout Blazor).</summary>
