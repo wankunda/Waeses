@@ -76,9 +76,13 @@ public sealed class TabLayoutTests : TestContext
     [Fact]
     public void En_haut_la_barre_suit_l_en_tete_avant_le_contenu()
     {
-        var root = Render(UiTabBarPosition.Top).Find(".ui-tablayout");
+        var root = RenderComponent<UiTabLayout>(p => p
+            .Add(c => c.NavigationItems, Tabs)
+            .Add(c => c.TabsPosition, UiTabBarPosition.Top)
+            .Add(c => c.Class, "mon-layout")).Find(".ui-tablayout");
 
         Assert.Contains("ui-tablayout-top", root.ClassList);
+        Assert.Contains("mon-layout", root.ClassList);
         Assert.NotNull(root.QuerySelector(".ui-tablayout-head > header + nav.ui-tablayout-tabs"));
         Assert.Single(root.QuerySelectorAll("nav"));
     }
