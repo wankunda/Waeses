@@ -2792,6 +2792,23 @@ main article{
 /* ==========================================================================\n+   AUTHENTICATION\n+   ========================================================================== */
 
 .auth-layout { min-height: 100vh; }
+
+/* Layout à onglets (UiTabLayout). L'en-tête reste en haut pendant le défilement ; la barre d'onglets aussi (Top) ou reste collée
+   au bas de l'écran (Bottom). min-height: 100vh pousse la barre du bas tout en bas même quand la page est courte. */
+.ui-tablayout { display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; }
+.ui-tablayout-head { position: sticky; top: 0; z-index: 100; }
+.ui-tablayout-tabs { display: flex; align-items: stretch; background: var(--bg-surface); }
+.ui-tablayout-bottom > .ui-tablayout-tabs { position: sticky; bottom: 0; z-index: 100; border-top: 1px solid var(--border-default); padding: 0 env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); }
+.ui-tablayout-head > .ui-tablayout-tabs { border-bottom: 1px solid var(--border-default); padding: 0 env(safe-area-inset-right, 0px) 0 env(safe-area-inset-left, 0px); }
+.ui-tablayout-tab { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .2rem; min-height: 3.5rem; padding: .45rem .125rem; color: var(--text-secondary); font-size: .75rem; font-weight: 500; text-decoration: none; transition: color var(--trans-fast), background-color var(--trans-fast); }
+.ui-tablayout-tab .ui-icon { width: 1.5rem; height: 1.5rem; color: currentColor; }
+.ui-tablayout-tab-label { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ui-tablayout-tab:hover { color: var(--text-main); background: var(--bg-surface-secondary); }
+.ui-tablayout-tab.active, .ui-tablayout-tab.active:hover { color: var(--primary); font-weight: 600; }
+.ui-tablayout-top .ui-tablayout-tab { border-bottom: 2px solid transparent; }
+.ui-tablayout-top .ui-tablayout-tab.active { border-bottom-color: var(--primary); }
+.ui-tablayout-tab-disabled, .ui-tablayout-tab-disabled:hover { color: var(--text-secondary); background: transparent; opacity: .5; cursor: not-allowed; }
+.ui-tablayout-tab:focus-visible { outline: 2px solid var(--border-focus); outline-offset: -2px; }
 .auth-page {
     min-height: 90vh;
     padding: 2rem clamp(1rem, 4vw, 4rem) 1.5rem;

@@ -18,6 +18,7 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Les
   - `UiDialogParameters<TComponent>` : `Add(x => x.Param, valeur)`, nom vérifié à la compilation ; `UiDialogParameters.Get<T>()`.
   - `UiDialogResult.Ok<T>()` et `DataType`.
 - `UiModal` : `Position`, `FullScreen`, `DefaultFocus` et `BackdropClass`, comme les dialogues.
+- `UiTabLayout` : layout à onglets, sur le modèle de `UiLayout` et `UiSimpleLayout` (en-tête avec nom et bouton clair/sombre, `MainBody`, pied de page optionnel). La navigation est une barre d'onglets `NavigationItem` (icône et libellé, onglet actif en couleur primaire), placée en bas de l'écran ou sous l'en-tête avec `TabsPosition` (`UiTabBarPosition.Bottom` par défaut, ou `Top`). Sans JavaScript.
 - `UiNavBar` : barre de navigation horizontale (nom ou logo, liens `NavigationItem`, zone `EndContent`). Sous la largeur `CollapseBelow` (`UiBreakpoint` : 640, 768 ou 1024 px ; 768 par défaut), les liens se replient derrière un bouton hamburger. Sans JavaScript.
 - `UiToastContainer.Position` : position par défaut des toasts qui n'en précisent pas une. Un toast affiché avec `position:` (ou `ToastModel.Position`) garde la sienne. Ordre de priorité : position du toast, puis `UiToastContainer.Position`, puis `UiOptions.ToastPosition`.
 

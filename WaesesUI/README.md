@@ -106,6 +106,8 @@ Les composants sont organises par familles :
 
 | Famille | Composants |
 | --- | --- |
+| Actions | `UiButton`, `UiBadge` |
+| Layout et navigation | `UiLayout`, `UiSimpleLayout`, `UiTabLayout`, `UiNavMenu`, `UiNavMenuItem`, `UiNavBar`, `UiBreadcrumbs`, `UiStepper` |
 | Actions | `UiButton`, `UiBadge`, `UiCommandPalette` |
 | Layout et navigation | `UiLayout`, `UiSimpleLayout`, `UiNavMenu`, `UiNavMenuItem`, `UiNavBar`, `UiBreadcrumbs`, `UiStepper` |
 | Formulaires | `UiFormField`, `UiInput`, `UiTextArea`, `UiSelect`, `UiMultiSelect`, `UiCombobox`, `UiColorPicker`, `UiTimePicker`, `UiDateRangePicker`, `UiTagInput`, `UiLocaleSwitcher`, `UiAutocomplete`, `UiDateTimePicker`, `UiDatePicker`, `UiCalendar`, `UiCheckbox`, `UiSwitch`, `UiSlider`, `UiRadioGroup`, `UiRadioOption`, `UiInputFile` |
@@ -174,6 +176,11 @@ Pour un site a navigation horizontale, `UiNavBar` affiche le nom, les liens et u
 }
 ```
 
+Pour une application mobile (Blazor Hybrid, PWA), `UiTabLayout` garde l'en-tete des autres layouts et remplace le menu par une barre d'onglets (icone et libelle). `TabsPosition` la place en bas (`UiTabBarPosition.Bottom`, par defaut) ou en haut (`Top`) :
+
+```razor
+<UiTabLayout BrandText="Mon Budget" NavigationItems="@Items" TabsPosition="UiTabBarPosition.Bottom" MainBody="@Body" />
+```
 `UiNavMenu` et `UiNavBar` acceptent aussi `IsOpen` et `IsOpenChanged` pour ouvrir ou fermer leur menu depuis le parent. Sans liaison, ils gèrent leur état localement. Le drawer du `UiNavMenu` démarre fermé sur mobile et se referme au changement de breakpoint.
 
 Pour un ecran autonome, comme une page de connexion, utilisez `UiSimpleLayout` avec le fragment `MainBody`.
