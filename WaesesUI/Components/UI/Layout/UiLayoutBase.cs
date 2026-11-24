@@ -24,6 +24,9 @@ public abstract class UiLayoutBase : UiComponentBase, IDisposable
     /// <summary>Indique si le mode sombre est actif.</summary>
     [Parameter] public bool IsDarkMode { get; set; }
 
+    /// <summary>Indique si le label du mode est affiché.</summary>
+    [Parameter] public bool IsShowLabelMode { get; set; }
+
     /// <summary>Appelé quand l'utilisateur change de mode.</summary>
     [Parameter] public EventCallback<bool> IsDarkModeChanged { get; set; }
 
