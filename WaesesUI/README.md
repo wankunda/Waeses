@@ -107,7 +107,7 @@ Les composants sont organises par familles :
 | Famille | Composants |
 | --- | --- |
 | Actions | `UiButton`, `UiBadge` |
-| Layout et navigation | `UiLayout`, `UiSimpleLayout`, `UiNavMenu`, `UiNavMenuItem`, `UiNavBar`, `UiBreadcrumbs`, `UiStepper` |
+| Layout et navigation | `UiLayout`, `UiSimpleLayout`, `UiTabLayout`, `UiNavMenu`, `UiNavMenuItem`, `UiNavBar`, `UiBreadcrumbs`, `UiStepper` |
 | Formulaires | `UiFormField`, `UiInput`, `UiTextArea`, `UiSelect`, `UiMultiSelect`, `UiCombobox`, `UiColorPicker`, `UiTimePicker`, `UiDateRangePicker`, `UiTagInput`, `UiLocaleSwitcher`, `UiAutocomplete`, `UiDateTimePicker`, `UiDatePicker`, `UiCalendar`, `UiCheckbox`, `UiSwitch`, `UiSlider`, `UiRadioGroup`, `UiRadioOption`, `UiInputFile` |
 | Contenu | `UiCard`, `UiList`, `UiListItem`, `UiChip`, `UiDivider`, `UiCodeBlock`, `UiCopyButton`, `UiImage`, `UiImageGallery`, `UiLightbox`, `UiCarousel`, `UiFilePreview`, `UiAvatar`, `UiAvatarGroup`, `UiAvatarMenu` |
 | Feedback | `UiAlert`, `UiCallout`, `UiTimeline`, `UiLocalizedText`, `UiSpinner`, `UiSkeleton`, `UiEmptyState`, `UiErrorState`, `UiLoadingOverlay`, `UiTooltip`, `UiAccordion`, `UiAccordionItem`, `UiToastContainer`, `UiMessageBoxProvider` |
@@ -168,6 +168,12 @@ Pour un site a navigation horizontale, `UiNavBar` affiche le nom, les liens et u
         <UiButton Size="UiSize.Sm" Href="/connexion">Connexion</UiButton>
     </EndContent>
 </UiNavBar>
+```
+
+Pour une application mobile (Blazor Hybrid, PWA), `UiTabLayout` garde l'en-tete des autres layouts et remplace le menu par une barre d'onglets (icone et libelle). `TabsPosition` la place en bas (`UiTabBarPosition.Bottom`, par defaut) ou en haut (`Top`) :
+
+```razor
+<UiTabLayout BrandText="Mon Budget" NavigationItems="@Items" TabsPosition="UiTabBarPosition.Bottom" MainBody="@Body" />
 ```
 
 Pour un ecran autonome, comme une page de connexion, utilisez `UiSimpleLayout` avec le fragment `MainBody`.

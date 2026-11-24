@@ -131,6 +131,26 @@ public static class Snippets
         <UiSimpleLayout BrandText="Mon application" MainBody="@Body" />
         """;
 
+    public const string TabLayoutUsage = """
+        @* Layout à onglets, comme une application mobile : l'en-tête en haut, une barre d'onglets (icône et libellé) en bas. *@
+        @inherits LayoutComponentBase
+
+        <UiTabLayout BrandText="Mon Budget" BrandIcon="" NavigationItems="_tabs"
+                     TabsPosition="UiTabBarPosition.Bottom" MainBody="@Body" />
+
+        @code {
+            // Un onglet = une page (@page). L'onglet de la page affichée prend la couleur primaire.
+            private readonly NavigationItem[] _tabs =
+            {
+                new() { Text = "Accueil", Href = "", Icon = Icons.Material.Filled.Dashboard, Match = NavLinkMatch.All },
+                new() { Text = "Transactions", Href = "transactions", Icon = Icons.Material.Filled.ReceiptLong },
+                new() { Text = "Budgets", Href = "budgets", Icon = Icons.Material.Filled.Savings },
+                new() { Text = "Comptes", Href = "comptes", Icon = Icons.Material.Filled.AccountBalanceWallet },
+                new() { Text = "Réglages", Href = "reglages", Icon = Icons.Material.Filled.Settings }
+            };
+        }
+        """;
+
     public const string CssVariables = """
         /* Surcharge ponctuelle, sans écrire de thème complet */
         :root {

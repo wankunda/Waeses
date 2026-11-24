@@ -51,6 +51,16 @@ public enum UiDrawerPosition
     Right
 }
 
+/// <summary>Bord de l'écran où <see cref="UiTabLayout"/> place sa barre d'onglets.</summary>
+public enum UiTabBarPosition
+{
+    /// <summary>Sous l'en-tête, en haut de la page.</summary>
+    Top,
+
+    /// <summary>En bas de l'écran, comme dans une application mobile.</summary>
+    Bottom
+}
+
 /// <summary>Largeur d'écran de référence pour les composants qui changent de forme sur petit écran (<see cref="UiNavBar"/>).</summary>
 public enum UiBreakpoint
 {

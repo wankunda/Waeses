@@ -6,11 +6,16 @@
         <UiCodeBlock Code="@Snippets.SimpleLayoutUsage" Language="razor" />
     </DocSection>
 
+    <DocSection Title="Layout à onglets" Description="`UiTabLayout` suit les mêmes principes (`BrandText`, `BrandIcon`, bouton clair/sombre, `MainBody`, pied de page) mais remplace le menu latéral par une barre d'onglets : une icône et un libellé par page, l'onglet de la page affichée en couleur primaire. Les onglets sont des `NavigationItem`. `TabsPosition` place la barre en bas de l'écran (`Bottom`, défaut, comme une application mobile) ou sous l'en-tête (`Top`). Le pied de page est masqué par défaut (`ShowFooter`).">
+        <UiCodeBlock Code="@Snippets.TabLayoutUsage" Language="razor" />
+    </DocSection>
+
     <DocSection Title="Thème, mode et densité" Description="`UiThemeProvider` pose le mode (clair, sombre ou celui du système), la densité et, avec `Definition`, le thème décrit en C#. Voir le [guide du thème](guides/theme)." />
 
     <DocSection Title="API">
         <ApiTable Component="typeof(UiLayout)" />
         <ApiTable Component="typeof(UiSimpleLayout)" />
+        <ApiTable Component="typeof(UiTabLayout)" />
         <ApiTable Component="typeof(UiThemeProvider)" />
     </DocSection>
 </DocPage>
