@@ -3,7 +3,7 @@
 <DocPage Href="composants/mise-en-page">
     <DocSection Title="Structure de l'application" Description="`UiLayout` assemble l'en-tête (nom, version, bouton clair/sombre), le menu latéral et le contenu : c'est la structure de ce site. `UiSimpleLayout` fait de même sans menu, pour les pages de connexion ou plein cadre. Un layout occupe toute la page : il est présenté en code.">
         <UiCodeBlock Code="@Snippets.LayoutUsage" Language="razor" />
-        <UiCodeBlock Code="@Snippets.SimpleLayoutUsage" Language="razor" />
+        <UiCodeBlock Code="@Snippets.SimpleLayoutUsage" Language="razor" Class="mt-xs" />
     </DocSection>
 
     <DocSection Title="Layout à onglets" Description="`UiTabLayout` suit les mêmes principes (`BrandText`, `BrandIcon`, bouton clair/sombre, `MainBody`, pied de page) mais remplace le menu latéral par une barre d'onglets : une icône et un libellé par page, l'onglet de la page affichée en couleur primaire. Les onglets sont des `NavigationItem`. `TabsPosition` place la barre en bas de l'écran (`Bottom`, défaut, comme une application mobile) ou sous l'en-tête (`Top`). Le pied de page est masqué par défaut (`ShowFooter`).">

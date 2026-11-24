@@ -22,8 +22,14 @@
                 <UiTooltip Text="@ModeText" Position="TooltipPosition.Left">
                     <button type="button" class="ui-btn ui-btn-secondary ui-btn-sm"
                             style="border-radius: var(--radius-full); padding: 0.4rem 0.85rem;" @onclick="ToggleTheme">
-                        <span>@ModeIcon</span>
-                            <span class="mode-theme-text">@ModeText</span>
+                        @if(!string.IsNullOrEmpty(ModeIcon))
+                            {
+                                <span class="mode-theme-icon">@ModeIcon</span>
+                            }
+                            @if(!string.IsNullOrEmpty(ModeText))
+                            {
+                                <span class="mode-theme-text">@ModeText</span>
+                            }
                     </button>
                 </UiTooltip>
             </div>
