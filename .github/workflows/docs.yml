@@ -23,7 +23,8 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # Playwright 1.52 ne sait pas installer Chromium sur Ubuntu 26.04 (nouvelle image ubuntu-latest) : image fixée, comme docs-e2e dans ci.yml.
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 

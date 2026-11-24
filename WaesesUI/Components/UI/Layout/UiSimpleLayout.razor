@@ -20,7 +20,7 @@
             <div class="d-flex align-center gap-sm">
                 <UiTooltip Text="@ModeText" Position="TooltipPosition.Left">
                     <button type="button" class="ui-btn ui-btn-secondary ui-btn-sm"
-                            style="border-radius: var(--radius-full); padding: 0.4rem 0.85rem;" @onclick="ToggleTheme">
+                            style="border-radius: var(--radius-full); padding: 0.4rem 0.85rem;" aria-label="@ModeText" @onclick="ToggleTheme">
                         @if(!string.IsNullOrEmpty(ModeIcon))
                             {
                                 <span class="mode-theme-icon">@ModeIcon</span>
