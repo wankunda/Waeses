@@ -1,10 +1,9 @@
-@inject IThemeService ThemeService
-@implements IDisposable
 @namespace WaesesUI
+@inherits UiLayoutBase
 
 @* Même principe que UiLayout et UiSimpleLayout : en-tête (nom, bouton clair/sombre), contenu (MainBody), pied de page.
    La navigation est une barre d'onglets (icône et libellé), en haut sous l'en-tête ou en bas de l'écran. *@
-<div class="ui-tablayout ui-tablayout-@TabsPosition.ToString().ToLowerInvariant()">
+<div class="@RootClass" style="@Style" @attributes="AdditionalAttributes">
     <div class="ui-tablayout-head">
         <header class="d-flex justify-space-between align-center"
                 style="background: var(--bg-surface); border-bottom: 1px solid var(--border-default); padding: calc(0.85rem + env(safe-area-inset-top, 0px)) calc(1.5rem + env(safe-area-inset-right, 0px)) 0.85rem calc(1.5rem + env(safe-area-inset-left, 0px)); backdrop-filter: blur(10px);">
@@ -58,7 +57,7 @@
             @if (FooterText != string.Empty)
             {
                 <span style="font-size: 0.85rem; color: var(--text-secondary);">
-                    @(FooterText ?? $"© {DateTime.Now.Year} Waeses. All rights reserved.")
+                    @FooterLabel
                 </span>
             }
             @Footer
@@ -72,24 +71,8 @@
 </div>
 
 @code {
-    /// <summary>Nom de l'application, affiché dans l'en-tête.</summary>
-    [Parameter] public string BrandText { get; set; } = "Waeses UI";
-    /// <summary>Icône ou emoji devant le nom.</summary>
-    [Parameter] public string? BrandIcon { get; set; } = "⚡";
-    /// <summary>Affiche le bouton clair/sombre dans l'en-tête.</summary>
-    [Parameter] public bool ShowThemeToggle { get; set; } = true;
-    /// <summary>Indique si le mode sombre est actif.</summary>
-    [Parameter] public bool IsDarkMode { get; set; }
-    /// <summary>Appelé quand l'utilisateur change de mode.</summary>
-    [Parameter] public EventCallback<bool> IsDarkModeChanged { get; set; }
-    /// <summary>Contenu de la page (le <c>Body</c> du layout Blazor).</summary>
-    [Parameter] public RenderFragment? MainBody { get; set; }
-    /// <summary>Contenu supplémentaire du pied de page.</summary>
-    [Parameter] public RenderFragment? Footer { get; set; }
-    /// <summary>Affiche le pied de page (texte et fragment <see cref="Footer"/>). Faux par défaut : la barre d'onglets en tient lieu.</summary>
-    [Parameter] public bool ShowFooter { get; set; }
-    /// <summary>Texte du pied de page. Null : « © année Waeses. All rights reserved. » ; chaîne vide : aucun texte.</summary>
-    [Parameter] public string? FooterText { get; set; }
+    // La barre d'onglets tient lieu de pied de page : il est masqué par défaut (ShowFooter="true" l'affiche).
+    public UiTabLayout() => ShowFooter = false;
 
     /// <summary>Onglets de la barre : libellé, icône et adresse de chaque page. La propriété <c>Group</c> des éléments est ignorée.</summary>
     [Parameter] public IEnumerable<NavigationItem>? NavigationItems { get; set; }
@@ -98,8 +81,10 @@
     /// <summary>Nom accessible de la barre d'onglets.</summary>
     [Parameter] public string AriaLabel { get; set; } = "Navigation principale";
 
-    string ModeText => IsDarkMode ? "Mode Clair" : "Mode Sombre";
-    string ModeIcon => IsDarkMode ? "☀️" : "🌙";
+    private string RootClass => CssBuilder.Default("ui-tablayout")
+        .Add($"ui-tablayout-{TabsPosition.ToString().ToLowerInvariant()}")
+        .Add(Class)
+        .Build();
 
     private IEnumerable<NavigationItem> Items => NavigationItems ?? Array.Empty<NavigationItem>();
 
@@ -129,35 +114,4 @@
             }
         }
     </nav>;
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await ThemeService.InitializeThemeAsync();
-            IsDarkMode = ThemeService.IsDarkMode;
-            await IsDarkModeChanged.InvokeAsync(IsDarkMode);
-            ThemeService.OnThemeChanged += HandleThemeChanged;
-            StateHasChanged();
-        }
-    }
-
-    private async Task ToggleTheme()
-    {
-        await ThemeService.ToggleThemeAsync();
-        IsDarkMode = ThemeService.IsDarkMode;
-        await IsDarkModeChanged.InvokeAsync(IsDarkMode);
-    }
-
-    private async void HandleThemeChanged()
-    {
-        IsDarkMode = ThemeService.IsDarkMode;
-        await IsDarkModeChanged.InvokeAsync(IsDarkMode);
-        await InvokeAsync(StateHasChanged);
-    }
-
-    public void Dispose()
-    {
-        ThemeService.OnThemeChanged -= HandleThemeChanged;
-    }
 }

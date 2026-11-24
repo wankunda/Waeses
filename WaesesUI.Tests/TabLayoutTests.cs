@@ -76,9 +76,13 @@ public sealed class TabLayoutTests : TestContext
     [Fact]
     public void En_haut_la_barre_suit_l_en_tete_avant_le_contenu()
     {
-        var root = Render(UiTabBarPosition.Top).Find(".ui-tablayout");
+        var root = RenderComponent<UiTabLayout>(p => p
+            .Add(c => c.NavigationItems, Tabs)
+            .Add(c => c.TabsPosition, UiTabBarPosition.Top)
+            .Add(c => c.Class, "mon-layout")).Find(".ui-tablayout");
 
         Assert.Contains("ui-tablayout-top", root.ClassList);
+        Assert.Contains("mon-layout", root.ClassList);
         Assert.NotNull(root.QuerySelector(".ui-tablayout-head > header + nav.ui-tablayout-tabs"));
         Assert.Single(root.QuerySelectorAll("nav"));
     }
@@ -91,5 +95,17 @@ public sealed class TabLayoutTests : TestContext
         var cut = RenderComponent<UiTabLayout>(p => p.Add(c => c.ShowFooter, true).Add(c => c.FooterText, "MonBudget 1.0"));
 
         Assert.Equal("MonBudget 1.0", cut.Find("footer").TextContent.Trim());
+    }
+
+    [Fact]
+    public void Les_trois_layouts_partagent_la_base_commune_et_gardent_leurs_valeurs_par_defaut()
+    {
+        Assert.True(typeof(UiLayoutBase).IsAssignableFrom(typeof(UiLayout)));
+        Assert.True(typeof(UiLayoutBase).IsAssignableFrom(typeof(UiSimpleLayout)));
+        Assert.True(typeof(UiLayoutBase).IsAssignableFrom(typeof(UiTabLayout)));
+
+        Assert.True(new UiLayout().ShowFooter);
+        Assert.True(new UiSimpleLayout().ShowFooter);
+        Assert.False(new UiTabLayout().ShowFooter);
     }
 }
