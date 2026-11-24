@@ -28,8 +28,8 @@
             <div class="d-flex align-center gap-sm">
                 <UiTooltip Text="@ModeText" Position="TooltipPosition.Left">
                     <button type="button" class="ui-btn ui-btn-secondary ui-btn-sm"
-                            style="border-radius: var(--radius-full); padding: 0.4rem 0.85rem;" @onclick="ToggleTheme">
-                        <span>@ModeIcon</span>
+                            style="border-radius: var(--radius-full); padding: 0.4rem 0.85rem;" aria-label="@ModeText" @onclick="ToggleTheme">
+                        <span aria-hidden="true">@ModeIcon</span>
                             <span class="mode-theme-text">@(IsShowTextMode ? ModeText : string.Empty)</span>
                     </button>
                 </UiTooltip>

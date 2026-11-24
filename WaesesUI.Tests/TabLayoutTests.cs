@@ -92,4 +92,15 @@ public sealed class TabLayoutTests : TestContext
 
         Assert.Equal("MonBudget 1.0", cut.Find("footer").TextContent.Trim());
     }
+
+    [Fact]
+    public void Le_bouton_de_theme_a_un_nom_accessible_meme_sans_texte_visible()
+    {
+        var tab = Render().Find("header button");
+        var layout = RenderComponent<UiLayout>().Find("header button");
+
+        Assert.Equal("Mode Sombre", tab.GetAttribute("aria-label"));
+        Assert.Equal("Mode Sombre", layout.GetAttribute("aria-label"));
+        Assert.Equal("true", layout.QuerySelector("span")!.GetAttribute("aria-hidden"));
+    }
 }
