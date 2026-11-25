@@ -3,7 +3,9 @@
 @* Les providers sont ceux que les exemples (dialogues, toasts, popovers) attendent dans le layout. *@
 <UiLayout BrandText="WaesesUI" BrandIcon="👽" VersionText="@Version" ShowFooter="false" MainBody="@Body">
     <NavMenu>
-        <UiNavMenu BrandText="Documentation" BrandHref="" NavigationItems="@_items" AriaLabel="Pages de la documentation">
+        @* Pendant une recherche, les groupes deviennent fixes : tous les résultats restent visibles. *@
+        <UiNavMenu BrandText="Documentation" BrandHref="" NavigationItems="@_items" AriaLabel="Pages de la documentation"
+                   CollapsibleGroups="@(_query.Length == 0)">
             <HeaderContent>
                 <div class="docs-search">
                     <label class="ui-sr-only" for="docs-search-input">Rechercher dans la documentation</label>

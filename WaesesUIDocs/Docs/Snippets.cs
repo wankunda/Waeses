@@ -97,15 +97,22 @@ public static class Snippets
         """;
 
     public const string NavMenuUsage = """
-        <UiNavMenu BrandText="Mon application" BrandHref="" NavigationItems="_items" AriaLabel="Navigation principale" />
+        <UiNavMenu BrandText="Mon application" BrandHref="" NavigationItems="_items" Groups="_groups" AriaLabel="Navigation principale" />
 
         @code {
             private readonly IReadOnlyList<NavigationItem> _items = new[]
             {
-                new NavigationItem { Text = "Accueil", Href = "", Match = NavLinkMatch.All, Group = "Général" },
+                new NavigationItem { Text = "Tableau de bord", Href = "", Match = NavLinkMatch.All },   // sans groupe : affichage simple
                 new NavigationItem { Text = "Clients", Href = "clients", Group = "Général" },
+                new NavigationItem { Text = "Contacts", Href = "contacts", Group = "Général" },
                 new NavigationItem { Text = "Facturation", Href = "facturation", Group = "Gestion" },
                 new NavigationItem { Text = "Archives", Href = "archives", Group = "Gestion", Disabled = true }
+            };
+
+            // "Général" n'est pas listé : il reste fixe (CollapsibleGroups vaut false par défaut).
+            private readonly NavigationGroup[] _groups =
+            {
+                new("Gestion") { Collapsible = true, InitiallyCollapsed = true }
             };
         }
         """;

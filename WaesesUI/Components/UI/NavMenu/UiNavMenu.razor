@@ -1,4 +1,5 @@
 @inject IJSRuntime JS
+@inject NavigationManager Navigation
 @implements IAsyncDisposable
 @namespace WaesesUI
 @inherits UiComponentBase
@@ -35,20 +36,46 @@
 
         <div class="nav-scrollable" @onclick="CloseDrawer">
             <nav class="nav flex-column" aria-label="@AriaLabel">
-                @{ string? previousGroup = null; }
-                @foreach (var item in Items)
+                @foreach (var block in Sections)
                 {
-                    @if (!string.IsNullOrEmpty(item.Group) && item.Group != previousGroup)
+                    @if (block.Name is null)
                     {
-                        <div class="nav-group-title" role="presentation">@item.Group</div>
+                        @* Liens sans groupe : affichage simple, sans retrait. *@
+                        @foreach (var item in block.Items)
+                        {
+                            <UiNavMenuItem @key="item.Href" Text="@item.Text" Href="@item.Href" Icon="@item.Icon" Match="@item.Match" Disabled="@item.Disabled" />
+                        }
                     }
-                    previousGroup = item.Group;
-                    <UiNavMenuItem @key="item.Href"
-                                   Text="@item.Text"
-                                   Href="@item.Href"
-                                   Icon="@item.Icon"
-                                   Match="@item.Match"
-                                   Disabled="@item.Disabled" />
+                    else
+                    {
+                        var collapsible = IsCollapsible(block.Name);
+                        var collapsed = collapsible && _collapsed.Contains(block.Name);
+                        var titleId = $"{_idPrefix}-title-{block.Index}";
+                        var itemsId = $"{_idPrefix}-items-{block.Index}";
+
+                        <div @key="block.Name" class="nav-group @(collapsible ? "nav-group-collapsible" : "") @(collapsed ? "nav-group-collapsed" : "")">
+                            @if (collapsible)
+                            {
+                                @* stopPropagation : le clic sur un titre ne doit pas refermer le tiroir (voir nav-scrollable). *@
+                                <button type="button" id="@titleId" class="nav-group-title nav-group-toggle"
+                                        aria-expanded="@(collapsed ? "false" : "true")" aria-controls="@itemsId"
+                                        @onclick="() => ToggleGroup(block.Name)" @onclick:stopPropagation="true">
+                                    <span>@block.Name</span>
+                                    <UiIcon Icon="@Icons.Material.Filled.ExpandMore" Size="UiSize.Sm" Class="nav-group-chevron" />
+                                </button>
+                            }
+                            else
+                            {
+                                <div id="@titleId" class="nav-group-title">@block.Name</div>
+                            }
+                            <div id="@itemsId" class="nav-group-items" role="group" aria-labelledby="@titleId" hidden="@collapsed">
+                                @foreach (var item in block.Items)
+                                {
+                                    <UiNavMenuItem @key="item.Href" Text="@item.Text" Href="@item.Href" Icon="@item.Icon" Match="@item.Match" Disabled="@item.Disabled" />
+                                }
+                            </div>
+                        </div>
+                    }
                 }
             </nav>
         </div>
@@ -71,16 +98,33 @@
     /// <summary>Liens du menu. Les éléments d'un même <c>Group</c> doivent se suivre.</summary>
     [Parameter] public IEnumerable<NavigationItem>? NavigationItems { get; set; }
 
+    /// <summary>Rend tous les groupes repliables par défaut. Un groupe listé dans <see cref="Groups"/> peut changer ce choix.</summary>
+    [Parameter] public bool CollapsibleGroups { get; set; }
+
+    /// <summary>Réglages groupe par groupe (repliable ou fixe, replié au départ), retrouvés par leur nom.</summary>
+    [Parameter] public IEnumerable<NavigationGroup>? Groups { get; set; }
+
     /// <summary>Contenu affiché entre le titre et la liste (champ de recherche, sélecteur de version…).</summary>
     [Parameter] public RenderFragment? HeaderContent { get; set; }
 
     private IEnumerable<NavigationItem> Items => NavigationItems ?? Array.Empty<NavigationItem>();
+
+    // Une "block" est une suite de liens consécutifs du même groupe (Name = null pour les liens sans groupe).
+    private sealed record NavSection(int Index, string? Name, List<NavigationItem> Items);
+
+    private readonly string _idPrefix = $"nav-group-{Guid.NewGuid():N}";
+    private readonly HashSet<string> _collapsed = new();          // groupes repliés en ce moment
+    private readonly HashSet<string> _initialStateApplied = new(); // groupes dont InitiallyCollapsed a déjà été appliqué
+    private List<NavSection> Sections { get; set; } = new();
     private ElementReference _drawerRef;
     private ElementReference _toggleRef;
     private ElementReference _closeRef;
     private DotNetObjectReference<UiNavMenu>? _dotNetRef;
     private bool _isOpen;
     private bool _initialized;
+
+    protected override void OnInitialized() =>
+        Navigation.LocationChanged += OnLocationChanged;
 
     protected override void OnParametersSet()
     {
@@ -89,7 +133,85 @@
             _isOpen = IsOpen;
             _initialized = true;
         }
+
+        Sections = BuildSections(Items);
+
+        // InitiallyCollapsed ne s'applique qu'une fois par groupe : ensuite, c'est l'utilisateur qui décide.
+        foreach (var name in Sections.Select(s => s.Name).OfType<string>().Distinct())
+        {
+            if (_initialStateApplied.Add(name) && IsCollapsible(name) && FindGroup(name)?.InitiallyCollapsed == true)
+            {
+                _collapsed.Add(name);
+            }
+        }
+
+        ExpandActiveGroup();
     }
+
+    private static List<NavSection> BuildSections(IEnumerable<NavigationItem> items)
+    {
+        var sections = new List<NavSection>();
+        foreach (var item in items)
+        {
+            var name = string.IsNullOrEmpty(item.Group) ? null : item.Group;
+            var last = sections.Count > 0 ? sections[^1] : null;
+            if (last is not null && last.Name == name)
+            {
+                last.Items.Add(item);
+            }
+            else
+            {
+                sections.Add(new NavSection(sections.Count, name, new List<NavigationItem> { item }));
+            }
+        }
+
+        return sections;
+    }
+
+    private NavigationGroup? FindGroup(string name) =>
+        Groups?.FirstOrDefault(g => string.Equals(g.Name, name, StringComparison.Ordinal));
+
+    // Le réglage du groupe l'emporte ; sinon, la valeur par défaut du menu.
+    private bool IsCollapsible(string name) => FindGroup(name)?.Collapsible ?? CollapsibleGroups;
+
+    private void ToggleGroup(string name)
+    {
+        if (!_collapsed.Remove(name))
+        {
+            _collapsed.Add(name);
+        }
+    }
+
+    // Le groupe de la page affichée est toujours ouvert, pour que l'utilisateur voie où il se trouve.
+    private void ExpandActiveGroup()
+    {
+        var path = Navigation.ToBaseRelativePath(Navigation.Uri).Split('?', '#')[0].Trim('/');
+        foreach (var block in Sections.Where(s => s.Name is not null))
+        {
+            if (block.Items.Any(item => IsActive(item, path)))
+            {
+                _collapsed.Remove(block.Name!);
+            }
+        }
+    }
+
+    private static bool IsActive(NavigationItem item, string path)
+    {
+        var href = item.Href.Trim('/');
+        if (item.Match == NavLinkMatch.All || href.Length == 0)
+        {
+            return string.Equals(path, href, StringComparison.OrdinalIgnoreCase);
+        }
+
+        return path.Equals(href, StringComparison.OrdinalIgnoreCase)
+            || path.StartsWith(href + "/", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e) => _ = InvokeAsync(() =>
+    {
+        ExpandActiveGroup();
+        StateHasChanged();
+    });
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -126,6 +248,7 @@
 
     public async ValueTask DisposeAsync()
 {
+    Navigation.LocationChanged -= OnLocationChanged;
     if (_dotNetRef == null)
     {
         return;
