@@ -10,7 +10,7 @@ namespace WaesesUI
         public NavLinkMatch Match { get; init; } = NavLinkMatch.Prefix;
         public bool Disabled { get; init; }
 
-        /// <summary>Titre de section : un en-tête s'affiche à chaque changement de groupe dans la liste (les éléments d'un même groupe doivent se suivre).</summary>
+        /// <summary>Nom du groupe : les liens d'un même groupe s'affichent en retrait sous son titre (ils doivent se suivre dans la liste). Voir <see cref="NavigationGroup"/> pour le rendre repliable.</summary>
         public string? Group { get; init; }
     }
 }

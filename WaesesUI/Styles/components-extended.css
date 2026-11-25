@@ -404,9 +404,18 @@ button.ui-accordion-header { width: 100%; border: 0; font: inherit; text-align: 
 .ui-datagrid-columns-item { display: flex; align-items: center; gap: .5rem; cursor: pointer; font-size: .9rem; }
 .ui-datagrid-columns-item input { accent-color: var(--primary); }
 
-/* Menu de navigation : titres de groupe et zone d'en-tête. */
-.nav-group-title { padding: 1rem 1.5rem .35rem; color: var(--text-secondary); font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
-.nav-group-title:first-child { padding-top: .35rem; }
+/* Menu de navigation : le titre du groupe vient en premier, ses liens sont en retrait sous un trait vertical. */
+.nav-group + .nav-group, .nav-item + .nav-group, .nav-group + .nav-item { margin-top: .9rem; }
+.nav-group-title { display: flex; align-items: center; justify-content: space-between; gap: .5rem; width: 100%; padding: .35rem .75rem .4rem; color: var(--text-main); font-size: .75rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.nav-group-toggle { border: 0; border-radius: var(--radius-sm); background: transparent; font-family: inherit; text-align: left; cursor: pointer; transition: background-color var(--trans-fast); }
+.nav-group-toggle:hover { background: var(--bg-surface); }
+.nav-group-toggle:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
+.nav-group-chevron { flex: none; color: var(--text-secondary); transition: transform var(--trans-fast); }
+.nav-group-collapsed .nav-group-chevron { transform: rotate(-90deg); }
+.nav-group-items { margin: .15rem 0 0 .95rem; padding-left: .55rem; border-left: 2px solid var(--border-default); }
+.nav-group-items[hidden] { display: none; }
+.nav-group-items .nav-item + .nav-item { margin-top: .15rem; }
+.nav-group-items .nav-item .nav-link { min-height: 2.3rem; padding: .45rem .7rem; }
 .nav-header { padding: .5rem 1rem; }
 
 /* UiMultiSelect : la zone est un conteneur (puces + bouton de bascule), le focus se lit sur toute la zone. */
