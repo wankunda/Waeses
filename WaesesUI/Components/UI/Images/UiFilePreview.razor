@@ -23,12 +23,19 @@
     /// <summary>Adresse du fichier, pour l'aperçu et le téléchargement.</summary>
     [Parameter] public string? Url { get; set; }
 
-    private string FormatSize() => !SizeBytes.HasValue ? string.Empty : SizeBytes.Value switch
+    private const double Ko = 1024d;
+    private const double Mo = 1024d * 1024d;
+
+    // Pas de « switch » avec des motifs « < 1024 » ici : en début de ligne,
+    // Razor lit « < » comme une balise HTML et le bloc @code ne compile plus.
+    private string FormatSize()
     {
-        < 1024 => $"· {SizeBytes} o",
-        < 1024 * 1024 => $"· {SizeBytes.Value / 1024d:0.#} Ko",
-        _ => $"· {SizeBytes.Value / (1024d * 1024d):0.#} Mo"
-    };
+        if (!SizeBytes.HasValue) return string.Empty;
+        long taille = SizeBytes.Value;
+        if (taille < Ko) return $"· {taille} o";
+        if (taille < Mo) return $"· {taille / Ko:0.#} Ko";
+        return $"· {taille / Mo:0.#} Mo";
+    }
 
     private string GetIcon() => ContentType?.ToLowerInvariant() switch
     {
